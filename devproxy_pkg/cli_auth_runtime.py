@@ -49,14 +49,26 @@ def run_cli(executable,profile,args=None,environment_factory=None,stdin_fd=None,
     session=AuthSession('agy',profile,mode='watch',auto=True)
     session.browser_directory=session.hookdir/'browser-data'
     codes=queue.Queue(maxsize=2);auth_requests=queue.Queue(maxsize=8);gate=CliCodeGate()
+    stage_seen=set()
+    def stage(message):
+        key=(gate.state,message)
+        if key in stage_seen:return
+        if len(stage_seen)>=256:stage_seen.clear()
+        stage_seen.add(key)
+        try:
+            from .journal import append
+            append('cliAuth',True,message)
+        except Exception:pass
     original_capture=session.capture_url
     def capture(url):
         if not complete_cli_oauth(url):raise ValueError("CLI передал неполную OAuth-ссылку.")
         try:auth_requests.put_nowait(url)
         except queue.Full:pass
+        stage('CLI: исходная ссылка входа получена; ожидается код в браузере.')
         return original_capture(url)
     session.capture_url=capture
     def received_code(code,state):
+        stage('CLI: браузер передал код; ожидается подходящее приглашение в этой терминальной сессии.')
         try:codes.put_nowait((code,state))
         except queue.Full:pass
     session.code_callback=received_code
@@ -111,7 +123,11 @@ def run_cli(executable,profile,args=None,environment_factory=None,stdin_fd=None,
                 os.write(output_fd,data);pending=(pending+decoder.decode(data))[-65536:]
             if read_input and input_fd in readable:
                 data=os.read(input_fd,4096)
-                if data:gate.user_input();enter_due=None;os.write(master,data)
+                if data:
+                    if gate.user_input(data):
+                        enter_due=None
+                        if gate.waiting:stage('CLI: обнаружен ручной ввод; автоматическая отправка приостановлена.')
+                    os.write(master,data)
                 else:read_input=False;os.write(master,b'\x04')
             for url in cli_auth_urls(pending,settled=master not in readable):
                 if url in seen:continue
@@ -123,7 +139,9 @@ def run_cli(executable,profile,args=None,environment_factory=None,stdin_fd=None,
                     requested=auth_requests.get_nowait()
                     if requested not in seen or not gate.state:gate.begin(requested);seen.add(requested)
                 except queue.Empty:break
+            was_waiting=gate.waiting
             gate.observe(pending)
+            if gate.waiting and not was_waiting:stage('CLI: обнаружено приглашение для кода авторизации.')
             while not codes.empty():
                 try:authorization,state=codes.get_nowait();gate.offer(authorization,state)
                 except queue.Empty:break
@@ -132,7 +150,8 @@ def run_cli(executable,profile,args=None,environment_factory=None,stdin_fd=None,
                 os.write(master,authorization.encode());authorization=None;enter_due=time.monotonic()+.12
             if enter_due is not None and time.monotonic()>=enter_due and process.poll() is None:
                 os.write(master,b'\r');enter_due=None
-                os.write(output_fd,b'\r\nDagami: authorization code submitted to CLI.\r\n')
+                stage('CLI: код отправлен в собственный PTY процесса; Enter отправлен. Успех входа подтверждает сам CLI.')
+                os.write(output_fd,'\r\nDagami: код передан в эту CLI-сессию, Enter отправлен.\r\n'.encode())
             if process.poll() is not None and not readable:break
         code=process.wait()
         return code if code>=0 else 128-code

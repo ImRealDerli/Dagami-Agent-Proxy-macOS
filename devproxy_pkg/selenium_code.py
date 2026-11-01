@@ -37,12 +37,12 @@ def webdriver_assets():
 class SeleniumCodeBrowser:
     def __init__(self,browser,args,env,url,on_code,on_error=None,callback=CALLBACK):
         self.driver_path,self.manifest=webdriver_assets();self.browser=browser;self.on_code=on_code;self.on_error=on_error or (lambda message:None);self.callback=callback
-        self.lock=threading.RLock();self.state='';self.pending_url=None;self.delivered=set();self.stop_event=threading.Event();self.driver=None;self.service=None;self.extra_processes=[];self.environment=dict(env)
+        self.lock=threading.RLock();self.state='';self.pending_url=None;self.delivered=set();self.stop_event=threading.Event();self.driver=None;self.service=None;self.capture=None;self.extra_processes=[];self.environment=dict(env)
         self.state=self._url_state(url)
         reserve=socket.socket();reserve.bind(('127.0.0.1',0));self.port=reserve.getsockname()[1];reserve.close()
         launch_args=[*args[:-1],'--remote-debugging-address=127.0.0.1','--remote-debugging-port='+str(self.port),'--no-first-run','--no-default-browser-check',url]
         self.launch_args=launch_args
-        self.process=Launcher.launch(browser,launch_args,env,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        self.process=Launcher.launch(browser,[*launch_args[:-1],'about:blank'],env,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         self.thread=threading.Thread(target=self._run,daemon=True,name='DagamiSeleniumCode');self.thread.start()
     def _url_state(self,url):
         query=parse_qs(urlsplit(url).query);states=query.get('state',[])
@@ -56,6 +56,8 @@ class SeleniumCodeBrowser:
         if not url:return
         if self.service:
             self.service.stop();self.service=None;self.driver=None
+        if self.capture:
+            self.capture.navigate(url);return
         proc=Launcher.launch(self.browser,[*self.launch_args[:-1],url],self.environment,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         self.extra_processes.append(proc)
     def _emit(self,url,values=()):
@@ -74,7 +76,28 @@ class SeleniumCodeBrowser:
             connection.request('GET','/json/version');reply=connection.getresponse();reply.read(65536);return reply.status==200
         except OSError:return False
         finally:connection.close()
+    def _install_capture(self,url):
+        from .callback_capture import CallbackCapture
+        connection=http.client.HTTPConnection('127.0.0.1',self.port,timeout=2)
+        try:
+            connection.request('GET','/json/list');targets=json.loads(connection.getresponse().read(1048576))
+        finally:connection.close()
+        page=next(item for item in targets if item.get('type')=='page' and item.get('webSocketDebuggerUrl'))
+        self.capture=CallbackCapture(page['webSocketDebuggerUrl'],page['id'],self.port,self.callback)
+        self.capture.navigate(url)
+    def _proof(self):
+        proof=self.capture.proof() if self.capture else None
+        if not isinstance(proof,dict):return None
+        with self.lock:state=self.state
+        url=proof.get('url','')
+        if not callback_state_matches(url,state,self.callback):return None
+        code=callback_code(url,state,callback=self.callback)
+        if code:
+            from .journal import register_secret
+            register_secret(code)
+        return proof
     def _callback_available(self):
+        if self._proof():return True
         connection=http.client.HTTPConnection('127.0.0.1',self.port,timeout=.4)
         try:
             connection.request('GET','/json/list');reply=connection.getresponse();targets=json.loads(reply.read(1048576))
@@ -101,9 +124,15 @@ class SeleniumCodeBrowser:
                 self.driver.switch_to.window(handle);url=self.driver.current_url
                 if self._emit(url):continue
                 with self.lock:state=self.state
+                proof=self._proof() if self.capture and handle.removeprefix('CDwindow-')==self.capture.target else None
+                if proof:
+                    original=urlsplit(proof['url']);current=urlsplit(url)
+                    if (current.scheme,current.hostname,current.port,current.path)==(original.scheme,original.hostname,original.port,original.path):
+                        if self._emit(proof['url']):continue
+                        url=proof['url']
                 if callback_state_matches(url,state,self.callback):
                     values=[]
-                    for element in self.driver.find_elements('css selector','#auth-code,#code-value,code,pre,input[readonly],textarea[readonly]')[:10]:
+                    for element in self.driver.find_elements('css selector','[data-code-box],#auth-code,#code-value,code,pre,input[readonly],textarea[readonly]')[:10]:
                         value=element.get_attribute('value') or element.text
                         if isinstance(value,str):values.append(value.strip())
                     self._emit(url,values)
@@ -116,6 +145,7 @@ class SeleniumCodeBrowser:
                 if time.monotonic()>deadline:raise RuntimeError('Browser startup timeout')
                 self.stop_event.wait(.2)
             if self.stop_event.is_set() or self.process.poll() is not None:return
+            self._install_capture(self.launch_args[-1])
             while not self.stop_event.is_set() and self.process.poll() is None:
                 self._open_pending()
                 if self.driver is None:
@@ -129,6 +159,7 @@ class SeleniumCodeBrowser:
             except Exception:pass
             self.on_error('Selenium не смог получить код. Подробности доступны в журнале; код можно вставить в CLI вручную.')
         finally:
+            if self.capture:self.capture.close()
             if self.service:
                 try:self.service.stop()
                 except Exception:pass

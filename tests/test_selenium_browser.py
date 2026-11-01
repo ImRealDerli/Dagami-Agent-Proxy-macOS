@@ -17,14 +17,14 @@ class SeleniumBrowserTests(unittest.TestCase):
         class Handler(http.server.BaseHTTPRequestHandler):
             def log_message(self,*args):pass
             def do_GET(self):
-                self.send_response(200);self.send_header('Content-Type','text/html');self.end_headers();self.wfile.write(('<html><title>Dagami code fixture</title><code id="auth-code">'+CODE+'</code></html>').encode())
+                self.send_response(200);self.send_header('Content-Type','text/html');self.end_headers();self.wfile.write(('<html><script>history.replaceState({},document.title,location.pathname)</script><title>Dagami code fixture</title><div data-code-box>'+CODE+'</div></html>').encode())
         server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start()
         try:
             with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,{'DEVPROXY_HOME':temp}),patch('devproxy_pkg.auth_manager.load_profile',return_value=ProxyProfile.parse('direct://')):
                 root=Path(temp);exe=root/'fixture-cli';result=root/'result.json'
                 script='#!'+sys.executable+' -B\nimport json,signal\nsignal.alarm(25)\nfrom pathlib import Path\nprint('+repr(URL)+',flush=True)\nprint("Enter the authorization code:",flush=True)\nvalue=input()\nPath('+repr(str(result))+').write_text(json.dumps({"received":value=='+repr(CODE)+'}))\n'
                 exe.write_text(script);exe.chmod(0o700)
-                local='http://127.0.0.1:'+str(server.server_port)+'/oauth-callback?state='+STATE+'&code='+CODE
+                local='http://127.0.0.1:'+str(server.server_port)+'/oauth-callback?state='+STATE
                 def captured(session,url):
                     directory=session.hookdir/'fixture-browser';directory.mkdir()
                     args=['--headless=new','--disable-background-networking','--disable-component-update','--disable-gpu','--use-mock-keychain','--user-data-dir='+str(directory),local]

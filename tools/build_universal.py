@@ -67,7 +67,7 @@ def main():
  shutil.copy2(certificate,resources/'cacert.pem')
  shutil.copy2(ROOT/'LICENSE',resources/'LICENSE')
  shutil.copy2(ROOT/'devproxy_pkg/assets/dagami-agent-proxy.icns',resources/'Dagami.icns')
- info={'CFBundleName':'Dagami','CFBundleDisplayName':'Dagami','CFBundleIdentifier':'ru.dagami.agentproxy.native','CFBundleExecutable':'Dagami','CFBundleIconFile':'Dagami.icns','CFBundlePackageType':'APPL','CFBundleShortVersionString':'0.4.0','CFBundleVersion':'424','LSMinimumSystemVersion':'13.0','NSHighResolutionCapable':True,'NSPrincipalClass':'NSApplication','NSHumanReadableCopyright':'Dagami Agent Proxy · MIT'}
+ info={'CFBundleName':'Dagami','CFBundleDisplayName':'Dagami','CFBundleIdentifier':'ru.dagami.agentproxy.native','CFBundleExecutable':'Dagami','CFBundleIconFile':'Dagami.icns','CFBundlePackageType':'APPL','CFBundleShortVersionString':'0.4.0','CFBundleVersion':'425','LSMinimumSystemVersion':'13.0','NSHighResolutionCapable':True,'NSPrincipalClass':'NSApplication','NSHumanReadableCopyright':'Dagami Agent Proxy · MIT'}
  (contents/'Info.plist').write_bytes(plistlib.dumps(info))
  run('codesign','--force','--deep','--sign','-',APP,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
  run('codesign','--verify','--deep','--strict',APP)

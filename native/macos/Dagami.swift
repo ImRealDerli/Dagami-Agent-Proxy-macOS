@@ -223,7 +223,7 @@ struct RootView:View {
     }
     var settings:some View {
         VStack(spacing:20){LicenseSettingsView();Card{Label("При входе в систему",systemImage:"power").font(.headline);Toggle("Запускать Dagami вместе с macOS",isOn:Binding(get:{model.state.startup},set:{model.run("startup",["enabled":$0])})).disabled(model.busy);Text("Настройка использует пользовательский LaunchAgent.").font(.caption).foregroundStyle(.secondary)}
-            Card{Text("Dagami Agent Proxy").font(.title2.bold());Text("Нативный интерфейс · Universal · 0.4.0 mac.24").foregroundStyle(.secondary);HStack{Link("Поддержка",destination:URL(string:"https://t.me/dagamvi")!);Link("Сообщить об ошибке",destination:URL(string:"https://dns.dagami.ru/support/agent-proxy/")!)};HStack{Link("Официальный репозиторий",destination:URL(string:"https://github.com/j46871417-ui/Dagami-Agent-Proxy")!);Link("Портер на Mac — ImRealDerli",destination:URL(string:"https://github.com/ImRealDerli")!)}.buttonStyle(.bordered)}
+            Card{Text("Dagami Agent Proxy").font(.title2.bold());Text("Нативный интерфейс · Universal · 0.4.0 mac.25").foregroundStyle(.secondary);HStack{Link("Поддержка",destination:URL(string:"https://t.me/dagamvi")!);Link("Сообщить об ошибке",destination:URL(string:"https://dns.dagami.ru/support/agent-proxy/")!)};HStack{Link("Официальный репозиторий",destination:URL(string:"https://github.com/j46871417-ui/Dagami-Agent-Proxy")!);Link("Портер на Mac — ImRealDerli",destination:URL(string:"https://github.com/ImRealDerli")!)}.buttonStyle(.bordered)}
         }
     }
 }
