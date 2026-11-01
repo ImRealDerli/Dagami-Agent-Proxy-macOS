@@ -22,9 +22,9 @@ namespace DevProxyApp {
    if(NativeUpdates.CliBusy())throw new IOException("Работает CLI через Dagami. Завершите его перед установкой.");
    var release=NativeUpdates.ReadProtected<UpdateRelease>(Path.Combine(stage,"release.dat"));NativeUpdates.ValidatePayload(release,stage);
    if(!NativeUpdates.IsNewer(release))throw new InvalidOperationException("Этот релиз не новее установленной сборки.");
-   // Every attempt has fresh readiness/cancellation markers; retrying never
-   // observes a previous helper's ready file or overwrites a running helper.
-   string attempt=Path.Combine(NativeUpdates.Root,"staged",Guid.NewGuid().ToString("N"));Directory.CreateDirectory(attempt);
+   
+    
+    string attempt=Path.Combine(NativeUpdates.Root,"staged",Guid.NewGuid().ToString("N"));Directory.CreateDirectory(attempt);
    foreach(string name in new[]{"DagamiAgentProxy.exe","release.dat"})File.Copy(Path.Combine(stage,name),Path.Combine(attempt,name));
    var process=Process.GetCurrentProcess();
    return new UpdatePlan{Stage=attempt,GuiPath=Path.GetFullPath(guiPath),OldGuiHash=NativeUpdates.FileHash(guiPath),Release=release,ParentId=process.Id,ParentStartTicks=process.StartTime.ToUniversalTime().Ticks,Restart=restart,RefreshCli=true};

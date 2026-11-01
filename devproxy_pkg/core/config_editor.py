@@ -1,10 +1,10 @@
-"""
-ConfigEditor: Safe JSONC and config modifier.
-- Preserves comments and structure where possible.
-- Atomic writes with backups.
-- Keeps track of changes made specifically by devproxy in a rollback ledger.
-- Never replaces a malformed file with an empty dictionary.
-"""
+
+
+
+
+
+
+
 
 import os
 import json
@@ -15,7 +15,7 @@ from typing import Any, Dict, Optional, Tuple
 
 
 def strip_json_comments(text: str) -> str:
-    """State-machine comment stripper preserving string literals and URLs."""
+    
     out = []
     in_string = False
     escape = False
@@ -42,7 +42,7 @@ def strip_json_comments(text: str) -> str:
 
         if c == '/' and i + 1 < n:
             if text[i + 1] == '/':
-                # Line comment
+                              
                 while i < n and text[i] != '\n':
                     i += 1
                 if i < n:
@@ -50,7 +50,7 @@ def strip_json_comments(text: str) -> str:
                     i += 1
                 continue
             elif text[i + 1] == '*':
-                # Block comment
+                               
                 i += 2
                 while i + 1 < n and not (text[i] == '*' and text[i + 1] == '/'):
                     i += 1
@@ -63,7 +63,7 @@ def strip_json_comments(text: str) -> str:
 
 
 def strip_trailing_commas(text: str) -> str:
-    """Remove trailing commas outside string literals."""
+    
     out = []
     in_string = False
     escape = False
@@ -107,12 +107,12 @@ def parse_jsonc(text: str) -> dict:
 class ConfigEditor:
     @staticmethod
     def load_jsonc(path: str) -> Tuple[Optional[dict], Optional[str]]:
-        """
-        Safely reads JSONC file.
-        Returns: (parsed_dict, raw_text).
-        If file doesn't exist, returns ({}, "").
-        If parse error, returns (None, raw_text).
-        """
+        
+
+
+
+
+
         if not os.path.exists(path):
             return {}, ""
         try:
@@ -127,17 +127,17 @@ class ConfigEditor:
 
     @staticmethod
     def update_json_fields_preserving(raw_text: str, updates: Dict[str, Any]) -> str:
-        """
-        Updates top-level keys and serializes validated JSON. Comments are removed
-        deliberately because the standard library has no lossless JSONC writer.
-        """
+        
+
+
+
         data = parse_jsonc(raw_text) if raw_text.strip() else {}
         data.update(updates)
         return json.dumps(data, indent=4, ensure_ascii=False) + "\n"
 
     @staticmethod
     def remove_json_fields_preserving(raw_text: str, keys: list) -> str:
-        """Removes specified keys from JSON/JSONC text preserving other structure."""
+        
         data = parse_jsonc(raw_text) if raw_text.strip() else {}
         for key in keys:
             data.pop(key, None)
@@ -145,10 +145,10 @@ class ConfigEditor:
 
     @staticmethod
     def atomic_write(path: str, content: str):
-        """Writes content atomically to avoid corruption on crash."""
+        
         dir_name = os.path.dirname(os.path.abspath(path))
         os.makedirs(dir_name, exist_ok=True)
-        # Create backup if file exists
+                                      
         if os.path.exists(path):
             backup_path = path + ".bak"
             if not os.path.exists(backup_path):
@@ -158,7 +158,7 @@ class ConfigEditor:
         try:
             with open(fd, "w", encoding="utf-8") as f:
                 f.write(content)
-            # Atomic replace
+                            
             os.replace(tmp_path, path)
         except Exception:
             if os.path.exists(tmp_path):

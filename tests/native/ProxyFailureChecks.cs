@@ -85,8 +85,8 @@ class ProxyFailureChecks {
    unavailable.Bind(new IPEndPoint(IPAddress.Loopback,0));
    using(var bridge=new NoDirectBridge()){
     Assert(bridge.Start(0,"http://127.0.0.1:"+((IPEndPoint)unavailable.LocalEndPoint).Port),"Failure fixture bridge did not start");
-    // Resolver is enabled, but the unscoped host must never be resolved/dialled.
-    typeof(LocalProxyBridge).GetField("_scopedDns",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(bridge,new ScopedDnsResolver("192.0.2.53"));
+    
+     typeof(LocalProxyBridge).GetField("_scopedDns",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(bridge,new ScopedDnsResolver("192.0.2.53"));
     foreach(string method in new[]{"CONNECT","GET"})using(var client=new TcpClient("127.0.0.1",bridge.BoundPort)){
      client.GetStream().ReadTimeout=5000;string authority="outside.fixture.invalid:443";
      string request=method+" "+(method=="CONNECT"?authority:"http://outside.fixture.invalid/fixture")+" HTTP/1.1\r\nHost: "+authority+"\r\n\r\n";

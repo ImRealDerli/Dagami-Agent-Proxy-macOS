@@ -37,8 +37,8 @@ class DnsTransportChecks {
   void Tcp(){try{while(!stopped)using(var client=tcp.AcceptTcpClient()){
    var stream=client.GetStream();stream.ReadTimeout=1000;byte[] prefix=Read(stream,2);byte[] query=Read(stream,(prefix[0]<<8)|prefix[1]);Interlocked.Increment(ref TcpQueries);
    if(mode=="dead")continue;byte[] answer=Answer(query,mode=="truncated"?"valid":mode);
-   // Fragment the length prefix and payload to exercise real TCP framing.
-   stream.WriteByte((byte)(answer.Length>>8));stream.Flush();Thread.Sleep(3);stream.WriteByte((byte)answer.Length);
+   
+    stream.WriteByte((byte)(answer.Length>>8));stream.Flush();Thread.Sleep(3);stream.WriteByte((byte)answer.Length);
    for(int offset=0;offset<answer.Length;offset+=7){int count=Math.Min(7,answer.Length-offset);stream.Write(answer,offset,count);stream.Flush();}
   }}catch(SocketException){}catch(ObjectDisposedException){}catch(IOException){}}
   public void Dispose(){stopped=true;udp.Close();tcp.Stop();Assert(udpThread.Join(2000)&&tcpThread.Join(2000),"DNS fixture did not stop");}
@@ -51,9 +51,9 @@ class DnsTransportChecks {
  static string Header(Stream stream){var bytes=new MemoryStream();int state=0;while(state<4){int b=stream.ReadByte();if(b<0)throw new EndOfStreamException();bytes.WriteByte((byte)b);state=(state==0||state==2)?(b==13?state+1:0):(b==10?state+1:0);if(bytes.Length>16384)throw new IOException();}return Encoding.ASCII.GetString(bytes.ToArray());}
  static void SmartDnsFailureUsesConfiguredProxy(bool connectionFailure){
   using(var dns=new Server("dead")){
-   // Keep the loopback port bound but not listening, so the Smart DNS connect
-   // fails locally without sending traffic to a real external server.
-   Socket unavailable=null;
+   
+    
+    Socket unavailable=null;
    if(connectionFailure){unavailable=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);unavailable.ExclusiveAddressUse=true;unavailable.Bind(new IPEndPoint(IPAddress.Parse("127.203.10.17"),443));}
    var upstream=new TcpListener(IPAddress.Loopback,0);upstream.Start();Exception failure=null;string request=null;
    var worker=new Thread(()=>{try{using(var peer=upstream.AcceptTcpClient()){peer.GetStream().ReadTimeout=5000;request=Header(peer.GetStream());byte[] reply=Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\n\r\n");peer.GetStream().Write(reply,0,reply.Length);}}catch(Exception ex){failure=ex;}});worker.IsBackground=true;worker.Start();

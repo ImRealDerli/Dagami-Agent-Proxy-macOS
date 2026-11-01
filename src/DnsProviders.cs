@@ -119,9 +119,9 @@ namespace DevProxyApp {
   public static DnsEndpoint[] ExtendedPool(string server){
    var primary=ForServer(server);
    if(primary==null)return null;
-   // Additional providers are available by explicit selection, never silently
-   // substituted for the selected Dagami -> MagicDNS chain.
-   return OrderByProbeHealth(new List<DnsEndpoint>(primary));
+   
+    
+    return OrderByProbeHealth(new List<DnsEndpoint>(primary));
   }
   internal static int AttemptTimeout(int remaining,int attempts,int ceiling){
    return Math.Min(remaining,Math.Min(ceiling,Math.Max(1,remaining/Math.Max(1,attempts))));
@@ -131,9 +131,9 @@ namespace DevProxyApp {
     var result=new List<DnsEndpoint>();
     var providers=new List<string>();
     foreach(var ep in list)if(!providers.Contains(ep.Provider))providers.Add(ep.Provider);
-    // Health and latency only reorder nodes within a provider, never the selected
-    // provider and its explicit fallback order. Do not truncate reserve nodes.
-    foreach(string provider in providers){
+    
+     
+     foreach(string provider in providers){
      var working=new List<DnsEndpoint>();var untested=new List<DnsEndpoint>();var failed=new List<DnsEndpoint>();
      foreach(var ep in list){if(ep.Provider!=provider)continue;int ms;
       if(probeLatencyMs.TryGetValue(ep.Provider+":"+ep.Address,out ms)){if(ms>=0)working.Add(ep);else failed.Add(ep);}

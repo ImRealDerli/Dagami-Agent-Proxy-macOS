@@ -1,4 +1,4 @@
-"""Check staged sources without printing credentials or using third-party packages."""
+
 from collections import defaultdict
 from fnmatch import fnmatchcase
 import hashlib
@@ -50,11 +50,16 @@ def main():
         size=int(header[2]); offset=end+1
         data=proc.stdout[offset:offset+size]; offset+=size+1
         if data: groups[hashlib.sha256(data).hexdigest()].append(name)
+        trusted=policy.get('trusted_binaries',{}).get(name)
+        if trusted:
+            if hashlib.sha256(data).hexdigest()!=trusted.get('sha256'):issues.append('Verified binary hash mismatch: '+name)
+            elif data[:4] not in (b'\xcf\xfa\xed\xfe',b'\xca\xfe\xba\xbe'):issues.append('Verified artifact is not Mach-O: '+name)
+            else:continue
         for label,pattern in PATTERNS.items():
             for match in re.finditer(pattern,data):
                 line=data[:match.start()].count(b'\n')+1
                 issues.append(f'{name}:{line}: possible {label}; value withheld')
-    # Intentional install-layout resources are explicit; a new copy is rejected.
+                                                                                
     allowed=[set(group) for group in policy['allowed_duplicate_groups']]
     for paths in groups.values():
         if len(paths)>1 and not any(set(paths)<=group for group in allowed):

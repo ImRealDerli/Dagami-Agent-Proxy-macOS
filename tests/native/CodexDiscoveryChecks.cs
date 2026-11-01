@@ -36,9 +36,9 @@ class CodexDiscoveryChecks {
    Manifest(root,"OpenAI.Codex","app/ChatGPT.exe","<!DOCTYPE Package [<!ENTITY forbidden SYSTEM 'file:///missing-dagami-fixture'>]>");
    Assert(ApplicationDiscovery.PackagedDesktop(root,"OpenAI.Codex")==null,"Manifest DTD accepted");
    File.WriteAllText(Path.Combine(root,"AppxManifest.xml"),"broken XML");Assert(ApplicationDiscovery.PackagedDesktop(root,"OpenAI.Codex")==null,"Malformed manifest crashed discovery");
-   // Read-only integration against registration APIs. Nothing is launched,
-   // stopped, patched or written inside the real package/user profile.
-   var installed=ApplicationDiscovery.PackageRoots(ApplicationDiscovery.CodexPackageFamily);string actual=null;
+   
+    
+    var installed=ApplicationDiscovery.PackageRoots(ApplicationDiscovery.CodexPackageFamily);string actual=null;
    foreach(string package in installed){actual=ApplicationDiscovery.PackagedDesktop(package,"OpenAI.Codex");if(actual!=null)break;}
    if(actual!=null){
     Assert(ApplicationDiscovery.Desktop("Codex",new string[0])==actual,"Registered Codex package not discovered");

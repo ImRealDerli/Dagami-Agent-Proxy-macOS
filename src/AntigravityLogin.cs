@@ -29,9 +29,9 @@ namespace DevProxyApp
             foreach(string path in paths)foreach(var process in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(path)))using(process) {
                 try {
                     if(process.HasExited)continue;
-                    // Never infer ownership from a process name or kill after an
-                    // access-denied path lookup. Another install may share a name.
-                    if(!string.Equals(Path.GetFullPath(process.MainModule.FileName),path,StringComparison.OrdinalIgnoreCase))continue;
+                    
+                     
+                     if(!string.Equals(Path.GetFullPath(process.MainModule.FileName),path,StringComparison.OrdinalIgnoreCase))continue;
                     process.Kill();
                     if(!process.WaitForExit(Math.Max(0,timeoutMilliseconds-(int)deadline.ElapsedMilliseconds)))errors.Add(Path.GetFileName(path)+": процесс не завершился");
                 } catch(InvalidOperationException) { }
@@ -53,10 +53,10 @@ namespace DevProxyApp
 
                     {
 
-                        // Codex Desktop and Codex CLI can share a basename;
-
-                        // another installed copy must not block this launcher.
-
+                        
+ 
+                        
+ 
                         if(Path.IsPathRooted(executable))try {
 
                             if(!string.Equals(Path.GetFullPath(process.MainModule.FileName),Path.GetFullPath(executable),StringComparison.OrdinalIgnoreCase))continue;
@@ -91,10 +91,10 @@ namespace DevProxyApp
 
                 args += " --disable-updates";
 
-            // Use the real settings/account profile. RequireStopped prevents an
-
-            // existing direct process from silently discarding these flags.
-
+            
+ 
+            
+ 
             return args;
 
         }

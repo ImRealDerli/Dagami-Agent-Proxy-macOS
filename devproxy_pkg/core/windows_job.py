@@ -1,16 +1,16 @@
-"""
-core/windows_job.py
-Win32 Job Object manager and thread lifecycle orchestrator.
-Zero-Dependencies implementation using ctypes.
-Ensures child IDE process trees are cleanly terminated on parent exit.
-"""
+
+
+
+
+
+
 
 import sys
 import ctypes
 from ctypes import wintypes
 from typing import Optional
 
-# WinAPI Constants
+                  
 JOBOBJECT_EXTENDED_LIMIT_INFORMATION = 9
 JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x00002000
 TH32CS_SNAPTHREAD = 0x00000004
@@ -67,10 +67,10 @@ class THREADENTRY32(ctypes.Structure):
 
 
 class WindowsJobManager:
-    """
-    Manages a Win32 Job Object bound to the devproxy lifecycle.
-    Forces all descendant processes to terminate when the Job Object handle closes.
-    """
+    
+
+
+
 
     def __init__(self, job_name: Optional[str] = None):
         if sys.platform != "win32":
@@ -134,7 +134,7 @@ class WindowsJobManager:
             raise ctypes.WinError(err)
 
     def assign_process(self, process_handle: int) -> bool:
-        """Assigns target process handle to this job object."""
+        
         if not self.job_handle:
             return False
         res = self.k32.AssignProcessToJobObject(self.job_handle, wintypes.HANDLE(process_handle))
@@ -143,11 +143,11 @@ class WindowsJobManager:
         return True
 
     def resume_all_threads(self, pid: int) -> int:
-        """
-        Enumerates all threads of target PID and calls ResumeThread.
-        Fixes the early-return bug from Toolhelp32 snapshots to prevent
-        Electron/Chromium deadlocks during suspended process starts.
-        """
+        
+
+
+
+
         h_snapshot = self.k32.CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0)
         if h_snapshot == INVALID_HANDLE_VALUE:
             raise ctypes.WinError(ctypes.GetLastError())
@@ -173,7 +173,7 @@ class WindowsJobManager:
         return resumed_count
 
     def close(self) -> None:
-        """Closes job handle, triggering kill of assigned processes if still running."""
+        
         if self.job_handle:
             self.k32.CloseHandle(self.job_handle)
             self.job_handle = None

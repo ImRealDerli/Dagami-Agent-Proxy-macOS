@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import unittest
 from devproxy_pkg.core.antigravity_recovery import ASARRecoveryManager
@@ -16,7 +17,7 @@ class TestASARRecoveryManager(unittest.TestCase):
 
     def test_evaluate_injection_strategy_system_path(self):
         eval_res = ASARRecoveryManager.evaluate_injection_strategy(
-            "C:\\Program Files\\Antigravity\\Antigravity.exe",
+            "C:\\Program Files\\Antigravity\\Antigravity.exe" if sys.platform=="win32" else "/Applications/Antigravity.app/Contents/MacOS/Antigravity" if sys.platform=="darwin" else "/usr/bin/antigravity",
             ["C:\\Program Files\\Antigravity\\resources\\app.asar"]
         )
         self.assertEqual(eval_res["strategy"], "env_only_fallback")
@@ -32,7 +33,7 @@ class TestASARRecoveryManager(unittest.TestCase):
                 user_exe,
                 [conf_path]
             )
-            # In user temp directory, if writable and not in Program Files:
+                                                                           
             self.assertEqual(eval_res["strategy"], "standard_persistent")
         finally:
             if os.path.exists(conf_path):

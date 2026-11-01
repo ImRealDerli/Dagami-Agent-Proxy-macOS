@@ -26,9 +26,9 @@ namespace DevProxyApp {
   public static List<string> PackageRoots(string family) {
    var roots=new List<string>();
    try {
-    // Query the current user's registrations. Do not enumerate WindowsApps or
-    // alter package ACLs, and do not depend on an already-running GUI process.
-    for(int attempt=0;attempt<2;attempt++) {
+    
+     
+     for(int attempt=0;attempt<2;attempt++) {
      uint count=0,length=0;int status=GetPackagesByPackageFamily(family,ref count,null,ref length,IntPtr.Zero);
      if(status!=122||count==0||count>128||length==0||length>1048576)return roots;
      var names=new IntPtr[(int)count];IntPtr buffer=Marshal.AllocHGlobal(checked((int)length*2));
@@ -102,9 +102,9 @@ namespace DevProxyApp {
    if(name.Equals("Codex",StringComparison.OrdinalIgnoreCase))foreach(string root in PackageRoots(CodexPackageFamily)) {
     string executable=PackagedDesktop(root,"OpenAI.Codex");if(executable!=null)return executable;
    }
-   // A running packaged Desktop app reveals its real launcher without guessing
-   // a versioned WindowsApps directory or changing package permissions.
-   foreach(var process in Process.GetProcessesByName(name))using(process)try {
+   
+    
+    foreach(var process in Process.GetProcessesByName(name))using(process)try {
     string path=process.MainModule.FileName;var target=new AppTarget{ExePath=path};
     if(File.Exists(path)&&!NativeCliApps.IsCli(target))return path;
    }catch(System.ComponentModel.Win32Exception){}catch(InvalidOperationException){}

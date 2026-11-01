@@ -146,6 +146,8 @@ class DesktopTests(unittest.TestCase):
                 style=ttk.Style(app);self.assertEqual('#087fc1',style.lookup('Accent.TButton','background'))
                 self.assertEqual('#c62626',style.lookup('Danger.TButton','background'))
                 app.hide_after_login();self.assertIn('оставлено открытым',app.notice.get())
+                                                                         
+                app.deiconify();app.update_idletasks()
                 dialog=DnsDialog(app,system=System(),execute=lambda *_args,**_kw:'fixture')
                 app.dns_dialog=dialog
                 deadline=time.monotonic()+3

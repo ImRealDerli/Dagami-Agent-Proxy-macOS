@@ -1,9 +1,9 @@
-"""
-Recovery: State management and atomic rollback for persistent changes.
-Tracks exact keys and values modified by devproxy in ~/.devproxy/state.json.
-Restoring replaces manual edits of managed proxy keys with the original values.
-Unrelated settings and failed recovery records are retained.
-"""
+
+
+
+
+
+
 
 import os
 import json
@@ -49,7 +49,7 @@ class StateManager:
 
     @classmethod
     def record_applied_change(cls, app_id: str, file_path: str, modified_keys: Dict[str, Any], original_values: Dict[str, Any]):
-        """Records modification made to a specific application file."""
+        
         state = cls.load_state()
         applied = state.setdefault("applied", {})
         app_record = applied.setdefault(app_id, {})

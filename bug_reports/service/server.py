@@ -1,4 +1,4 @@
-"""Private bug reports. Run behind the same-origin HTTPS nginx reverse proxy."""
+
 import argparse
 import base64
 import hashlib
@@ -113,7 +113,7 @@ class Reports:
         image = payload.get('image_base64', '')
         if not isinstance(image, str) or len(image) > (MAX_IMAGE * 4 // 3 + 4):
             raise Failure(413, 'Картинка должна быть не больше 2 МБ.')
-        # Hash the submitted content, not a decoder-dependent image encoding.
+                                                                             
         digest = hashlib.sha256(json.dumps([values, image], ensure_ascii=False).encode()).hexdigest()
         receipt = hashlib.sha256(token.encode()).hexdigest()
         with self.connect() as db:
@@ -134,7 +134,7 @@ class Reports:
                         if im.format not in ('PNG', 'JPEG') or im.width * im.height > Image.MAX_IMAGE_PIXELS:
                             raise ValueError()
                         im.load()
-                        # Rebuild pixels: EXIF/XMP/ICC and untrusted trailing bytes never survive.
+                                                                                                  
                         im = ImageOps.exif_transpose(im).convert('RGB')
                         pixels = Image.new('RGB', im.size)
                         pixels.paste(im)
@@ -156,7 +156,7 @@ class Reports:
                 db.execute('INSERT INTO reports VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',
                            (ident, receipt, digest, now, now, 'new', *values, picture))
             except sqlite3.IntegrityError:
-                # A concurrent identical retry must behave like a serial retry.
+                                                                               
                 old = db.execute('SELECT receipt_hash,payload_hash FROM reports WHERE id=?', (ident,)).fetchone()
                 if not old or not hmac.compare_digest(receipt, old[0]) or digest != old[1]:
                     raise Failure(409, 'Этот номер уже использован другим отчётом.')
@@ -167,7 +167,7 @@ def handler(app):
     class Handler(BaseHTTPRequestHandler):
         server_version = 'DagamiReports'
         def log_message(self, *args):
-            pass  # Never write report bodies, credentials or contact details to access logs.
+            pass                                                                             
 
         def reply(self, status, value, content_type='application/json; charset=utf-8', cookie=None):
             data = value if isinstance(value, bytes) else json.dumps(value, ensure_ascii=False).encode()
@@ -255,7 +255,7 @@ def handler(app):
                 raise Failure(403, 'Недопустимый источник запроса.')
             if method == 'GET' and path == API + '/health':
                 return self.reply(200, {'ok': True})
-            # Trust only the nginx-supplied header; the service binds loopback.
+                                                                               
             ip = self.headers.get('X-Real-IP', self.client_address[0])
             if method == 'POST' and path == API + '/reports':
                 app.rate(('report', ip), 12, 3600)
@@ -320,8 +320,8 @@ def handler(app):
                                 raise Failure(400, 'Некорректный статус.')
                             db.execute('UPDATE reports SET status=?,updated=? WHERE id=?', (status, int(time.time()), ident))
                             saved = True
-                    # Do not acknowledge a mutation until the transaction commits.
-                    # A following GET can otherwise race the previous handler.
+                                                                                  
+                                                                              
                     if saved:
                         return self.reply(200, {'ok': True})
                 raise Failure(404, 'Не найдено.')

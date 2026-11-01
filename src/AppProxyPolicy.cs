@@ -24,8 +24,8 @@ namespace DevProxyApp {
         public static void ConfigureGemini(ProcessStartInfo start,string proxy) {
             string flags=ChromiumArguments(proxy);
             start.Arguments=(start.Arguments ?? "")+" "+flags;
-            // Embedded runtimes ignore HTTP_PROXY. Keep the normal account profile.
-            foreach(string variable in new[]{"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS","QTWEBENGINE_CHROMIUM_FLAGS"}) {
+            
+             foreach(string variable in new[]{"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS","QTWEBENGINE_CHROMIUM_FLAGS"}) {
                 string existing=start.EnvironmentVariables[variable];
                 start.EnvironmentVariables[variable]=(string.IsNullOrWhiteSpace(existing)?"":existing+" ")+flags;
             }

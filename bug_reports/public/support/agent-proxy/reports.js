@@ -43,7 +43,7 @@ $('image-file').addEventListener('change',()=>{
 });
 form.addEventListener('submit',async event=>{
   event.preventDefault();const controls=[...form.querySelectorAll('input,textarea,button')];
-  // Capture values before disabling inputs: disabled controls are omitted by FormData.
+   
   const formData=new FormData(form);controls.forEach(control=>control.disabled=true);$('report-message').textContent='Отправляем…';
   try {
     if(!pending){

@@ -42,9 +42,9 @@ class NativeEofChecks {
     Stream s=client.GetStream();s.ReadTimeout=6000;
     byte[] req=Encoding.ASCII.GetBytes("CONNECT oauth2.googleapis.com:443 HTTP/1.1\r\nHost: oauth2.googleapis.com:443\r\n\r\n");
     s.Write(req,0,req.Length);
-    // Optimistic client data must be held until a successful CONNECT, never
-    // copied to the failed connections. The upstream sees it exactly once.
-    if(behavior=="recover")s.WriteByte(17);
+    
+     
+     if(behavior=="recover")s.WriteByte(17);
     Assert(Headers(s).Contains(" "+expectedStatus+" "),"Wrong downstream CONNECT status: "+behavior);
     if(behavior=="recover") {Assert(s.ReadByte()==42,"Relay lost response after retry");client.Client.Shutdown(SocketShutdown.Send);Assert(s.ReadByte()==-1,"Relay did not finish");}
    }

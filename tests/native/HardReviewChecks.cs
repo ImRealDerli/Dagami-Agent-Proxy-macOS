@@ -54,8 +54,8 @@ class HardReviewChecks {
    string ps=Path.Combine(npm,"tool.ps1");File.WriteAllText(ps,"# & \"node$exe\" \"$basedir/wrong.js\" $args\r\n& \"$basedir/node$exe\" \"$basedir/right.js\" $args\r\n");
    Assert(NativeCliApps.CreateStart(ps,new string[0],"http://127.0.0.1:12345",root).Arguments.Contains("right.js"),"Standard npm PowerShell wrapper failed");
 
-   // A real round trip through the shared GUI/CLI unpatch coordinator.
-   string backend=Path.Combine(root,"language_server.exe");
+   
+    string backend=Path.Combine(root,"language_server.exe");
    var patterns=(string[])typeof(AntigravityIntegration).GetField("Patterns",BindingFlags.NonPublic|BindingFlags.Static).GetValue(null);
    byte[] original=Encoding.ASCII.GetBytes("fixture\0"+string.Join("\0",patterns)+"\0https_proxy\0https_proxy\0tail");File.WriteAllBytes(backend,original);
    AntigravityIntegration.Prepare(backend);string patched=Hash(backend);bool launcherRestored=false;
@@ -71,15 +71,15 @@ class HardReviewChecks {
    NativeAppPatcher.RestoreWithLauncher(new AppTarget{ExePath=untouched},()=>new List<string>());
    Assert(!File.Exists(untouched+".devproxy.lock"),"Unpatch wrote a lock to an unmanaged backend");
 
-   // Same image name, different installations: only the exact requested file closes.
-   string self=Process.GetCurrentProcess().MainModule.FileName;var copies=new List<string>();
+   
+    string self=Process.GetCurrentProcess().MainModule.FileName;var copies=new List<string>();
    foreach(string dir in new[]{"A","B"}){string folder=Path.Combine(root,dir);Directory.CreateDirectory(folder);File.Copy(typeof(MainForm).Assembly.Location,Path.Combine(folder,"DagamiAgentProxy.exe"));string exe=Path.Combine(folder,"review-worker.exe");File.Copy(self,exe);copies.Add(exe);}
    a=Start(copies[0]);b=Start(copies[1]);Thread.Sleep(400);
    NativeLogin.StopExactExecutables(new[]{copies[0]});
    Assert(a.WaitForExit(5000)&&!b.HasExited,"Name-only conflict shutdown killed another installation");
 
-   // Saturate the connection guard without opening external sockets or threads.
-   using(var bridge=new LocalProxyBridge()){
+   
+    using(var bridge=new LocalProxyBridge()){
     Assert(bridge.Start(0,"direct"),"Capacity fixture bridge failed");
     var slots=(SemaphoreSlim)typeof(LocalProxyBridge).GetField("_connectionSlots",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(bridge);
     int acquired=0;try{while(slots.Wait(0))acquired++;Assert(acquired==LocalProxyBridge.MaximumConcurrentConnections,"Connection limit mismatch");

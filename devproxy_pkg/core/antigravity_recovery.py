@@ -1,9 +1,9 @@
-"""
-core/antigravity_recovery.py
-UAC boundary handler and non-destructive Env-only fallback validator.
-Zero-Dependencies implementation.
-Ensures devproxy never attempts hazardous binary/ASAR patching in Program Files.
-"""
+
+
+
+
+
+
 
 import os
 import sys
@@ -11,15 +11,15 @@ from typing import Tuple, List, Dict, Any
 
 
 class ASARRecoveryManager:
-    """
-    Validates editor directories and implements Env-only Fallback strategy.
-    Rejects in-place patching of ASAR/binaries in system directories to avoid
-    UAC permission crashes, update breakage, and antivirus false positives.
-    """
+    
+
+
+
+
 
     @staticmethod
     def is_protected_system_path(path: str) -> bool:
-        """Checks if path is located in a protected Windows/macOS/Linux system path."""
+        
         norm = os.path.abspath(path).lower()
         if sys.platform == "win32":
             prog_files = os.environ.get("ProgramFiles", "C:\\Program Files").lower()
@@ -33,7 +33,7 @@ class ASARRecoveryManager:
 
     @staticmethod
     def is_writable(path: str) -> bool:
-        """Pre-flight check to verify if a path or its parent directory is writable."""
+        
         if os.path.exists(path):
             return os.access(path, os.W_OK)
         parent = os.path.dirname(os.path.abspath(path))
@@ -41,10 +41,10 @@ class ASARRecoveryManager:
 
     @classmethod
     def evaluate_injection_strategy(cls, executable_path: str, config_paths: List[str]) -> Dict[str, Any]:
-        """
-        Evaluates whether persistent settings file modification is safe or
-        if Env-only Fallback + CLI arguments must be used.
-        """
+        
+
+
+
         is_sys_install = cls.is_protected_system_path(executable_path)
         unwritable_configs = [c for c in config_paths if not cls.is_writable(c)]
 
@@ -71,7 +71,7 @@ class ASARRecoveryManager:
 
     @classmethod
     def cleanup_legacy_backups(cls, search_dir: str) -> List[str]:
-        """Scans for and safely cleans up any legacy .devproxy.bak files from previous versions."""
+        
         cleaned = []
         if not os.path.exists(search_dir) or not os.access(search_dir, os.W_OK):
             return cleaned

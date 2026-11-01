@@ -1,13 +1,13 @@
-"""
-ProxyValidator: Multi-step connectivity and routing verifier.
-Distinguishes between:
-1. Syntax validity
-2. TCP reachability of the proxy host/port
-3. Proxy authentication status
-4. Target provider endpoints reachability (e.g. Gemini, OpenAI, Claude, GitHub)
-5. Strict TLS certificate verification (never accepts invalid certs or disables TLS)
-6. Latency measurement.
-"""
+
+
+
+
+
+
+
+
+
+
 
 import socket
 import ssl
@@ -56,7 +56,7 @@ class ValidationResult:
 class ProxyValidator:
     @staticmethod
     def test_tcp_connect(host: str, port: int, timeout: float = 4.0) -> (bool, Optional[float], Optional[str]):
-        """Tests pure TCP socket connection and measures round-trip time."""
+        
         t0 = time.monotonic()
         try:
             sock = socket.create_connection((host, port), timeout=timeout)
@@ -67,20 +67,38 @@ class ProxyValidator:
             return False, None, str(e)
 
     @classmethod
-    def test_http_proxy(cls, profile: ProxyProfile, target_host: str = "generativelanguage.googleapis.com", target_port: int = 443, timeout: float = 6.0) -> (bool, bool, bool, Optional[str]):
-        """
-        Tests HTTP CONNECT handshake through HTTP/HTTPS proxy.
-        Returns: (connect_ok, auth_ok, tls_ok, error_msg)
-        """
+    def test_http_proxy(cls, profile, target_host="generativelanguage.googleapis.com", target_port=443, timeout=6.0):
+        if profile.protocol != 'https':
+            return cls._test_http_connect(profile,target_host,target_port,timeout)
+                                                                           
+                                                                               
+        from .tunnel import LocalTunnel
+        tunnel=LocalTunnel(profile)
+        try:
+            port=tunnel.start()
+            local=ProxyProfile(name=profile.name,protocol='http',host='127.0.0.1',port=port)
+            ok,auth,tls,error=cls._test_http_connect(local,target_host,target_port,timeout)
+            if error and 'HTTP 407' in error:
+                if profile.username:error=error.replace('логин не задан','логин задан')
+                if profile.password:error=error.replace('пароль не задан','пароль задан')
+            return ok,auth,tls,error
+        finally:tunnel.stop()
+
+    @classmethod
+    def _test_http_connect(cls, profile: ProxyProfile, target_host: str = "generativelanguage.googleapis.com", target_port: int = 443, timeout: float = 6.0) -> (bool, bool, bool, Optional[str]):
+        
+
+
+
         try:
             sock = socket.create_connection((profile.host, profile.port), timeout=timeout)
             
-            # If upstream proxy itself uses HTTPS (protocol == https)
+                                                                     
             if profile.protocol == "https":
                 ctx = ssl.create_default_context()
                 sock = ctx.wrap_socket(sock, server_hostname=profile.host)
 
-            # Build CONNECT request
+                                   
             connect_line = f"CONNECT {target_host}:{target_port} HTTP/1.1\r\nHost: {target_host}:{target_port}\r\n"
             headers = [connect_line, "Proxy-Connection: Keep-Alive\r\n"]
 
@@ -93,7 +111,7 @@ class ProxyValidator:
             req_data = "".join(headers).encode("latin-1")
             sock.sendall(req_data)
 
-            # Read response
+                           
             resp_buf = b""
             while b"\r\n\r\n" not in resp_buf:
                 chunk = sock.recv(4096)
@@ -113,20 +131,31 @@ class ProxyValidator:
 
             if status_code == 407:
                 sock.close()
-                return False, False, False, "HTTP 407 Proxy Authentication Required (Invalid or missing credentials)"
+                schemes=[]
+                for line in resp_buf.split(b"\r\n")[1:]:
+                    if line.lower().startswith(b'proxy-authenticate:'):
+                        value=line.split(b':',1)[1].strip().split(None,1)
+                        if value:
+                            scheme=value[0].decode('ascii','ignore')
+                            if scheme.isalpha() and len(scheme)<20 and scheme not in schemes:schemes.append(scheme)
+                state=('логин задан' if profile.username else 'логин не задан')+', '+('пароль задан' if profile.password else 'пароль не задан')
+                method=', '.join(schemes) if schemes else 'сервер не указал схему'
+                hint='Проверьте логин, пароль и привязку IP в кабинете провайдера.'
+                if schemes and 'basic' not in [x.lower() for x in schemes]:hint='Этот прокси требует другую схему авторизации. В приложении поддержана Basic; выберите у провайдера HTTP Basic или SOCKS5.'
+                return False, False, False, f"HTTP 407 Proxy Authentication Required: upstream-прокси отклонил доступ; {state}; схема: {method}. {hint}"
 
             if status_code != 200:
                 sock.close()
                 return False, False, False, f"Proxy returned HTTP {status_code}: {first_line}"
 
-            # CONNECT succeeded! Now verify strict TLS to target endpoint through tunnel
+                                                                                        
             ctx = ssl.create_default_context()
-            # Certificate validation MUST be kept ON (never disable check_hostname or verify_mode)
+                                                                                                  
             ctx.check_hostname = True
             ctx.verify_mode = ssl.CERT_REQUIRED
             
             tls_sock = ctx.wrap_socket(sock, server_hostname=target_host)
-            # Check certificate
+                               
             cert = tls_sock.getpeercert()
             tls_sock.close()
 
@@ -141,16 +170,16 @@ class ProxyValidator:
 
     @classmethod
     def test_socks5_proxy(cls, profile: ProxyProfile, target_host: str = "generativelanguage.googleapis.com", target_port: int = 443, timeout: float = 6.0) -> (bool, bool, bool, Optional[str]):
-        """
-        Tests SOCKS5 / SOCKS5h handshake, optional username/password auth, and target connect.
-        Returns: (connect_ok, auth_ok, tls_ok, error_msg)
-        """
+        
+
+
+
         try:
             sock = socket.create_connection((profile.host, profile.port), timeout=timeout)
             
-            # SOCKS5 greeting
+                             
             if profile.has_auth:
-                sock.sendall(b"\x05\x02\x00\x02")  # methods: 00 (no auth), 02 (user/pass)
+                sock.sendall(b"\x05\x02\x00\x02")                                         
             else:
                 sock.sendall(b"\x05\x01\x00")
 
@@ -165,7 +194,7 @@ class ProxyValidator:
                 return False, False, False, "SOCKS5 No acceptable authentication methods"
 
             if auth_method == 0x02:
-                # Username/password subnegotiation
+                                                  
                 user_bytes = (profile.username or "").encode("utf-8")
                 pwd_bytes = (profile.password or "").encode("utf-8")
                 if len(user_bytes) > 255 or len(pwd_bytes) > 255:
@@ -177,8 +206,8 @@ class ProxyValidator:
                     sock.close()
                     return False, False, False, "SOCKS5 Authentication failed (bad username or password)"
 
-            # CONNECT request
-            # Domain name (0x03) allows remote DNS resolution (SOCKS5h)
+                             
+                                                                       
             host_bytes = target_host.encode("utf-8")
             if len(host_bytes) > 255:
                 return False, True, False, "SOCKS5 target hostname exceeds the 255-byte protocol limit"
@@ -192,7 +221,7 @@ class ProxyValidator:
                 sock.close()
                 return False, True, False, f"SOCKS5 Connect rejected by proxy (code 0x{rep_code:02x})"
 
-            # Skip bound address
+                                
             atyp = conn_resp[3]
             if atyp == 0x01:
                 cls._recv_exact(sock, 4 + 2)
@@ -202,7 +231,7 @@ class ProxyValidator:
             elif atyp == 0x04:
                 cls._recv_exact(sock, 16 + 2)
 
-            # Now perform strict TLS handshake to target
+                                                        
             ctx = ssl.create_default_context()
             ctx.check_hostname = True
             ctx.verify_mode = ssl.CERT_REQUIRED
@@ -229,11 +258,20 @@ class ProxyValidator:
 
     @classmethod
     def validate(cls, profile: ProxyProfile, targets: Optional[List[tuple]] = None, timeout: float = 5.0) -> ValidationResult:
-        """Runs full suite of checks for profile."""
+        
+        if profile.protocol == 'direct' or not profile.proxy_enabled or profile.smart_dns:
+            from .tunnel import LocalTunnel
+            tunnel=LocalTunnel(profile)
+            try:
+                port=tunnel.start()
+                result=cls.validate(ProxyProfile(name=profile.name,protocol='http',host='127.0.0.1',port=port),targets,timeout)
+                result.profile=profile
+                return result
+            finally:tunnel.stop()
         res = ValidationResult(profile)
         check_targets = targets or DEFAULT_TARGETS
 
-        # 1. TCP Reachability
+                             
         tcp_ok, latency, err = cls.test_tcp_connect(profile.host, profile.port, timeout=timeout)
         res.tcp_reachable = tcp_ok
         res.tcp_latency_ms = latency
@@ -241,7 +279,7 @@ class ProxyValidator:
             res.errors.append(f"Proxy host unreachable ({profile.host}:{profile.port}): {err}")
             return res
 
-        # 2. Check each target
+                              
         passed_any = False
         for label, host, port in check_targets:
             t_start = time.monotonic()
@@ -268,6 +306,9 @@ class ProxyValidator:
             elif msg and "Authentication" in msg:
                 res.auth_required = True
                 res.errors.append(f"Auth error on {label}: {msg}")
+                if "HTTP 407" in msg:break                                                          
+            elif not (ok and tls_ok):
+                res.errors.append(f"{label} ({host}): {msg or 'TLS не подтверждён'}")
 
         res.overall_success = bool(res.target_checks) and all(item["success"] for item in res.target_checks)
         if not res.overall_success and not res.errors:

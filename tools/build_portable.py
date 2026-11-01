@@ -1,4 +1,4 @@
-"""Build Dagami packages for the host OS. No publishing or remote operations."""
+
 import argparse
 import hashlib
 import importlib.util
@@ -41,7 +41,7 @@ def source_member(path):
         return path.suffix=='.py' or (relative.parent.as_posix()=='devproxy_pkg/assets' and
             path.name in SOURCE_ASSETS)
     if relative.parts[0]=='tests':return path.suffix in ('.py','.cs','.ps1','.md')
-    if relative.parts[0]=='tools':return path.name in ('check_source_hygiene.py','source-policy.json','test_source_hygiene.py','run_native_checks.py')
+    if relative.parts[0]=='tools':return path.name in ('check_source_hygiene.py','source-policy.json','test_source_hygiene.py','run_native_checks.py','verify_macos.py')
     if relative.parts[0]=='.agents':return path.suffix in ('.md','.json','.sh','.py')
     if relative.parts[0]=='bug_reports':return Path(*relative.parts[1:]).as_posix() in BUG_REPORTS_FILES
     return relative.parts[:2]==('.github','workflows') and path.suffix in ('.yml','.yaml')
@@ -57,7 +57,7 @@ def add_source(archive,path):
     archive.writestr(info,data,compress_type=zipfile.ZIP_DEFLATED)
 
 def tcl_data(output):
-    """Tk 9 embeds scripts in zipfs; materialize them for PyInstaller's hook."""
+    
     import tkinter
     interp=tkinter.Tcl()
     if not str(interp.call('info','library')).startswith('//zipfs:'):return []
@@ -74,12 +74,12 @@ def tcl_data(output):
     finally:root.destroy()
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--source-only',action='store_true');parser.add_argument('--output-dir',type=Path,default=ROOT/'dist-portable');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--source-only',action='store_true');parser.add_argument('--skip-gui-smoke',action='store_true',help='Package in a sandbox without WindowServer; GUI remains unverified');parser.add_argument('--output-dir',type=Path,default=ROOT/'dist-portable');args=parser.parse_args()
     output=args.output_dir.resolve();output.mkdir(parents=True,exist_ok=True)
     source=output/'dagami-agent-proxy-source.zip'
     names=['.gitignore','.gitattributes','.gitleaks.toml','.githooks/pre-commit',
            'devproxy_gui.py','pyproject.toml','PORTABLE.md','BUILD_LINUX_MACOS.md',
-           'README.md','MATRIX.md','APPLICATIONS.md','BUG_REPORTS.md','RELEASE_NOTES.md','CHANGELOG.md','AGENTS.md',
+           'MACOS_PORT.md','README.md','MATRIX.md','APPLICATIONS.md','BUG_REPORTS.md','RELEASE_NOTES.md','CHANGELOG.md','AGENTS.md',
            'SYSTEM_DNS.md','SOURCE_POLICY.md','STARTUP.md','LICENSE',
            'tools/build_portable.py','tools/build_native_app.py','tools/install_portable.py','install.sh',
            'src/SystemDns.ps1','src/app.manifest',*['src/'+name for name in NATIVE_SOURCES]]
@@ -101,7 +101,7 @@ def main():
     host={'win32':'windows','darwin':'macos'}.get(sys.platform,'linux')
     arch=platform.machine().lower();arch={'amd64':'x64','x86_64':'x64','aarch64':'arm64'}.get(arch,arch)
     if host=='windows':
-        # Windows has one native executable for GUI, CLI and DNS maintenance.
+                                                                             
         native=output/'windows'
         subprocess.run([sys.executable,str(ROOT/'tools/build_native_app.py'),'--output-dir',str(native)],check=True)
         exe=native/'DagamiAgentProxy.exe'
@@ -118,8 +118,8 @@ def main():
     if any(importlib.util.find_spec(module) is None for module in ('pystray','PIL')):
         raise SystemExit('Install desktop build dependencies: python3 -m pip install ".[build,desktop]"')
     build=output/('dagami-'+host+'-'+arch);build.mkdir(exist_ok=True)
-    # GUI, CLI, session and elevation enter the same binary. A macOS .app
-    # keeps runtime libraries inside the bundle; no second CLI is shipped.
+                                                                         
+                                                                          
     name=GUI if host=='macos' else 'dagami-agent-proxy'
     command=[sys.executable,'-m','PyInstaller','--noconfirm','--clean',
              '--onedir' if host=='macos' else '--onefile','--name',name,
@@ -130,9 +130,17 @@ def main():
         command+=['--windowed','--osx-bundle-identifier','ru.dagami.agentproxy',
                   '--icon',str(ASSETS/'dagami-agent-proxy.icns')]
     command.append(str(ROOT/'devproxy_gui.py'));subprocess.run(command,cwd=ROOT,check=True)
-    gui=build/name if host=='linux' else build/(GUI+'.app')/'Contents'/'MacOS'/GUI
+    if host=='macos':
+        import plistlib
+        bundle=build/(GUI+'.app');info=bundle/'Contents'/'Info.plist'
+        if info.is_file():
+            data=plistlib.loads(info.read_bytes());data.update(CFBundleShortVersionString='0.4.0',CFBundleVersion='406',NSHighResolutionCapable=True)
+            info.write_bytes(plistlib.dumps(data))
+            subprocess.run(['/usr/bin/codesign','--force','--deep','--sign','-',str(bundle)],check=True)
+            subprocess.run(['/usr/bin/codesign','--verify','--deep','--strict',str(bundle)],check=True)
+    gui=build/name if host=='linux'  else build/(GUI+'.app')/'Contents'/'MacOS'/GUI
     subprocess.run([str(gui),'--help'],check=True,timeout=30)
-    subprocess.run([str(gui),'--smoke-gui'],check=True,timeout=30)
+    if not args.skip_gui_smoke:subprocess.run([str(gui),'--smoke-gui'],check=True,timeout=30)
     archive=output/f'dagami-agent-proxy-{host}-{arch}.zip'
     with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as package:
         artifact=build/name if host=='linux' else build/(GUI+'.app')

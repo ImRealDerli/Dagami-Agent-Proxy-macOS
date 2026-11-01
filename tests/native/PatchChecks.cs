@@ -53,8 +53,8 @@ class PatchChecks {
    Assert(Hash(backend)==foreignPrepared&&!File.Exists(backend+".devproxy-region.json"),"Foreign preparation was overwritten or assigned a false manifest");
    store.Restore(target.Id);
    File.WriteAllBytes(backend,Encoding.ASCII.GetBytes(string.Join("\0fixture\0",patterns)));string originalBackend=Hash(backend);
-   // The second shell link can be read but not replaced. The first link must roll back.
-   using(var held=new FileStream(two,FileMode.Open,FileAccess.Read,FileShare.Read)){
+   
+    using(var held=new FileStream(two,FileMode.Open,FileAccess.Read,FileShare.Read)){
     string failure=Reject(()=>NativeAppPatcher.Apply(target,manager,new[]{links},store));
     Assert(failure.Contains("отменены"),"Failed installation has no rollback outcome");
     Assert(Hash(one)==originalOne&&Hash(two)==originalTwo,"Partial shortcut installation was not rolled back");
@@ -75,8 +75,8 @@ class PatchChecks {
    File.AppendAllText(one,"external-change");string edited=Hash(one);
    Reject(()=>NativeAppPatcher.Apply(target,manager,new[]{links},store));
    Assert(Hash(one)==edited&&Hash(backend)==patchedBackend,"Foreign shortcut modification overwritten");
-   // The remaining fixture files are deliberately left inside the temporary tree for cleanup.
-   string autoLinks=Path.Combine(root,"AutoLinks");Directory.CreateDirectory(autoLinks);
+   
+    string autoLinks=Path.Combine(root,"AutoLinks");Directory.CreateDirectory(autoLinks);
    string autoConfig=Path.Combine(root,"settings.json");
    var autoTarget=new AppTarget{Id="auto-fixture",DisplayName="AutoFixture",ExePath=exe,ConfigPath=autoConfig};
    string autoSummary;

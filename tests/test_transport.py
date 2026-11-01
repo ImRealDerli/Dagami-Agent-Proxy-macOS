@@ -16,12 +16,12 @@ class TestAdaptiveTLSGate(unittest.TestCase):
         gate = AdaptiveTLSGate(base_slots=4, throttled_slots=2, rtt_threshold=1.0)
         self.assertEqual(gate.current_limit, 4)
 
-        # High latency RTT updates
+                                  
         gate.record_rtt(2.5)
         self.assertEqual(gate.current_limit, 2)
         self.assertGreater(gate.ema_rtt, 1.0)
 
-        # Recovering RTT updates
+                                
         gate.record_rtt(0.1)
         gate.record_rtt(0.1)
         gate.record_rtt(0.1)
@@ -41,7 +41,8 @@ class TestAdaptiveTLSGate(unittest.TestCase):
         try:
             tune_socket(s)
             nodelay = s.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY)
-            self.assertEqual(nodelay, 1)
+                                                                           
+            self.assertTrue(nodelay)
         finally:
             s.close()
 

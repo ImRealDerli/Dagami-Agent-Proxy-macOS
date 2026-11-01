@@ -1,4 +1,4 @@
-"""Behavior checks for the source guard; all repositories are disposable fixtures."""
+
 from pathlib import Path
 import shutil
 import sys

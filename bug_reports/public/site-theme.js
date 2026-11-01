@@ -1,4 +1,4 @@
-// Apply the theme before styles are painted.
+ 
 (() => {
   let mode = 'system';
   try { mode = localStorage.getItem('dagami_theme') || mode; } catch {}

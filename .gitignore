@@ -121,3 +121,5 @@ desktop.ini
 # Local review screenshots and fixture leftovers
 /local-*.png
 /temp-test/
+
+!/devproxy_pkg/assets/webdriver/selenium-vendor.zip

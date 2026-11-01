@@ -7,9 +7,9 @@ class GoogleGeminiChecks {
  static int checks;
  static void Assert(bool ok,string reason){checks++;if(!ok)throw new Exception(reason);}
  static int Main(string[] args){
-  // The same executable supplies a launcher/child fixture. Its child is deliberately
-  // created only after Job assignment, so the test proves descendant accounting.
-  if(args.Length>0 && args[0]=="child"){Thread.Sleep(30000);return 0;}
+  
+   
+   if(args.Length>0 && args[0]=="child"){Thread.Sleep(30000);return 0;}
   if(args.Length>0 && args[0]=="launcher"){
    while(!File.Exists(args[1]))Thread.Sleep(20);
    var child=Process.Start(new ProcessStartInfo(Process.GetCurrentProcess().MainModule.FileName,"child"){UseShellExecute=false,CreateNoWindow=true});

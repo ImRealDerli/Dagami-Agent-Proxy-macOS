@@ -90,8 +90,8 @@ namespace DevProxyApp {
    ValidateRelease(release);if(release.Gui==null)throw new InvalidDataException("EXE ещё не извлечён из архива.");var asset=release.Gui;string path=Path.Combine(folder,asset.Name);if(!File.Exists(path)||new FileInfo(path).Length!=asset.Size||FileHash(path)!=asset.Sha256.ToLowerInvariant())throw new InvalidDataException("Изменён скачанный файл "+asset.Name);
    var gui=FileVersionInfo.GetVersionInfo(path);
    if(gui.ProductName!=Brand.Name||NativeCliApps.IsCli(new AppTarget{ExePath=path}))throw new InvalidDataException("EXE не принадлежит Windows-сборке Dagami.");
-   // New releases carry the exact SemVer in AssemblyInformationalVersion.
-   if(!MatchesVersion(gui,release.Tag))throw new InvalidDataException("Версия EXE не соответствует тегу релиза.");
+   
+    if(!MatchesVersion(gui,release.Tag))throw new InvalidDataException("Версия EXE не соответствует тегу релиза.");
   }
   public static IDisposable AcquireActivity(bool cli){var leases=new List<IDisposable>();try{leases.Add(ActivityLock("activity.lock",false));if(cli)leases.Add(ActivityLock("cli.lock",false));return new Leases(leases);}catch{foreach(var lease in leases)lease.Dispose();throw new IOException("Идёт обновление Dagami. Повторите запуск после его завершения.");}}
   public static FileStream ActivityLock(string name,bool exclusive){Directory.CreateDirectory(Root);string path=Path.Combine(Root,name);if(!File.Exists(path))try{using(var f=new FileStream(path,FileMode.CreateNew,FileAccess.Write,FileShare.Read)){}}catch(IOException){if(!File.Exists(path))throw;}return new FileStream(path,FileMode.Open,FileAccess.Read,exclusive?FileShare.None:FileShare.Read);}

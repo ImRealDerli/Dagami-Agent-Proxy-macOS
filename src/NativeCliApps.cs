@@ -95,8 +95,8 @@ namespace DevProxyApp {
    string command=CommandName(target);
    if(!Regex.IsMatch(command,@"\A[A-Za-z0-9][A-Za-z0-9._-]{0,63}\z")||Array.Exists(new[]{"cmd","powershell","pwsh","node","python","git","dagami-proxy","dagamiagentproxy","devproxy"},x=>x.Equals(command,StringComparison.OrdinalIgnoreCase)))throw new InvalidOperationException("Нельзя подменять эту системную команду.");
    if(FindCommand(command,environment.MachinePath)!=null)throw new InvalidOperationException("Команда найдена в системном PATH, который имеет приоритет над пользовательским. Автоматическая настройка без изменения системного PATH невозможна; используйте запуск из Dagami.");
-   // Validate script support before changing PATH or writing launchers.
-   CreateStart(target.ExePath,new string[0],"http://127.0.0.1:1",Environment.CurrentDirectory);
+   
+    CreateStart(target.ExePath,new string[0],"http://127.0.0.1:1",Environment.CurrentDirectory);
    string runner=Path.GetFullPath(manager);
    if(!File.Exists(runner))throw new FileNotFoundException("Не найден файл Dagami для запуска CLI.");
    if(FileVersionInfo.GetVersionInfo(runner).ProductName!=Brand.Name||FileVersionInfo.GetVersionInfo(runner).FileVersion!=FileVersionInfo.GetVersionInfo(typeof(NativeCliApps).Assembly.Location).FileVersion)throw new InvalidOperationException("Версия файла Dagami не совпадает с работающей программой.");
@@ -105,9 +105,9 @@ namespace DevProxyApp {
    if(old!=null&&!old.Command.Equals(command,StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Имя команды изменилось. Сначала отмените прежнюю настройку.");
    string shim=Path.Combine(bin,command+".exe");
    if(File.Exists(shim)&&(old==null||Hash(File.ReadAllBytes(shim))!=old.Hash))throw new InvalidOperationException("CLI-запускатель изменён вне Dagami. Файл не перезаписан.");
-   // A missing managed file can be recreated from this verified runner; the
-   // protected journal still identifies its original application and command.
-   byte[] original=File.Exists(shim)?File.ReadAllBytes(shim):null,oldJournal=File.Exists(journal)?File.ReadAllBytes(journal):null;
+   
+    
+    byte[] original=File.Exists(shim)?File.ReadAllBytes(shim):null,oldJournal=File.Exists(journal)?File.ReadAllBytes(journal):null;
    string userPath=environment.UserPath,processPath=environment.ProcessPath;
    Directory.CreateDirectory(bin);
    try{
@@ -141,10 +141,10 @@ namespace DevProxyApp {
    try{foreach(var app in state.Apps){if(Hash(File.ReadAllBytes(app.Shim))!=app.Hash)throw new IOException("CLI-запускатель изменился во время обновления.");Atomic(app.Shim,bytes);changed.Add(app.Shim);app.Hash=next;}Save(state);return changed.Count;}
    catch(Exception error){var failed=new List<string>();foreach(string path in changed)try{if(Hash(File.ReadAllBytes(path))!=next)throw new IOException("Чужое изменение");Atomic(path,old[path]);}catch{failed.Add(Path.GetFileName(path));}Atomic(journal,journalBefore);if(failed.Count>0)throw new IOException("Не удалось откатить CLI: "+string.Join(", ",failed.ToArray())+". Копии: "+backup,error);throw;}
   });}
-  // cmd.exe must wait for a CLI command. A copy of the GUI-subsystem runner
-  // attaches too late: cmd may already be reading the same terminal as agy.
-  // Only the managed command copy gets the console subsystem; the GUI stays GUI.
-  public static byte[] ConsoleRunnerBytes(string runner){
+  
+   
+   
+   public static byte[] ConsoleRunnerBytes(string runner){
    byte[] bytes=File.ReadAllBytes(runner);
    if(bytes.Length<96||BitConverter.ToUInt16(bytes,0)!=0x5a4d)throw new InvalidDataException("Invalid runner executable.");
    int pe=BitConverter.ToInt32(bytes,0x3c);
@@ -178,8 +178,8 @@ namespace DevProxyApp {
      int lineStart=source.LastIndexOf('\n',candidate.Index)+1,lineEnd=source.IndexOf('\n',candidate.Index);if(lineEnd<0)lineEnd=source.Length;
      string prefix=source.Substring(lineStart,candidate.Index-lineStart),tail=source.Substring(candidate.Index+candidate.Length,lineEnd-candidate.Index-candidate.Length).Trim();
      string trimmed=prefix.TrimStart();if(trimmed.StartsWith("#")||trimmed.StartsWith("::")||trimmed.StartsWith("REM ",StringComparison.OrdinalIgnoreCase))continue;
-     // A quoted JS path in echo/comments is not an executable npm entrypoint.
-     bool nodeCall=ext==".ps1" ? Regex.IsMatch(prefix,@"&\s*[""'](?:\$basedir[\\/]node\$exe|node\$exe|node(?:\.exe)?)[""']\s*$",RegexOptions.IgnoreCase) :
+     
+      bool nodeCall=ext==".ps1" ? Regex.IsMatch(prefix,@"&\s*[""'](?:\$basedir[\\/]node\$exe|node\$exe|node(?:\.exe)?)[""']\s*$",RegexOptions.IgnoreCase) :
       Regex.IsMatch(prefix,@"(?:^|[&|])\s*[""'](?:%_prog%|%dp0%[\\/]node\.exe|node(?:\.exe)?)[""']\s*$",RegexOptions.IgnoreCase);
      if(nodeCall&&tail==(ext==".ps1"?"$args":"%*")){npm=candidate;break;}
     }

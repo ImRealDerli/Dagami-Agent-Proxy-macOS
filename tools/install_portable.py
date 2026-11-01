@@ -1,4 +1,4 @@
-"""Install sources and one user launcher. No downloads, elevation or startup."""
+
 import argparse
 import hashlib
 import json

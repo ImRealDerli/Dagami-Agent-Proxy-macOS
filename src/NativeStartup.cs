@@ -43,9 +43,9 @@ namespace DevProxyApp {
         void Delete(string name);
     }
     public sealed class WindowsStartupTaskStore : IStartupTaskStore {
-        // Use the same built-in PowerShell host as DNS helpers. Task operations
-        // stay hidden and inherit the current Windows identity.
-        string Call(string operation,string name,string xml,string sid) {
+        
+         
+         string Call(string operation,string name,string xml,string sid) {
             var serializer=new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength=2097152 };
             string payload=Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(serializer.Serialize(new { Operation=operation,Name=name,Xml=xml,Sid=sid })));
             string script=@"

@@ -32,13 +32,13 @@ namespace DevProxyApp
             int recordLen = (buffer[offset + 3] << 8) | buffer[offset + 4];
             if (recordLen < 38 || offset + 5 + recordLen > end) return false;
             int hs = offset + 5;
-            if (buffer[hs] != 0x01) return false; // ClientHello
-            int hsLen = (buffer[hs + 1] << 16) | (buffer[hs + 2] << 8) | buffer[hs + 3];
+            if (buffer[hs] != 0x01) return false; 
+             int hsLen = (buffer[hs + 1] << 16) | (buffer[hs + 2] << 8) | buffer[hs + 3];
             if (hs + 4 + hsLen > offset + 5 + recordLen) return false;
             int pos = hs + 4;
             if (pos + 34 > end) return false;
-            pos += 34; // client_version (2) + random (32)
-            if (pos >= end) return false;
+            pos += 34; 
+             if (pos >= end) return false;
             int sessionIdLen = buffer[pos++];
             pos += sessionIdLen;
             if (pos + 2 > end) return false;
@@ -167,8 +167,8 @@ namespace DevProxyApp
                     byte[] splitRecords = TlsClientHelloInspector.SplitTlsRecordAtSni(buffer, offset, count);
                     if (splitRecords != null) {
                         if (_mode == DpiDesyncMode.AutoSplit && splitRecords.Length > 7) {
-                            // Combine TLS record split + TCP multisplit (first 2 bytes, then up to second record, then rest)
-                            int firstRecordEnd = 5 + ((splitRecords[3] << 8) | splitRecords[4]);
+                            
+                             int firstRecordEnd = 5 + ((splitRecords[3] << 8) | splitRecords[4]);
                             _inner.Write(splitRecords, 0, 2);
                             _inner.Flush();
                             _inner.Write(splitRecords, 2, firstRecordEnd - 2);
@@ -183,8 +183,8 @@ namespace DevProxyApp
                     }
                 }
                 if ((_mode == DpiDesyncMode.TcpMultiSplit || _mode == DpiDesyncMode.AutoSplit) && sniMid > 2 && sniMid < count) {
-                    // Zapret/GoodbyeDPI TCP multisplit at pos 2 and midsld
-                    _inner.Write(buffer, offset, 2);
+                    
+                     _inner.Write(buffer, offset, 2);
                     _inner.Flush();
                     _inner.Write(buffer, offset + 2, sniMid - 2);
                     _inner.Flush();
@@ -208,25 +208,25 @@ namespace DevProxyApp
         public static byte[] PadQuery(byte[] query, int blockSize = 128)
         {
             if (query == null || query.Length < 17 || blockSize < 16 || blockSize > 512) return query;
-            // Only add OPT if ARCOUNT is currently 0
-            if (query[10] != 0 || query[11] != 0) return query;
-            int baseOptLen = 11 + 4; // Root(1) + Type OPT(2) + UDP size(2) + RCODE/Flags(4) + RDLEN(2) + OptionCode(2) + OptionLen(2)
-            int totalUnpadded = query.Length + baseOptLen;
+            
+             if (query[10] != 0 || query[11] != 0) return query;
+            int baseOptLen = 11 + 4; 
+             int totalUnpadded = query.Length + baseOptLen;
             int remainder = totalUnpadded % blockSize;
             int padBytes = remainder == 0 ? 0 : (blockSize - remainder);
             int rdLen = 4 + padBytes;
             byte[] padded = new byte[totalUnpadded + padBytes];
             Buffer.BlockCopy(query, 0, padded, 0, query.Length);
-            padded[11] = 1; // ARCOUNT = 1
-            int pos = query.Length;
-            padded[pos++] = 0; // root domain
-            padded[pos++] = 0; padded[pos++] = 41; // OPT record (41)
-            padded[pos++] = 0x04; padded[pos++] = 0xd0; // UDP payload size 1232
-            padded[pos++] = 0; padded[pos++] = 0; padded[pos++] = 0; padded[pos++] = 0; // ext RCODE & flags
-            padded[pos++] = (byte)(rdLen >> 8);
+            padded[11] = 1; 
+             int pos = query.Length;
+            padded[pos++] = 0; 
+             padded[pos++] = 0; padded[pos++] = 41; 
+             padded[pos++] = 0x04; padded[pos++] = 0xd0; 
+             padded[pos++] = 0; padded[pos++] = 0; padded[pos++] = 0; padded[pos++] = 0; 
+             padded[pos++] = (byte)(rdLen >> 8);
             padded[pos++] = (byte)rdLen;
-            padded[pos++] = 0; padded[pos++] = 12; // Option 12: EDNS0 Padding (RFC 8467)
-            padded[pos++] = (byte)(padBytes >> 8);
+            padded[pos++] = 0; padded[pos++] = 12; 
+             padded[pos++] = (byte)(padBytes >> 8);
             padded[pos++] = (byte)padBytes;
             return padded;
         }
@@ -295,8 +295,8 @@ namespace DevProxyApp
                 if (preset == "wrongseq") return "-e 2 -f 2 --native-frag --wrong-seq --blacklist " + quotedList;
                 return "-e 2 -f 2 --native-frag --reverse-frag --max-payload 1200 --blacklist " + quotedList;
             }
-            // Zapret winws.exe
-            if (preset == "fake")
+            
+             if (preset == "fake")
                 return "--wf-tcp=443 --dpi-desync=fake,multisplit --dpi-desync-split-pos=2,midsld --dpi-desync-autottl=2 --hostlist=" + quotedList;
             return "--wf-tcp=443 --dpi-desync=multisplit --dpi-desync-split-pos=2,midsld --dpi-desync-split-seqovl=1 --hostlist=" + quotedList;
         }

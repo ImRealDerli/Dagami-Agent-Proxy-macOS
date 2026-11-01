@@ -73,8 +73,8 @@ class SystemDnsUiChecks {
    var engine=SystemDnsManager.EngineStart("Restore",SystemDnsManager.EncodeRequest(request),Path.Combine(Path.GetTempPath(),"DNS test.ps1"));
    Assert(!engine.UseShellExecute && engine.CreateNoWindow && engine.WindowStyle==ProcessWindowStyle.Hidden,"DNS engine can create a console");
    Assert(engine.RedirectStandardOutput && engine.RedirectStandardError && engine.Arguments.Contains("-NonInteractive -WindowStyle Hidden"),"Engine output is not kept inside the report");
-   // Exercise the real process path with an inert script, never the DNS engine.
-   string inert=Path.Combine(Environment.CurrentDirectory,"Dagami-dns-inert-"+Guid.NewGuid().ToString("N")+".ps1");
+   
+    string inert=Path.Combine(Environment.CurrentDirectory,"Dagami-dns-inert-"+Guid.NewGuid().ToString("N")+".ps1");
    try {
     File.WriteAllText(inert,"param($Operation,$RequestBase64)\r\nWrite-Output 'INERT_DNS_ENGINE_OK'\r\n",new UTF8Encoding(true));
     using(var child=Process.Start(SystemDnsManager.EngineStart("Restore",SystemDnsManager.EncodeRequest(request),inert))) {

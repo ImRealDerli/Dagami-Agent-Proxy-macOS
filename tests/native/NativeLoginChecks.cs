@@ -41,9 +41,9 @@ public static class NativeLoginChecks
             var redact=typeof(Logger).GetMethod("Redact",BindingFlags.NonPublic|BindingFlags.Static);
             string safe=(string)redact.Invoke(null,new object[]{url+" http://alice:password@proxy.invalid:8080/ Authorization=TOKEN"});
             Assert(!safe.Contains("PRIVATE")&&!safe.Contains("SECRET")&&!safe.Contains("alice")&&!safe.Contains("password")&&!safe.Contains("TOKEN"),"Login secrets leaked");
-            // Observe socket behavior, not just a type predicate: TLS wrapper
-            // must not emit a raw FIN on its underlying TCP connection.
-            var listener=new TcpListener(IPAddress.Loopback,0);listener.Start();
+            
+             
+             var listener=new TcpListener(IPAddress.Loopback,0);listener.Start();
             using(var sender=new TcpClient("127.0.0.1",((IPEndPoint)listener.LocalEndpoint).Port))
             using(var receiver=listener.AcceptTcpClient()) {
                 receiver.GetStream().ReadTimeout=100;

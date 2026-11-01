@@ -27,9 +27,9 @@ class TlsDiagnosticsChecks {
      foreach(byte[] value in new[]{new byte[]{0},key.Modulus,key.Exponent,key.D,key.P,key.Q,key.DP,key.DQ,key.InverseQ}){byte[] encoded=Integer(value);data.Write(encoded,0,encoded.Length);}
      File.WriteAllText(keyPath,Pem("RSA PRIVATE KEY",Der(48,data.ToArray())));
     }
-    // Python/OpenSSL serves an in-memory fixture key from this disposable TEMP
-    // directory. Windows certificate/private-key stores are never changed.
-    string script="import socket,ssl,sys\nc=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)\nc.load_cert_chain(sys.argv[1],sys.argv[2])\ns=socket.socket()\ns.bind(('127.0.0.1',0))\ns.listen(1)\ns.settimeout(5)\nprint(s.getsockname()[1],flush=True)\ntry:\n p,_=s.accept()\n p.settimeout(3)\n c.wrap_socket(p,server_side=True).close()\nexcept (ssl.SSLError,OSError):\n pass\nfinally:\n s.close()\n";
+    
+     
+     string script="import socket,ssl,sys\nc=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)\nc.load_cert_chain(sys.argv[1],sys.argv[2])\ns=socket.socket()\ns.bind(('127.0.0.1',0))\ns.listen(1)\ns.settimeout(5)\nprint(s.getsockname()[1],flush=True)\ntry:\n p,_=s.accept()\n p.settimeout(3)\n c.wrap_socket(p,server_side=True).close()\nexcept (ssl.SSLError,OSError):\n pass\nfinally:\n s.close()\n";
     string python=Environment.GetEnvironmentVariable("DAGAMI_TEST_PYTHON");if(string.IsNullOrEmpty(python))throw new Exception("Run this suite through tools/run_native_checks.py");
     var start=new ProcessStartInfo(python,"-u -c "+NativeShortcuts.Quote(script)+" "+NativeShortcuts.Quote(certificatePath)+" "+NativeShortcuts.Quote(keyPath)){UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true};
     using(var server=Process.Start(start))try {

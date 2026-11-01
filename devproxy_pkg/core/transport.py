@@ -1,8 +1,8 @@
-"""
-core/transport.py
-Network transport layer with Tiered Backpressure Concurrency Gate and socket buffer tuning.
-Zero-Dependencies implementation using standard library.
-"""
+
+
+
+
+
 
 import time
 import socket
@@ -12,12 +12,12 @@ from typing import Generator, Optional
 
 
 class AdaptiveTLSGate:
-    """
-    Tiered Backpressure concurrency limiter for TLS handshakes.
-    - Base limit: 64 concurrent slots (fast, unthrottled for healthy upstreams).
-    - Throttled limit: 16 slots (when upstream latency degrades).
-    - Threshold: Exponential Moving Average (EMA) RTT > 2.0 seconds.
-    """
+    
+
+
+
+
+
 
     BASE_SLOTS = 64
     THROTTLED_SLOTS = 16
@@ -51,7 +51,7 @@ class AdaptiveTLSGate:
             return self._ema_rtt
 
     def record_rtt(self, rtt: float) -> None:
-        """Updates moving average RTT and recalibrates gate limit."""
+        
         with self._cond:
             if self._ema_rtt is None:
                 self._ema_rtt = rtt
@@ -70,10 +70,10 @@ class AdaptiveTLSGate:
 
     @contextmanager
     def acquire(self, timeout: float = 10.0) -> Generator[bool, None, None]:
-        """
-        Acquires an execution slot under the active capacity limit.
-        Raises TimeoutError if deadline is exceeded.
-        """
+        
+
+
+
         deadline = time.monotonic() + timeout
         with self._cond:
             while self._current_in_flight >= self._active_limit:
@@ -99,11 +99,11 @@ class AdaptiveTLSGate:
 
 
 def tune_socket(sock: socket.socket) -> None:
-    """
-    Applies high-throughput low-latency options to a socket:
-    - TCP_NODELAY: Disables Nagle's algorithm for instant streaming chunk dispatch.
-    - SO_RCVBUF / SO_SNDBUF: Configured to 128KB for smoother high-bandwidth data pipes.
-    """
+    
+
+
+
+
     try:
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     except (OSError, socket.error):
@@ -117,15 +117,15 @@ def tune_socket(sock: socket.socket) -> None:
 
 
 class FastDuplexRelay:
-    """
-    High-performance bidirectional raw byte streaming between two sockets.
-    Handles half-close states via shutdown(SHUT_WR).
-    """
+    
 
-    BUFFER_SIZE = 65536  # 64 KB
+
+
+
+    BUFFER_SIZE = 65536         
 
     @classmethod
-    def pipe(cls, sock1: socket.socket, sock2: socket.socket) -> None:
+    def pipe(cls, sock1: socket.socket, sock2: socket.socket, fragment_size: int = 0) -> None:
         tune_socket(sock1)
         tune_socket(sock2)
 
@@ -133,12 +133,16 @@ class FastDuplexRelay:
         sock2.setblocking(True)
 
         def _forward(src: socket.socket, dst: socket.socket):
+            first=True
             try:
                 while True:
                     data = src.recv(cls.BUFFER_SIZE)
                     if not data:
                         break
-                    dst.sendall(data)
+                    if first and src is sock1 and fragment_size and data[:1]==b'\x16':
+                        for offset in range(0,len(data),fragment_size):dst.sendall(data[offset:offset+fragment_size])
+                    else:dst.sendall(data)
+                    first=False
             except Exception:
                 pass
             finally:

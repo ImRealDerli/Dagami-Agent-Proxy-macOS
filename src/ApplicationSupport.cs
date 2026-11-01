@@ -62,8 +62,8 @@ namespace DevProxyApp {
    return "http://127.0.0.1:53200";
   }
   public static void ConfigureProcess(ProcessStartInfo start,string localProxy) {
-   AppProxyPolicy.ChromiumArguments(localProxy); // Validate the shared bridge contract.
-   foreach(string key in new[]{"HTTP_PROXY","HTTPS_PROXY","ALL_PROXY","http_proxy","https_proxy","all_proxy"})start.EnvironmentVariables[key]=localProxy;
+   AppProxyPolicy.ChromiumArguments(localProxy); 
+    foreach(string key in new[]{"HTTP_PROXY","HTTPS_PROXY","ALL_PROXY","http_proxy","https_proxy","all_proxy"})start.EnvironmentVariables[key]=localProxy;
    start.EnvironmentVariables["NO_PROXY"]=start.EnvironmentVariables["no_proxy"]="localhost,127.0.0.1,::1";
    start.EnvironmentVariables["NODE_USE_ENV_PROXY"]="1";
   }

@@ -1,10 +1,10 @@
-"""
-LocalProxyDetector: Optional client discovery.
-Rule:
-- Purely manual/optional helper (never runs automatically on startup).
-- Never overwrites custom user proxy or switches profile without confirmation.
-- Detects commonly used local VPN/proxy clients listening on loopback ports.
-"""
+
+
+
+
+
+
+
 
 import socket
 from typing import List, Dict, Any
@@ -27,7 +27,7 @@ KNOWN_LOCAL_CLIENTS = [
 class LocalProxyDetector:
     @staticmethod
     def scan_active_clients() -> List[Dict[str, Any]]:
-        """Scans loopback ports of known proxy clients."""
+        
         active = []
         for client in KNOWN_LOCAL_CLIENTS:
             host = client["host"]

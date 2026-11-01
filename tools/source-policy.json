@@ -1,6 +1,35 @@
 {
   "allowed_duplicate_groups": [],
-  "forbidden_paths": ["generate_license_key.py", "license-issuer/**", "app.manifest", "SystemDns.ps1", "build_native_app.py", "build_portable.py", "install_portable.py"],
-  "forbidden_root_extensions": [".cs"],
-  "required_paths": ["src/DevProxyApp.cs", "src/app.manifest", "src/SystemDns.ps1", "tools/build_native_app.py", "tools/build_portable.py", "tools/install_portable.py", "AGENTS.md", "CHANGELOG.md"]
+  "forbidden_paths": [
+    "generate_license_key.py",
+    "license-issuer/**",
+    "app.manifest",
+    "SystemDns.ps1",
+    "build_native_app.py",
+    "build_portable.py",
+    "install_portable.py"
+  ],
+  "forbidden_root_extensions": [
+    ".cs"
+  ],
+  "required_paths": [
+    "src/DevProxyApp.cs",
+    "src/app.manifest",
+    "src/SystemDns.ps1",
+    "tools/build_native_app.py",
+    "tools/build_portable.py",
+    "tools/install_portable.py",
+    "AGENTS.md",
+    "CHANGELOG.md"
+  ],
+  "trusted_binaries": {
+    "devproxy_pkg/assets/webdriver/mac-x64/chromedriver": {
+      "sha256": "da17fb835b15c1f2bec0621bae3d7f725133b5fd38fd5833d0419e175721794e",
+      "source": "https://storage.googleapis.com/chrome-for-testing-public/156.0.8078.80/mac-x64/chromedriver-mac-x64.zip"
+    },
+    "devproxy_pkg/assets/webdriver/mac-arm64/chromedriver": {
+      "sha256": "c081b7e2f45f495c8b377458da61a9346edc8529d280eaf9a739685fda28e08a",
+      "source": "https://storage.googleapis.com/chrome-for-testing-public/156.0.8078.80/mac-arm64/chromedriver-mac-arm64.zip"
+    }
+  }
 }

@@ -126,8 +126,8 @@ namespace DevProxyApp
 
 
 
-            // Keep inherited pipes intact for CLI calls to the GUI executable.
-
+            
+ 
 
 
             if (GetFileType(GetStdHandle(-11)) != 0) return;
@@ -154,12 +154,12 @@ namespace DevProxyApp
 
 
 
-            // A GUI-subsystem EXE can inherit valid pipes without a console.
+            
+ 
 
 
-
-            // Console.OutputEncoding calls SetConsoleOutputCP and fails there.
-
+            
+ 
 
 
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput(), utf8) { AutoFlush = true });
@@ -191,9 +191,9 @@ namespace DevProxyApp
 
 
         {
-            // Check before starting a bridge, saving config or launching children.
-            // A Low-labelled build image lowers even an Explorer-launched process.
-            int integrity;
+            
+             
+             int integrity;
             try { integrity = WindowsExecutionContext.IntegrityRid(); }
             catch { integrity = -1; }
             if (args != null && args.Length == 1 && args[0] == "--permissions-info") {
@@ -217,12 +217,12 @@ namespace DevProxyApp
 
 
 
-            // A DNS helper never enters shim, console, tray or GUI startup.
+            
+ 
 
 
-
-            // The caller reads the protected job report, so no dialogs here.
-
+            
+ 
 
 
             if (args != null && args.Length > 0 && args[0] == "--system-dns-helper") {
@@ -1754,8 +1754,8 @@ namespace DevProxyApp
 
 
 
-                ports.Add(0); // Windows may exclude the entire preferred range.
-
+                ports.Add(0); 
+ 
 
 
                 string bindError = null;
@@ -2174,12 +2174,12 @@ namespace DevProxyApp
 
 
 
-                        // The client may tunnel plain HTTP on port 80. A CONNECT
+                        
+ 
 
 
-
-                        // needs a 200 before the inner HTTP request and response.
-
+                        
+ 
 
 
                         byte[] established=Encoding.ASCII.GetBytes("HTTP/1.1 200 Connection established\r\n\r\n");
@@ -2734,12 +2734,12 @@ namespace DevProxyApp
 
 
 
-                            // No tunnel/data has been acknowledged. Reconnect only;
+                            
+ 
 
 
-
-                            // never replay application requests or OAuth codes.
-
+                            
+ 
 
 
                             upstreamStream.Dispose(); CloseConnection(upstream);
@@ -3111,9 +3111,9 @@ namespace DevProxyApp
 
 
                 IPAddress ip;
-                // Direct means the Windows/VPN route. Smart DNS was selected
-                // explicitly above; do not silently resolve again here.
-                if (IPAddress.TryParse(host, out ip))
+                
+                 
+                 if (IPAddress.TryParse(host, out ip))
                     result = tcp.BeginConnect(ip, port, null, null);
                 else
                     result = tcp.BeginConnect(host, port, null, null);
@@ -3457,12 +3457,12 @@ namespace DevProxyApp
 
 
 
-            // One origin per raw connection. Do not allow a later proxy request
+            
+ 
 
 
-
-            // with a different destination to be pipelined into this backend.
-
+            
+ 
 
 
             return result.Append("Connection: close\r\n\r\n").ToString();
@@ -3481,8 +3481,8 @@ namespace DevProxyApp
 
 
 
-            // Never resolve an arbitrary name into a direct/internal route.
-
+            
+ 
 
 
             IPAddress address = host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ? IPAddress.Loopback : IPAddress.Parse(host);
@@ -3713,12 +3713,12 @@ namespace DevProxyApp
 
 
 
-            // Messages may contain untrusted response text. Only generated status
+            
+ 
 
 
-
-            // and phase information are logged; headers and payloads stay opaque.
-
+            
+ 
 
 
             if (error.InnerException != null) result += " inner=" + ErrorKind(error.InnerException);
@@ -3745,12 +3745,12 @@ namespace DevProxyApp
 
 
 
-            // Streaming model responses may legitimately pause longer than the
+            
+ 
 
 
-
-            // handshake deadline. Preserve the tunnel until one side closes it.
-
+            
+ 
 
 
             if (s1.CanTimeout) s1.ReadTimeout = Timeout.Infinite;
@@ -3761,12 +3761,12 @@ namespace DevProxyApp
 
 
 
-            // HandleConnection returns after handing off the streams. Keep a
+            
+ 
 
 
-
-            // separate lease until both relay directions have finished.
-
+            
+ 
 
 
             Interlocked.Increment(ref _activeConnections);
@@ -3957,12 +3957,12 @@ namespace DevProxyApp
 
 
 
-            // TCP shutdown bypasses SslStream and truncates the TLS record layer.
+            
+ 
 
 
-
-            // Continue reading the opposite direction until the TLS peer closes.
-
+            
+ 
 
 
             if (destinationStream is SslStream) return;
@@ -4376,8 +4376,8 @@ namespace DevProxyApp
 
 
 
-            // Opt in: splitting can interfere with working TLS routes.
-
+            
+ 
 
 
             DnsObfuscation = false;
@@ -4506,8 +4506,8 @@ namespace DevProxyApp
 
 
 
-            // If no proxy saved in config, scan existing settings in IDEs or environment
-
+            
+ 
 
 
             if (string.IsNullOrEmpty(LastProxy))
@@ -4566,8 +4566,8 @@ namespace DevProxyApp
 
 
 
-            // Ensure baseline presets exist in profiles
-
+            
+ 
 
 
             EnsureDefaultProfiles();
@@ -4653,8 +4653,8 @@ namespace DevProxyApp
 
 
 
-                // Checked IDs
-
+                
+ 
 
 
                 sb.Append("  \"checked_ids\": [");
@@ -4685,8 +4685,8 @@ namespace DevProxyApp
 
 
 
-                // Profiles
-
+                
+ 
 
 
                 sb.AppendLine("  \"profiles\": [");
@@ -4773,8 +4773,8 @@ namespace DevProxyApp
 
 
 
-                // Custom Targets
-
+                
+ 
 
 
                 sb.AppendLine("  \"custom_targets\": [");
@@ -4875,8 +4875,8 @@ namespace DevProxyApp
 
 
 
-            // Protected values are preferred; legacy plaintext is read only for migration.
-
+            
+ 
 
 
             Match mProtectedProxy = Regex.Match(json, @"\""last_proxy_protected\""\s*:\s*\""([^\""]*)\""");
@@ -4915,8 +4915,8 @@ namespace DevProxyApp
 
 
 
-            // set_system_env
-
+            
+ 
 
 
             Match mEnv = Regex.Match(json, @"\""set_system_env\""\s*:\s*(true|false)");
@@ -4931,8 +4931,8 @@ namespace DevProxyApp
 
 
 
-            // use_dagami_dns
-
+            
+ 
 
 
             Match mUseProxy = Regex.Match(json, @"\""use_proxy\""\s*:\s*(true|false)");
@@ -5000,8 +5000,8 @@ namespace DevProxyApp
 
 
 
-            // checked_ids
-
+            
+ 
 
 
             Match mChecked = Regex.Match(json, @"\""checked_ids\""\s*:\s*\[([^\]]*)\]");
@@ -5044,8 +5044,8 @@ namespace DevProxyApp
 
 
 
-            // profiles
-
+            
+ 
 
 
             Match mProf = Regex.Match(json, @"\""profiles\""\s*:\s*\[(.*?)\]\s*,\s*\""custom", RegexOptions.Singleline);
@@ -5128,8 +5128,8 @@ namespace DevProxyApp
 
 
 
-            // custom_targets
-
+            
+ 
 
 
             Match mCust = Regex.Match(json, @"\""custom_targets\""\s*:\s*\[(.*?)\]", RegexOptions.Singleline);
@@ -5420,8 +5420,8 @@ namespace DevProxyApp
 
 
 
-            // Environment variable
-
+            
+ 
 
 
             string envProxy = Environment.GetEnvironmentVariable("HTTP_PROXY") ?? Environment.GetEnvironmentVariable("ALL_PROXY");
@@ -5746,8 +5746,8 @@ namespace DevProxyApp
 
 
 
-            // 1. Google Antigravity
-
+            
+ 
 
 
             string antigravityExe = FindFirstExisting(new string[] {
@@ -5798,8 +5798,8 @@ namespace DevProxyApp
 
 
 
-            // IDE 2.6 is a separate application; keep Manager and IDE discoverable together.
-
+            
+ 
 
 
             list.Add(new AppTarget {
@@ -5826,8 +5826,8 @@ namespace DevProxyApp
 
 
 
-            // 2. Cursor
-
+            
+ 
 
 
             string cursorExe = FindFirstExisting(new string[] {
@@ -5878,8 +5878,8 @@ namespace DevProxyApp
 
 
 
-            // 3. VS Code
-
+            
+ 
 
 
             string codeExe = FindFirstExisting(new string[] {
@@ -5930,8 +5930,8 @@ namespace DevProxyApp
 
 
 
-            // 4. Windsurf
-
+            
+ 
 
 
             string windsurfExe = FindFirstExisting(new string[] {
@@ -5982,8 +5982,8 @@ namespace DevProxyApp
 
 
 
-            // 5. VSCodium
-
+            
+ 
 
 
             string vscodiumExe = FindFirstExisting(new string[] {
@@ -6030,8 +6030,8 @@ namespace DevProxyApp
 
 
 
-            // 6. OpenAI Codex CLI
-
+            
+ 
 
 
             string codexExe = null;
@@ -6134,8 +6134,8 @@ namespace DevProxyApp
 
 
 
-            // 8. JetBrains IDEs
-
+            
+ 
 
 
             list.AddRange(ApplicationDiscovery.JetBrains(new[]{Path.Combine(progFiles,"JetBrains"),Path.Combine(localAppData,@"JetBrains\Toolbox\apps"),Path.Combine(localAppData,@"Programs\JetBrains")}));
@@ -6162,8 +6162,8 @@ namespace DevProxyApp
 
 
 
-            // 9. Load saved custom targets from ConfigManager
-
+            
+ 
 
 
             foreach (var custom in ConfigManager.Instance.CustomTargets)
@@ -6937,9 +6937,9 @@ namespace DevProxyApp
             if (File.Exists(path)) {
                 byte[] existing = File.ReadAllBytes(path);
                 bool bom = existing.Length >= 3 && existing[0] == 239 && existing[1] == 187 && existing[2] == 191;
-                // ReadAllText hides BOM, but IDE components using JSON.parse do
-                // not accept it. Identical text must still repair legacy files.
-                if (!bom && string.Equals(Encoding.UTF8.GetString(existing), content, StringComparison.Ordinal)) return;
+                
+                 
+                 if (!bom && string.Equals(Encoding.UTF8.GetString(existing), content, StringComparison.Ordinal)) return;
             }
             string temporary = Path.Combine(directory, ".devproxy-" + Guid.NewGuid().ToString("N") + ".tmp");
             try {
@@ -7230,8 +7230,8 @@ namespace DevProxyApp
 
 
 
-                // Process environment (inherited by child processes started by DevProxy)
-
+                
+ 
 
 
                 Environment.SetEnvironmentVariable("HTTP_PROXY", proxyUrl, EnvironmentVariableTarget.Process);
@@ -7282,8 +7282,8 @@ namespace DevProxyApp
 
 
 
-                // User environment (persisted in Windows registry for shell and other apps)
-
+                
+ 
 
 
                 Environment.SetEnvironmentVariable("HTTP_PROXY", proxyUrl, EnvironmentVariableTarget.User);
@@ -8542,8 +8542,8 @@ namespace DevProxyApp
 
 
 
-                if (wEx.NativeErrorCode == 1223) // ERROR_CANCELLED (user clicked "No" on UAC)
-
+                if (wEx.NativeErrorCode == 1223) 
+ 
 
 
                 {
@@ -8778,40 +8778,40 @@ namespace DevProxyApp
 
 
 
-                    // Standard DNS query packet for google.com
-
+                    
+ 
 
 
                     byte[] query = new byte[] {
 
 
 
-                        0xAA, 0xBB, // ID
+                        0xAA, 0xBB, 
+ 
 
 
-
-                        0x01, 0x00, // Recursion desired
-
-
-
-                        0x00, 0x01, // QDCOUNT: 1
+                        0x01, 0x00, 
+ 
 
 
-
-                        0x00, 0x00, // ANCOUNT: 0
-
-
-
-                        0x00, 0x00, // NSCOUNT: 0
+                        0x00, 0x01, 
+ 
 
 
+                        0x00, 0x00, 
+ 
 
-                        0x00, 0x00, // ARCOUNT: 0
+
+                        0x00, 0x00, 
+ 
 
 
+                        0x00, 0x00, 
+ 
 
-                        // 6 google 3 com 0
 
+                        
+ 
 
 
                         0x06, 0x67, 0x6F, 0x6F, 0x67, 0x6C, 0x65,
@@ -8826,12 +8826,12 @@ namespace DevProxyApp
 
 
 
-                        0x00, 0x01, // Type A
+                        0x00, 0x01, 
+ 
 
 
-
-                        0x00, 0x01  // Class IN
-
+                        0x00, 0x01  
+ 
 
 
                     };
@@ -9730,12 +9730,12 @@ namespace DevProxyApp
 
 
 
-                    // GUI launch gets a real console; ordinary command launch
+                    
+ 
 
 
-
-                    // uses NativeCliApps.Run and retains the caller's console.
-
+                    
+ 
 
 
                     if (string.IsNullOrEmpty(originalDirectory)) psi.WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -9776,8 +9776,8 @@ namespace DevProxyApp
 
 
 
-                // Support a server already prepared by an external unlocker too.
-
+                
+ 
 
 
                 psi.EnvironmentVariables["AG_LS_PROXY"] = localProxy;
@@ -9800,12 +9800,12 @@ namespace DevProxyApp
 
 
 
-                // A previous patch may contain the old/default bridge port.
+                
+ 
 
 
-
-                // Refresh it before each managed start, never upstream credentials.
-
+                
+ 
 
 
                 ApplicationSupport.ResolveSettings(target);

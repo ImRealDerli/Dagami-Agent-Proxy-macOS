@@ -53,8 +53,8 @@ class ShortcutChecks {
    Reject(()=>store.Resolve("../escape","fixture"),"Traversal key accepted");
    byte[] journal=File.ReadAllBytes(Path.Combine(root,"state","journal.dat"));
    Assert(!Encoding.UTF8.GetString(journal).Contains("--project"),"Original arguments persisted in plaintext journal");
-   // Legacy Apply/Restore must not silently unwrap a managed shortcut.
-   typeof(ProxyEngine).GetMethod("UpdateShortcutFile",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{linkPath,exe,"http://127.0.0.1:9",false});
+   
+    typeof(ProxyEngine).GetMethod("UpdateShortcutFile",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{linkPath,exe,"http://127.0.0.1:9",false});
    Assert(Bytes(patched,File.ReadAllBytes(linkPath)),"Legacy Apply destroyed managed shortcut");
    Assert(store.Restore("fixture").Count==1 && Bytes(original,File.ReadAllBytes(linkPath)),"Rollback is not byte exact");
    Assert(store.Count("fixture")==0,"Rollback kept active record");

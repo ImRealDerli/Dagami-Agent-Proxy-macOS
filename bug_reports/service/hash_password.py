@@ -1,4 +1,4 @@
-"""Print only a salted admin password hash; stdlib only, no secret CLI arguments."""
+
 import getpass
 import hashlib
 import secrets

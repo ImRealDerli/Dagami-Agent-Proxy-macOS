@@ -50,8 +50,8 @@ namespace DevProxyApp {
    using(var stream=File.OpenRead(path))using(var image=Image.FromStream(stream,true,true)) {
     if(image.RawFormat.Guid!=ImageFormat.Png.Guid&&image.RawFormat.Guid!=ImageFormat.Jpeg.Guid)throw new IOException("Выберите PNG или JPEG.");
     if((long)image.Width*image.Height>12000000)throw new IOException("Картинка должна быть не больше 12 мегапикселей.");
-    // A fresh bitmap drops EXIF and other metadata before anything is queued.
-    using(var pixels=new Bitmap(image.Width,image.Height))using(var graphics=Graphics.FromImage(pixels))using(var output=new MemoryStream()) {
+    
+     using(var pixels=new Bitmap(image.Width,image.Height))using(var graphics=Graphics.FromImage(pixels))using(var output=new MemoryStream()) {
      graphics.Clear(Color.White);graphics.DrawImage(image,0,0,image.Width,image.Height);pixels.Save(output,ImageFormat.Png);
      if(output.Length>2*1024*1024)throw new IOException("После очистки картинка больше 2 МБ. Уменьшите её размер.");
      return Convert.ToBase64String(output.ToArray());
@@ -75,16 +75,16 @@ namespace DevProxyApp {
   }
   public static void Send(BugReportPayload payload,string root,string endpoint=Endpoint) {
    Uri uri;if(!Uri.TryCreate(endpoint,UriKind.Absolute,out uri)||(uri.Scheme!="https"&&!(uri.Scheme=="http"&&uri.IsLoopback)))throw new ArgumentException("Reports require HTTPS.");
-   Queue(payload,root); // Persist the exact sanitized payload before any network request.
-   byte[] data=Encoding.UTF8.GetBytes(Serializer().Serialize(payload));
+   Queue(payload,root); 
+    byte[] data=Encoding.UTF8.GetBytes(Serializer().Serialize(payload));
    if(data.Length>3*1024*1024)throw new IOException("Слишком большой отчёт.");
-   // The runner targets .NET Framework 4: TLS 1.2 is not enabled by default
-   // on every Windows installation. Keep certificate validation unchanged.
-   if(uri.Scheme=="https")ServicePointManager.SecurityProtocol|=SecurityProtocolType.Tls12;
+   
+    
+    if(uri.Scheme=="https")ServicePointManager.SecurityProtocol|=SecurityProtocolType.Tls12;
    var request=(HttpWebRequest)WebRequest.Create(uri);request.Method="POST";request.ContentType="application/json; charset=utf-8";
    request.Proxy=null;request.AllowAutoRedirect=false;request.Timeout=30000;request.ReadWriteTimeout=30000;request.ContentLength=data.Length;
-   // Per-read timeouts alone do not bound a peer that keeps trickling bytes.
-   using(var deadline=new System.Threading.Timer(state=>request.Abort(),null,30000,System.Threading.Timeout.Infinite)) {
+   
+    using(var deadline=new System.Threading.Timer(state=>request.Abort(),null,30000,System.Threading.Timeout.Infinite)) {
    using(var stream=request.GetRequestStream())stream.Write(data,0,data.Length);
    using(var response=(HttpWebResponse)request.GetResponse()) {
     if(response.StatusCode!=HttpStatusCode.Created)throw new IOException("Сервис не подтвердил приём отчёта.");
@@ -96,8 +96,8 @@ namespace DevProxyApp {
     }
    }
    }
-   // Keep only a protected receipt after success, not another copy of the logs/image.
-   string receipt=Path.ChangeExtension(PendingPath(payload,root),"receipt");
+   
+    string receipt=Path.ChangeExtension(PendingPath(payload,root),"receipt");
    File.WriteAllBytes(receipt,ProtectedData.Protect(Encoding.UTF8.GetBytes(Serializer().Serialize(new{id=payload.id,receipt_token=payload.receipt_token})),Entropy,DataProtectionScope.CurrentUser));
    File.Delete(PendingPath(payload,root));
   }

@@ -1,18 +1,18 @@
-"""
-CLI Interface for Dagami Agent Proxy v2.0.0.
-Implements commands:
-- devproxy profile add [URL] [--name NAME]
-- devproxy profile list
-- devproxy profile remove NAME
-- devproxy apps list
-- devproxy test [--profile NAME] [--app TARGET] [--echo]
-- devproxy run TARGET [--profile NAME] [--dry-run] [-- APP_ARGS...]
-- devproxy apply --app TARGET [--profile NAME]
-- devproxy restore --app TARGET
-- devproxy detect
-- devproxy status
-- interactive wizard: "Insert proxy -> Test -> Select App -> Run/Apply"
-"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import sys
 import os
@@ -49,14 +49,14 @@ class Colors:
 def print_banner():
     print(f"{Colors.CYAN}{Colors.BOLD}")
     print("============================================================")
-    print("  Dagami Agent Proxy 0.1.0 альфа — Universal IDE & Dev Tools Proxy Manager  ")
+    print("  Dagami Agent Proxy 0.4.0 beta — Universal IDE & Dev Tools Proxy Manager  ")
     print("  Google Antigravity | VS Code | Cursor | Windsurf | Codex  ")
     print("============================================================")
     print(f"{Colors.RESET}")
 
 
 def resolve_profile(profile_name: Optional[str] = None, proxy_str: Optional[str] = None) -> Optional[ProxyProfile]:
-    """Resolves profile from name or raw string, injecting password from SecretStore."""
+    
     if proxy_str:
         p = ProxyProfile.parse(proxy_str, name=profile_name or "adhoc")
         if p.password:
@@ -66,7 +66,7 @@ def resolve_profile(profile_name: Optional[str] = None, proxy_str: Optional[str]
     name = profile_name or "default"
     prof_dict = StateManager.get_profile(name)
     if not prof_dict:
-        # Check if only 1 profile exists
+                                        
         all_profs = StateManager.list_profiles()
         if len(all_profs) == 1:
             prof_dict = next(iter(all_profs.values()))
@@ -86,20 +86,12 @@ def cmd_profile_add(args):
         raw = getpass.getpass("Прокси URL (ввод скрыт): ")
     name = args.name or "default"
     try:
-        profile = ProxyProfile.parse(raw, name=name)
-        requires_password = bool(profile.password)
-        if profile.password:
-            backend = SecretStore.store_password(name, profile.username or "", profile.password)
-            if backend != "os_keychain":
-                raise RuntimeError("Пароль не сохранён в хранилище ОС. Linux: установите libsecret-tools и разблокируйте Secret Service; macOS: разблокируйте Keychain.")
-            print(f"{Colors.GREEN}[✓] Пароль надежно сохранен ({backend}).{Colors.RESET}")
-            # Do not persist plaintext password in JSON state
-            profile.password = None
-
-        data = profile.to_dict(include_password=False)
-        data["requires_password"] = requires_password
-        StateManager.save_profile(data)
-        print(f"{Colors.GREEN}[✓] Профиль '{name}' успешно сохранен: {profile.to_safe_url()}{Colors.RESET}")
+        from .proxy_editor import save_connection
+        from .macos_settings import active_sessions
+        if StateManager.get_profile(name) and active_sessions(name):
+            raise RuntimeError('Перед заменой прокси остановите активные сессии этого профиля.')
+        result=save_connection(name,raw,replace=True)
+        print(f"{Colors.GREEN}[✓] {result}{Colors.RESET}")
     except Exception as e:
         print(f"{Colors.RED}[-] Ошибка добавления профиля: {e}{Colors.RESET}")
         return 1
@@ -349,7 +341,7 @@ def interactive_wizard():
             else:
                 print(f"{Colors.GREEN}[✓] Соединение проверено успешно!{Colors.RESET}")
 
-            # Save profile?
+                           
             save = input("Сохранить этот профиль для постоянного использования? [y/N]: ").strip().lower()
             if save == 'y':
                 pname = input("Имя профиля [myproxy]: ").strip() or "myproxy"
@@ -359,7 +351,7 @@ def interactive_wizard():
                 StateManager.save_profile(profile.to_dict(include_password=False))
                 print(f"{Colors.GREEN}[✓] Профиль сохранен как '{pname}'.{Colors.RESET}")
 
-            # Choose app
+                        
             print("\nВыберите приложение для запуска:")
             adapters = list_adapters()
             for i, a in enumerate(adapters, 1):
@@ -415,7 +407,7 @@ def main():
     parser.add_argument('--version', action='version', version=__version__)
     subparsers = parser.add_subparsers(dest="subcommand")
 
-    # profile
+             
     p_prof = subparsers.add_parser("profile", help="Manage proxy profiles")
     p_prof_sub = p_prof.add_subparsers(dest="profile_action")
     p_add = p_prof_sub.add_parser("add", help="Add proxy profile")
@@ -426,18 +418,18 @@ def main():
     p_del = p_prof_sub.add_parser("remove", help="Delete profile")
     p_del.add_argument("name", help="Profile name to delete")
 
-    # apps
+          
     p_apps = subparsers.add_parser("apps", help="Application adapters")
     p_apps_sub = p_apps.add_subparsers(dest="apps_action")
     p_apps_sub.add_parser("list", help="List supported applications")
 
-    # test
+          
     p_test = subparsers.add_parser("test", help="Test connectivity")
     p_test.add_argument("--profile", "-p", help="Profile name")
     p_test.add_argument("--proxy", help="Ad-hoc proxy URL")
     p_test.add_argument("--echo", action="store_true", help="Query external IP diagnostic")
 
-    # run
+         
     p_run = subparsers.add_parser("run", help="Launch application in isolated session")
     p_run.add_argument("app", help="Target application ID (antigravity, vscode, cursor, codex, etc.)")
     p_run.add_argument("--profile", "-p", help="Profile name")
@@ -447,34 +439,34 @@ def main():
     for name, help_text in [("patch", "Prepare normal launchers"), ("unpatch", "Restore launchers"), ("sessions", "Active background sessions"), ("stop", "Stop an app session"), ("shortcuts", "Launcher status"), ("login", "Google login through session proxy"), ("logs", "Session log"), ("gui", "Open desktop GUI"), ("register", "Set application executable path"), ("dns", "Linux/macOS DNS: dns --help"), ("autostart", "Linux/macOS login startup: autostart --help")]:
         subparsers.add_parser(name, help=help_text)
 
-    # apply
+           
     p_apply = subparsers.add_parser("apply", help="Apply persistent settings")
     p_apply.add_argument("--app", "-a", required=True, help="App ID or comma-separated list")
     p_apply.add_argument("--profile", "-p", help="Profile name")
     p_apply.add_argument("--proxy", help="Ad-hoc proxy string")
 
-    # restore
+             
     p_restore = subparsers.add_parser("restore", help="Restore original settings")
     p_restore.add_argument("--app", "-a", required=True, help="App ID or comma-separated list")
 
-    # detect
+            
     p_det = subparsers.add_parser("detect", help="Scan local proxy clients")
     p_det.add_argument("--save", action="store_true", help="Offer to save found client as profile")
 
-    # status
+            
     subparsers.add_parser("status", help="Show current status")
 
     if len(sys.argv) == 1:
         interactive_wizard()
         return
 
-    # Check if first arg is an ad-hoc proxy URL (backward compatibility with devproxy v1)
+                                                                                         
     first = sys.argv[1]
     if first.startswith(("http://", "https://", "socks5://", "socks5h://")) or (":" in first and not first.startswith("-") and first not in ["profile", "apps", "test", "run", "apply", "restore", "detect", "status"]):
         interactive_wizard()
         return
 
-    # Split extra args after '--'
+                                 
     raw_argv = sys.argv[1:]
     extra_after_dash = []
     if "--" in raw_argv:

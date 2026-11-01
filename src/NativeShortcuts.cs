@@ -77,9 +77,9 @@ namespace DevProxyApp
             if (string.IsNullOrEmpty(folder) || depth > 8 || !Directory.Exists(folder)) yield break;
             string[] links, dirs;
             try {
-                // Known Windows folders may themselves be redirected to OneDrive.
-                // Do not recurse through nested junctions, which can form cycles.
-                if (depth > 0 && (File.GetAttributes(folder) & FileAttributes.ReparsePoint) != 0) yield break;
+                
+                 
+                 if (depth > 0 && (File.GetAttributes(folder) & FileAttributes.ReparsePoint) != 0) yield break;
                 links = Directory.GetFiles(folder, "*.lnk"); dirs = Directory.GetDirectories(folder);
             } catch (UnauthorizedAccessException) { yield break; } catch (IOException) { yield break; }
             foreach (string link in links) yield return link;
@@ -163,15 +163,15 @@ namespace DevProxyApp
                             catch (IOException) { return false; } catch (UnauthorizedAccessException) { return false; }
                         });
                         if (moved != null) { record.LinkPath = Path.GetFullPath(moved); changed = true; continue; }
-                        // A deleted shortcut must not prevent creating a replacement.
-                        // Its protected journal snapshot and backup remain recoverable.
-                        records.Remove(record); changed = true; continue;
+                        
+                         
+                         records.Remove(record); changed = true; continue;
                     }
                     string current = Hash(File.ReadAllBytes(record.LinkPath));
                     if (Same(record.Executable, target.ExePath) && current == record.PatchedHash) continue;
-                    // A reinstalled app can recreate its original shortcut at the
-                    // same path. Adopt it as a fresh original on an explicit patch.
-                    object link = null;
+                    
+                     
+                     object link = null;
                     try {
                         link = Open(shell, record.LinkPath);
                         string executable = Get(link, "TargetPath");
@@ -281,8 +281,8 @@ namespace DevProxyApp
                         link = Open(shell, path); string exe = Get(link, "TargetPath");
                         if (string.IsNullOrEmpty(exe) || !Same(exe, target.ExePath)) continue;
                         if(!CanEditLink(path)){SkippedReadOnlyLinks++;Logger.Log("[Shortcut] Нет прав записи; используйте настроенную пользовательскую копию: "+Path.GetFileName(path));continue;}
-                        // WScript hotkeys and icons remain in the copied shell link.
-                        byte[] original = File.ReadAllBytes(path);
+                        
+                         byte[] original = File.ReadAllBytes(path);
                         var record = new ShortcutRecord { Id = Guid.NewGuid().ToString("N"), ApplicationId = target.Id,
                             ConfigPath=target.ConfigPath,DisplayName=target.DisplayName,
                             LinkPath = Path.GetFullPath(path), Executable = Path.GetFullPath(exe), Arguments = Get(link, "Arguments"),
@@ -300,8 +300,8 @@ namespace DevProxyApp
                             patched.GetType().InvokeMember("Save", BindingFlags.InvokeMethod, null, patched, null);
                             Release(patched); patched = null;
                             byte[] replacement = File.ReadAllBytes(temp); record.PatchedHash = Hash(replacement);
-                            // Persist recovery data before replacing the original.
-                            records.Add(record); Save(records);
+                            
+                             records.Add(record); Save(records);
                             if (Hash(File.ReadAllBytes(path)) != record.OriginalHash) throw new IOException("Ярлык изменился во время настройки.");
                             File.Replace(temp, path, null); Notify(path); changed.Add(path);
                         } finally { Release(patched); if (File.Exists(temp)) File.Delete(temp); }
@@ -343,8 +343,8 @@ namespace DevProxyApp
             var before=new Dictionary<string,byte[]>(StringComparer.OrdinalIgnoreCase);
             var originals=new Dictionary<string,byte[]>(StringComparer.OrdinalIgnoreCase);
             bool missing=false;
-            // Validate the whole operation before changing the first link or record.
-            foreach (var record in selected) {
+            
+             foreach (var record in selected) {
                 if (!File.Exists(record.LinkPath)) {
                     var roots = new List<string> { Path.GetDirectoryName(record.LinkPath) };
                     foreach (string root in UserFolders()) if (!string.IsNullOrEmpty(root) &&

@@ -169,8 +169,8 @@ namespace DevProxyApp {
             foreach(string path in paths)Console.WriteLine(path);Console.WriteLine("Файлов запуска: "+paths.Count);return true;
         }
 
-        // Classify a supplied report without echoing account tokens, paths or its body.
-        public static string FailureHint(string report){
+        
+         public static string FailureHint(string report){
             string value=(report??"").ToLowerInvariant();
             if(value.Contains("user location is not supported")||value.Contains("region is not supported"))return "Google API отклонил условие региона. Проверьте регион выхода, фактический маршрут запросов модели и доступ аккаунта. Успешный вход и ответы других моделей не подтверждают доступ Gemini. Локальная подготовка CLI не меняет серверное решение о регионе.";
             if(value.Contains("subscription_required"))return "Сервер требует подходящую подписку или доступ аккаунта. Региональный патч это ограничение не снимает.";

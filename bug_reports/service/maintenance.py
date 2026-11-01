@@ -1,4 +1,4 @@
-"""Daily online backup + 90-day retention; run as the service account."""
+
 import os
 import sqlite3
 import time
@@ -21,7 +21,7 @@ def maintain(database, now=None):
         with db:
             db.execute('DELETE FROM reports WHERE created < ?', (now-90*86400,))
         db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
-    # Keep three days of private snapshots. No report information goes in filenames.
+                                                                                    
     for path in backup_dir.glob('*.sqlite'):
         if path.stat().st_mtime < now-3*86400:
             path.unlink()

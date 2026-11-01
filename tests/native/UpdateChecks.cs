@@ -64,14 +64,14 @@ class UpdateChecks {
   badUrl=Payload(work,Path.Combine(root,"bad-sha"));badUrl.Gui.Sha256="missing";Reject(()=>NativeUpdates.ValidateRelease(badUrl));
   var wrongVersion=Payload(work,Path.Combine(root,"wrong-version"));string actualTag=wrongVersion.Tag;wrongVersion.Tag="v9.9.9";wrongVersion.Page=wrongVersion.Page.Replace(actualTag,wrongVersion.Tag);wrongVersion.Gui.Url=wrongVersion.Gui.Url.Replace(actualTag,wrongVersion.Tag);Reject(()=>NativeUpdates.ValidatePayload(wrongVersion,Path.Combine(root,"wrong-version")));
   var paths=new Paths{UserPath="original;foreign",ProcessPath="original;foreign"};var store=new NativeCliApps(Path.Combine(root,"cli-store"),paths);string original=Path.Combine(root,"agy.ps1");File.WriteAllText(original,"param()\r\n");var app=new AppTarget{Id="update-fixture",ExePath=original};string shim=store.Enable(app,Path.Combine(work,"DagamiAgentProxy.exe"));
-  // Change the source runner bytes without editing a signed/versioned vendor file.
-  string nextRunner=Path.Combine(root,"runner.exe");File.Copy(Path.Combine(work,"DagamiAgentProxy.exe"),nextRunner);File.AppendAllText(nextRunner,"fixture-next-runner");Assert(store.RefreshRunner(nextRunner)==1,"CLI refresh skipped");string issue;Assert(store.VerifiedCount(app.Id,out issue)==1&&issue==null,"Refreshed CLI hash/journal mismatch");
+  
+   string nextRunner=Path.Combine(root,"runner.exe");File.Copy(Path.Combine(work,"DagamiAgentProxy.exe"),nextRunner);File.AppendAllText(nextRunner,"fixture-next-runner");Assert(store.RefreshRunner(nextRunner)==1,"CLI refresh skipped");string issue;Assert(store.VerifiedCount(app.Id,out issue)==1&&issue==null,"Refreshed CLI hash/journal mismatch");
   var cliFailure=Plan(Path.Combine(root,"cli-failure"),work);File.AppendAllText(shim,"foreign");Reject(()=>UpdateInstaller.InstallCore(cliFailure,null,()=>store.RefreshRunner(Path.Combine(work,"DagamiAgentProxy.exe"))));Unchanged(cliFailure);
   using(NativeUpdates.AcquireActivity(true)){Assert(NativeUpdates.CliBusy(),"Active CLI not detected");Reject(()=>{using(NativeUpdates.ActivityLock("activity.lock",true)){};});}
   using(NativeUpdates.ActivityLock("activity.lock",true)){Reject(()=>NativeUpdates.AcquireActivity(false));}
-  // A CONNECT handler returns before its two relay threads. The updater must
-  // still see a live tunnel as busy until both directions have closed.
-  var listener=new TcpListener(IPAddress.Loopback,0);listener.Start();
+  
+   
+   var listener=new TcpListener(IPAddress.Loopback,0);listener.Start();
   var peerThread=new Thread(()=>{using(var peer=listener.AcceptTcpClient()){var stream=peer.GetStream();stream.ReadTimeout=5000;var header=new StringBuilder();while(!header.ToString().EndsWith("\r\n\r\n")){int b=stream.ReadByte();if(b<0)return;header.Append((char)b);}byte[] ok=Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\n\r\n");stream.Write(ok,0,ok.Length);stream.ReadByte();}}){IsBackground=true};peerThread.Start();
   using(var bridge=new LocalProxyBridge()){
    Assert(bridge.Start(0,"http://127.0.0.1:"+((IPEndPoint)listener.LocalEndpoint).Port),"Activity fixture bridge failed");

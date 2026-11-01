@@ -1,0 +1,11 @@
+ https://accounts.google.com/o/oauth2/auth?access_type=offline&client_id=123456
+ 7890123-cccccccccccccccccccccccccccccccc.apps.googleusercontent.com&code_chall
+ enge=ppppppppppppppppppppppppppppppppppppppppppp&code_challenge_method=S256&pr
+ ompt=consent&redirect_uri=https%3A%2F%2Fantigravity.google%2Foauth-callback&re
+ sponse_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platfor
+ m+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.g
+ oogleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Faut
+ h%2Fcclog+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fexperimentsandconfigs+http
+ s%3A%2F%2Fwww.googleapis.com%2Fauth%2Faicode+openid&state=ssssssssssssssssssss
+ ss
+

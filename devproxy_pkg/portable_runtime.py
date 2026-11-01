@@ -1,4 +1,4 @@
-"""Shared session controller for the portable desktop and command line."""
+
 from __future__ import annotations
 
 import contextlib
@@ -52,8 +52,9 @@ def load_profile(name):
     data = StateManager.get_profile(name)
     if not data:
         raise ValueError(f'Нет профиля «{name}». Добавьте его командой profile add.')
-    password = SecretStore.get_password(name)
-    if data.get('requires_password') and password is None:
+    uses_proxy=data.get('proxy_enabled',True) and data.get('protocol')!='direct'
+    password = SecretStore.get_password(name) if uses_proxy else None
+    if uses_proxy and data.get('requires_password') and password is None:
         raise RuntimeError('Пароль профиля недоступен в хранилище ОС. Разблокируйте Keychain/Secret Service или сохраните профиль заново.')
     return ProxyProfile.from_dict(data, password=password)
 
@@ -61,10 +62,10 @@ def entry_command():
     if getattr(sys, 'frozen', False):
         return [sys.executable]
     source=Path(__file__).resolve().parent.parent / 'devproxy_gui.py'
-    return [sys.executable,str(source)] if source.is_file() else [sys.executable,'-m','devproxy_pkg']
+    return [sys.executable,'-B',str(source)] if source.is_file() else [sys.executable,'-B','-m','devproxy_pkg']
 
 def require_stopped(exe):
-    if os.name=='nt':return  # Native Windows GUI/CLI has its own process preflight.
+    if os.name=='nt':return                                                         
     result=subprocess.run(['ps','-axo','pid=,comm='],capture_output=True,text=True,timeout=10,check=True,env=external_environment())
     target=os.path.realpath(exe)
     for line in result.stdout.splitlines():
@@ -76,7 +77,8 @@ def require_stopped(exe):
         if exact or linux_name:raise RuntimeError('Приложение уже открыто вне этой сессии. Полностью закройте его и повторите запуск через Dagami Agent Proxy.')
 
 def executable(adapter):
-    path=StateManager.load_state().get('executables',{}).get(adapter.app_id) or adapter.detect_executable()
+    from .macos_backend import checked_executable
+    path=checked_executable(adapter.app_id,verify=False) or StateManager.load_state().get('executables',{}).get(adapter.app_id) or adapter.detect_executable()
     if not path or not Path(path).is_file():raise RuntimeError('Приложение не найдено. Укажите путь: devproxy register APP PATH')
     if os.name!='nt' and not os.access(path,os.X_OK):raise RuntimeError('У файла приложения нет права исполнения.')
     return str(Path(path).absolute())
@@ -112,12 +114,13 @@ def descriptor(app):
     return runtime_dir() / f'{app}.json'
 
 def request(app, command='status', **data):
-    """No network discovery: only a token-protected loopback session descriptor."""
+    
     path = descriptor(app)
     try:
         record = json.loads(path.read_text(encoding='utf-8'))
     except FileNotFoundError:
         return None
+    if record.get('stop_error'):raise RuntimeError('Не завершена остановка сессии: '+record['stop_error'])
     if not isinstance(record.get('port'), int) or not 1 <= record['port'] <= 65535 or not re.fullmatch('[a-f0-9]{64}', record.get('token', '')):
         raise RuntimeError('Повреждён дескриптор сессии. Проверьте журнал.')
     body = json.dumps(dict(command=command, **data)).encode()
@@ -133,6 +136,11 @@ def request(app, command='status', **data):
             raise RuntimeError(result.get('error', 'Сессия отклонила запрос.'))
         return result
     except (ConnectionRefusedError, ConnectionResetError, socket.timeout) as exc:
+        if command == 'status' and isinstance(record.get('pid'),int):
+            try:
+                os.kill(record['pid'],0)
+                return {'profile':record.get('profile'),'stopping':True,'running':False}
+            except ProcessLookupError:pass
         if command != 'status':
             raise RuntimeError('Сессия не подтвердила команду. Проверьте её статус и журнал перед повтором.') from exc
         return None
@@ -162,13 +170,14 @@ def session_lock(app):
                 fcntl.flock(stream, fcntl.LOCK_UN)
 
 def start_session(app, profile='default', extra_args=None):
-    app_adapter(app)
+    adapter=app_adapter(app)
     data = request(app)
-    if data:
-        if data['profile'] != profile:
-            raise RuntimeError('Приложение уже работает с другим профилем. Сначала остановите его сессию.')
-        return request(app, 'open', args=extra_args or [], cwd=os.getcwd())
-    load_profile(profile)  # Fail before spawning when a stored secret is unavailable.
+    if data and data['profile'] != profile:
+        raise RuntimeError('Приложение уже работает с другим профилем. Сначала остановите его сессию.')
+    load_profile(profile)
+    from .macos_architecture import require_compatible
+    require_compatible(executable(adapter))
+    if data:return request(app, 'open', args=extra_args or [], cwd=os.getcwd())
     log = runtime_dir() / f'{app}.boot.log'
     with log.open('ab') as stream:
         if os.name != 'nt':
@@ -184,7 +193,7 @@ def start_session(app, profile='default', extra_args=None):
                 raise RuntimeError('Одновременно запущена сессия с другим профилем.')
             return request(app, 'open', args=extra_args or [], cwd=os.getcwd())
         if helper.poll() is not None:
-            # Another caller may have acquired the lock; let its descriptor appear.
+                                                                                   
             if helper.returncode and _ > 10:
                 raise RuntimeError(f'Запуск не завершён. Откройте журнал: {log}')
         time.sleep(.1)
@@ -198,7 +207,7 @@ def validate_login(url):
 
 def _browser():
     import shutil
-    candidates = ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge']
+    candidates = ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge', '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser', '/Applications/Chromium.app/Contents/MacOS/Chromium']
     if sys.platform == 'win32':
         for base in ('LOCALAPPDATA', 'ProgramFiles', 'ProgramFiles(x86)'):
             candidates += [str(Path(os.environ.get(base, '')) / p) for p in ('Google/Chrome/Application/chrome.exe', 'Microsoft/Edge/Application/msedge.exe')]
@@ -210,11 +219,40 @@ def _browser():
             return shutil.which(command)
     raise RuntimeError('Установите Chromium, Google Chrome или Microsoft Edge для входа через прокси.')
 
+def process_alive(proc,retired):
+    if proc.pid in retired:return False
+    if proc.poll() is None:return True
+    if os.name!='nt':
+        try:
+            result=subprocess.run(['ps','-axo','pgid=,stat='],capture_output=True,text=True,check=True,timeout=5,env=external_environment())
+            if any(len(fields:=line.split())>=2 and fields[0]==str(proc.pid) and not fields[1].startswith('Z') for line in result.stdout.splitlines()):return True
+        except (OSError,subprocess.SubprocessError):
+            try:os.killpg(proc.pid,0);return True
+            except ProcessLookupError:pass
+    retired.add(proc.pid);return False
+
+
+def signal_group(pid,sig):
+    try:os.killpg(pid,sig)
+    except ProcessLookupError:pass
+    except PermissionError:
+        result=subprocess.run(['ps','-axo','pgid=,stat='],capture_output=True,text=True,check=True,timeout=5,env=external_environment())
+        if any(len(fields:=line.split())>=2 and fields[0]==str(pid) and not fields[1].startswith('Z') for line in result.stdout.splitlines()):raise
+
+
+def activate_macos_app(exe):
+    path=Path(exe)
+    if sys.platform=='darwin' and path.parent.name=='MacOS' and path.parent.parent.name=='Contents' and path.parents[2].suffix=='.app':
+        subprocess.run(['/usr/bin/open','-a',str(path.parents[2])],check=True,timeout=10,env=external_environment(),stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+
+
 def serve_session(app, profile_name):
     adapter = app_adapter(app)
     exe = executable(adapter)
+    from .macos_backend import checked_executable
+    checked_executable(app)
     profile = load_profile(profile_name)
-    stop = threading.Event(); guard = threading.RLock(); processes = []; retired=set()
+    stop = threading.Event(); guard = threading.RLock(); processes = []; applications=[]; retired=set();auth_url=''
     token = secrets.token_hex(32)
     path = descriptor(app)
     with session_lock(app):
@@ -236,23 +274,22 @@ def serve_session(app, profile_name):
         if os.name=='nt':
             from .core.windows_job import WindowsJobManager
             job=WindowsJobManager()
-        def alive(proc):
-            if proc.pid in retired:return False
-            if proc.poll() is None:return True
-            if os.name!='nt':
-                try:os.killpg(proc.pid,0);return True
-                except ProcessLookupError:pass
-            retired.add(proc.pid);return False
+        def alive(proc):return process_alive(proc,retired)
         def launch(args,cwd=None):
             if not isinstance(args, list) or len(args) > 256 or not all(isinstance(a,str) and '\x00' not in a for a in args):
                 raise ValueError('Некорректные аргументы приложения.')
             if cwd is not None and (not isinstance(cwd,str) or not Path(cwd).is_absolute() or not Path(cwd).is_dir()):raise ValueError('Некорректный рабочий каталог.')
-            if not any(alive(p) for p in processes):require_stopped(exe)
-            processes.append(Launcher.launch(exe, flags + args, env, cwd=cwd or str(Path(exe).parent),job_manager=job,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL))
-            log.info('Application launched app=%s pid=%s',app,processes[-1].pid)
+            if not any(alive(p) for p in applications) and getattr(adapter,'isolated_browser',False) is not True:require_stopped(exe)
+            proc=Launcher.launch(exe, flags + args, env, cwd=cwd or str(Path(exe).parent),job_manager=job,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+            processes.append(proc);applications.append(proc)
+            try:proc.wait(timeout=.35)
+            except subprocess.TimeoutExpired:pass
+            if not alive(proc):raise RuntimeError('Приложение завершилось сразу после запуска (код '+str(proc.returncode)+'). Проверьте его установку и системный отчёт о сбое.')
+            log.info('Application launched app=%s pid=%s',app,proc.pid)
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *_): pass
             def do_POST(self):
+                nonlocal auth_url
                 self.connection.settimeout(10)
                 if not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + token):
                     self.send_error(403); return
@@ -265,26 +302,47 @@ def serve_session(app, profile_name):
                     with guard:
                         if command == 'stop': stop.set()
                         elif command == 'open':
-                            if not any(alive(p) for p in processes) or data.get('args'):
+                            if not any(alive(p) for p in applications) or data.get('args'):
                                 launch(data.get('args', []),data.get('cwd'))
+                            else:activate_macos_app(exe)
                         elif command == 'login':
-                            url = validate_login(data['url'])
+                            if app in ('antigravity','antigravity-ide'):
+                                from .auth_manager import validate_url,validate_initial_auth_url
+                                validate_initial_auth_url(data['url'])
+                                url=validate_url(data['url'],'antigravity')
+                                if app=='antigravity-ide':
+                                    from .auth_manager import validate_clipboard_url
+                                    validate_clipboard_url(url,'antigravity-ide')
+                            else:url = validate_login(data['url'])
+                            from .auth_route import verify_route
+                            verify_route(local,url,profile_name)
                             browser_profile = runtime_dir() / (app + '-browser')
                             browser_profile.mkdir(mode=0o700, exist_ok=True)
                             processes.append(Launcher.launch(_browser(), ['--proxy-server='+local, '--proxy-bypass-list=localhost;127.0.0.1;[::1]', '--disable-quic', '--user-data-dir='+str(browser_profile), url], env,job_manager=job,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL))
+                            proc=processes[-1]
+                            try:proc.wait(timeout=.3)
+                            except subprocess.TimeoutExpired:pass
+                            if proc.poll() not in (None,0):raise RuntimeError('Браузер входа завершился с кодом '+str(proc.returncode)+'. Закройте прежнее окно входа и повторите попытку.')
+                            auth_url=url
                             log.info('Login browser launched app=%s',app)
-                        elif command != 'status': raise ValueError('Неизвестная команда.')
-                    result = {'app': app, 'profile': profile_name, 'pid': os.getpid(), 'bridge': local, 'running': any(alive(p) for p in processes), 'account_verified': False}
+                        elif command not in ('status','authStatus'): raise ValueError('Неизвестная команда.')
+                    result = {'app': app, 'application':adapter.display_name, 'executable':exe, 'application_pids':[p.pid for p in applications if alive(p)], 'profile': profile_name, 'pid': os.getpid(), 'bridge': local, 'running': any(alive(p) for p in applications), 'browser_running': any(alive(p) for p in processes if p not in applications), 'account_verified': False,'auth_route':1}
+                    if command=='authStatus':result['url']=auth_url
                     body = json.dumps(result).encode(); status = 200
                 except Exception as exc:
                     log.warning('Request failed: %s',redact(exc))
+                    try:
+                        from .journal import record_error
+                        record_error('session:'+app,exc)
+                    except Exception:pass
                     body = json.dumps({'error': redact(exc)}).encode(); status = 400
                 self.send_response(status); self.send_header('Content-Type','application/json'); self.send_header('Content-Length',str(len(body))); self.end_headers(); self.wfile.write(body)
         server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
         server.daemon_threads = True
+        env.update(DAGAMI_AUTH_PORT=str(server.server_port),DAGAMI_AUTH_TOKEN=token)
         thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
         tmp = path.with_suffix('.tmp')
-        tmp.write_text(json.dumps({'port':server.server_port, 'token':token}), encoding='utf-8'); tmp.chmod(0o600); os.replace(tmp, path)
+        tmp.write_text(json.dumps({'port':server.server_port, 'token':token, 'pid':os.getpid(), 'profile':profile_name}), encoding='utf-8'); tmp.chmod(0o600); os.replace(tmp, path)
         log.info('Session ready app=%s profile=%s bridge=%s',app,profile_name,local)
         try:
             idle=0
@@ -295,14 +353,30 @@ def serve_session(app, profile_name):
                     if processes and idle>=10 and os.name!='nt':break
         finally:
             server.shutdown(); server.server_close()
+            errors=[]
             for proc in processes:
-                if os.name != 'nt' and proc.pid not in retired:
-                    try: os.killpg(proc.pid, signal.SIGTERM)
-                    except ProcessLookupError: pass
-                elif proc.poll() is None:
-                    proc.terminate()
-                try: proc.wait(timeout=5)
-                except subprocess.TimeoutExpired: proc.kill(); proc.wait(timeout=5)
+                try:
+                    if os.name != 'nt' and proc.pid not in retired:
+                        signal_group(proc.pid,signal.SIGTERM)
+                    elif proc.poll() is None:proc.terminate()
+                    try:proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:proc.kill();proc.wait(timeout=5)
+                    if os.name!='nt' and proc.pid not in retired:
+                                                                       
+                        signal_group(proc.pid,signal.SIGKILL)
+                        deadline=time.monotonic()+2
+                        while True:
+                            listing=subprocess.run(['ps','-axo','pgid=,stat='],capture_output=True,text=True,check=True,timeout=5,env=external_environment())
+                            remaining=[line for line in listing.stdout.splitlines() if len(fields:=line.split())>=2 and fields[0]==str(proc.pid) and not fields[1].startswith('Z')]
+                            if not remaining:break
+                            if time.monotonic()>deadline:raise RuntimeError('Фоновые процессы ещё активны: '+str(proc.pid))
+                            time.sleep(.1)
+                except Exception as exc:errors.append(str(exc))
+            if errors:
+                item=json.loads(path.read_text(encoding='utf-8'));item['stop_error']='; '.join(errors)
+                tmp=path.with_suffix('.tmp');tmp.write_text(json.dumps(item),encoding='utf-8');tmp.chmod(0o600);os.replace(tmp,path)
+                tunnel.stop()
+                raise RuntimeError(item['stop_error'])
             if job:job.close()
             tunnel.stop()
             log.info('Session stopped app=%s',app);log.removeHandler(handler);handler.close()
@@ -337,6 +411,11 @@ def main(argv=None):
         elif args.command=='run':
             if app_adapter(args.app).is_cli:
                 adapter=app_adapter(args.app);exe=executable(adapter)
+                from .macos_backend import checked_executable
+                checked_executable(args.app)
+                if sys.platform=='darwin' and args.app=='agy':
+                    from .cli_auth_runtime import run_cli
+                    return run_cli(exe,args.profile,[*adapter.launch_flags(load_profile(args.profile),exe),*extra],adapter.get_launch_environment)
                 process,_=Launcher.launch_with_tunnel(exe,load_profile(args.profile),adapter.launch_flags(load_profile(args.profile),exe),extra,wait=True,environment_factory=adapter.get_launch_environment)
                 return process.returncode
             data=start_session(args.app,args.profile,extra); print(json.dumps(data,ensure_ascii=False))
@@ -353,6 +432,9 @@ def main(argv=None):
         elif args.command in ('patch','unpatch','shortcuts'):
             from .portable_shortcuts import PortableShortcuts
             links=PortableShortcuts()
+            if args.command=='unpatch':
+                from .macos_backend import restore,record
+                if record(args.app):restore(args.app)
             result=getattr(links, {'patch':'enable','unpatch':'restore','shortcuts':'status'}[args.command])(args.app, **({'profile':args.profile} if args.command=='patch' else {}))
             print(json.dumps(result,ensure_ascii=False))
         elif args.command=='logs':

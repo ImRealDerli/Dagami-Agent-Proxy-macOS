@@ -1,4 +1,4 @@
-"""Build the native Windows Forms application with the installed .NET compiler."""
+
 
 import os
 import subprocess
@@ -52,8 +52,8 @@ def main() -> None:
     command.append(r"/resource:devproxy_pkg\assets\dagami-agent-proxy.ico,Dagami.AgentProxy.ico")
     command.append(r"/resource:devproxy_pkg\assets\icon-64.png,Dagami.AgentProxy.png")
     command.append(r"/resource:src\SystemDns.ps1,DevProxy.SystemDns.ps1")
-    # Keep the assembly name stable while replacing the previous executable
-    # only after compilation succeeds.
+                                                                           
+                                      
     with tempfile.TemporaryDirectory(prefix=".devproxy-build-") as build:
         output = Path(build) / executable_name
         subprocess.run([command[0], f"/out:{output}", *command[1:]], cwd=ROOT, check=True)

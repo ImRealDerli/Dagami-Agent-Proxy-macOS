@@ -1,10 +1,30 @@
-"""Single executable dispatch: desktop, CLI, session and privileged DNS helper."""
+
 import sys
 import os
 
 
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
+    if args and args not in (['gui'],['--autostart'],['--smoke-gui']):
+                                                                               
+        for name,mode in (('stdin','r'),('stdout','w'),('stderr','w')):
+            if getattr(sys,name) is None:
+                try:setattr(sys,name,open('/dev/'+name,mode,encoding='utf-8'))
+                except OSError:setattr(sys,name,open(os.devnull,mode,encoding='utf-8'))
+    if args == ['--permissions-info']:
+        import json
+        print(json.dumps({'platform':sys.platform,'root':hasattr(os,'geteuid') and os.geteuid()==0,'home_writable':os.access(os.path.expanduser('~'),os.W_OK),'dns':'Права запрашиваются отдельно при явной записи DNS.','credentials':'macOS Keychain'},ensure_ascii=False))
+        return 0
+    if args[:1] == ['backend']:
+        import argparse
+        parser=argparse.ArgumentParser();parser.add_argument('action',choices=['prepare','restore','status']);parser.add_argument('app',choices=['antigravity','agy'])
+        options=parser.parse_args(args[1:])
+        from . import macos_backend
+        try:
+            if options.action=='status':print(macos_backend.checked_executable(options.app) or 'Не подготовлено.')
+            else:print(getattr(macos_backend,options.action)(options.app))
+            return 0
+        except Exception as exc:print(str(exc),file=sys.stderr);return 1
     if args[:1] == ['--system-dns-helper']:
         if len(args) != 2: return 2
         from .system_dns import helper
@@ -19,12 +39,6 @@ def main(argv=None):
             raise RuntimeError('Откройте приложение от обычного пользователя. Права для DNS оно запросит отдельно.')
         from .desktop import main as desktop
         return desktop(autostart=args == ['--autostart'])
-    # A macOS windowed bundle has no Python standard streams; CLI mode may
-    # still be invoked from Terminal using the very same executable.
-    for name in ('stdout', 'stderr'):
-        if getattr(sys, name) is None:
-            try:setattr(sys, name, open('/dev/'+name, 'w', encoding='utf-8'))
-            except OSError:setattr(sys, name, open(os.devnull, 'w', encoding='utf-8'))
     if args[:1] in (['dns'], ['autostart']):
         import argparse
         import json

@@ -1,8 +1,8 @@
-"""
-core/agent_ipc.py
-Ephemeral per-session background IPC server with Win32 SDDL ACL key security.
-Zero-Dependencies implementation using ctypes and standard library.
-"""
+
+
+
+
+
 
 import os
 import sys
@@ -31,21 +31,21 @@ if sys.platform == "win32":
 
 
 class AgentKeySecurity:
-    """Manages creation and strict OS-level ACL enforcement on agent.key."""
+    
 
     @staticmethod
     def write_restricted_key(file_path: str, secret_key: str) -> None:
-        """
-        Writes secret_key to file_path and guarantees that only the current user/SYSTEM
-        has read and write access.
-        """
+        
+
+
+
         if sys.platform == "win32":
-            # On Windows: write file first, then apply SDDL or write directly
+                                                                             
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(secret_key)
 
-            # Apply strict SDDL: Owner Full Control (OW) + SYSTEM Full Control (SY)
-            # D:P(A;;GA;;;SY)(A;;GA;;;OW)
+                                                                                   
+                                         
             try:
                 advapi32 = ctypes.windll.advapi32
                 sddl = "D:P(A;;GA;;;SY)(A;;GA;;;OW)"
@@ -63,12 +63,12 @@ class AgentKeySecurity:
                 if advapi32.ConvertStringSecurityDescriptorToSecurityDescriptorW(
                     sddl, SDDL_REVISION_1, ctypes.byref(p_sd), ctypes.byref(size)
                 ):
-                    # SetFileSecurityW(lpFileName, SecurityInformation, pSecurityDescriptor)
+                                                                                            
                     DACL_SECURITY_INFORMATION = 0x00000004
                     advapi32.SetFileSecurityW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.LPVOID]
                     advapi32.SetFileSecurityW.restype = wintypes.BOOL
                     secured = advapi32.SetFileSecurityW(file_path, DACL_SECURITY_INFORMATION, p_sd)
-                    # Free security descriptor memory via LocalFree
+                                                                   
                     ctypes.windll.kernel32.LocalFree(p_sd)
                     if not secured:
                         raise ctypes.WinError()
@@ -81,7 +81,7 @@ class AgentKeySecurity:
                     pass
                 raise
         else:
-            # POSIX: strict 0600 permissions
+                                            
             flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
             if hasattr(os, "O_NOFOLLOW"):
                 flags |= os.O_NOFOLLOW
@@ -91,10 +91,10 @@ class AgentKeySecurity:
 
 
 class EphemeralAgentIPC:
-    """
-    Session-bound lightweight IPC control plane.
-    Runs exclusively as a daemon thread during a 'devproxy run' session.
-    """
+    
+
+
+
 
     def __init__(self, key_dir: Optional[str] = None, max_workers: int = 4):
         self._owns_key_dir = key_dir is None
@@ -121,11 +121,11 @@ class EphemeralAgentIPC:
         self._handlers[command] = handler
 
     def start(self) -> int:
-        """Starts loopback IPC server and writes protected key file."""
-        # 1. Write protected key file
+        
+                                     
         AgentKeySecurity.write_restricted_key(self.key_file, self.secret_token)
 
-        # 2. Bind loopback ephemeral port
+                                         
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_sock.bind(("127.0.0.1", 0))
@@ -138,7 +138,7 @@ class EphemeralAgentIPC:
         return self.port
 
     def stop(self) -> None:
-        """Stops server, shuts down worker pool, and removes key file."""
+        
         self.is_running = False
         if self.server_sock:
             try:

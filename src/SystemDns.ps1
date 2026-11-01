@@ -77,8 +77,8 @@ function Read-State {
 }
 function Save-State($State){Write-Json (Join-Path (Get-StoreRoot) 'state.json') $State}
 function Get-ProviderDomains([string]$Preset) {
-    # Generated from the user's setup_smartdns_windows.ps1, plus the two
-    # Antigravity API names already supported by the native bridge.
+     
+     
     $all=@(
         'gemini.google.com',
         'gemini.google',
@@ -274,9 +274,9 @@ function Read-NetworkBaseline {
     $working
 }
 function Test-ServerHttpsProbe($Target,[string]$Server) {
-    # Pin a TCP/TLS connection to the proposed resolver's answers without
-    # changing Windows DNS. SslStream checks both the chain and the host name;
-    # no permissive certificate callback is installed. Try IPv4 and IPv6.
+     
+     
+     
     $answers=@()
     foreach($type in @('A','AAAA')){
         try{$answers+=@(Resolve-DnsName -Name $Target.HostName -Type $type -Server $Server -DnsOnly -NoHostsFile -QuickTimeout -ErrorAction Stop | Where-Object {$_.IPAddress} | Select-Object -First 2)}catch{}
@@ -367,8 +367,8 @@ function Undo-State($State,[bool]$FailureRollback=$false,[bool]$KeepExternalChan
         $applied=@($State.AppliedAdapters | Where-Object {$_.Guid -eq $original.Guid})
         if(-not $applied.Count -and $State.PendingAdapter -ne $original.Guid){continue}
         try {
-            # A missing device is only released when the user explicitly asks to
-            # keep external changes. Keep its snapshot for later manual recovery.
+             
+             
             $devices=@(Get-NetAdapter -IncludeHidden | Where-Object {([guid]$_.InterfaceGuid).ToString() -eq ([guid]$original.Guid).ToString()})
             if(-not $devices.Count -and $KeepExternalChanges){$warnings.Add('Adapter is missing; backup retained: '+$original.Alias);continue}
             $current=Read-Adapter (Find-Adapter $original.Guid)
@@ -385,8 +385,8 @@ function Undo-State($State,[bool]$FailureRollback=$false,[bool]$KeepExternalChan
                     if($KeepExternalChanges){$warnings.Add($message);continue}
                     $errors.Add($message);continue
                 }
-                # Restore only this address family; an external IPv6 edit must
-                # not stop restoration of IPv4 still owned by this operation.
+                 
+                 
                 Restore-Adapter ([pscustomobject]@{Guid=$original.Guid;Alias=$original.Alias;Families=@($family)})
             }
         }catch{$errors.Add($_.Exception.Message)}
@@ -414,8 +414,8 @@ function Undo-State($State,[bool]$FailureRollback=$false,[bool]$KeepExternalChan
                 if((Rule-Fingerprint (Snapshot-Rule $present[0])) -ne (Rule-Fingerprint $original)){throw 'A previous NRPT rule was edited outside DevProxy.'}
                 continue
             }
-            # Several baseline rules may cover the same namespace. Rules we
-            # already restored (including before a retry) are not foreign.
+             
+             
             $overlaps=@($current | Where-Object { $names=$_.Namespace; @($original.Namespace | Where-Object {$_ -in $names}).Count })
             $foreign=@($overlaps | Where-Object {
                 $candidate=$_
@@ -476,25 +476,25 @@ function Restore-ResetNrptStores($State) {
     }
 }
 function Invoke-ResetAll($Request) {
-    # No connectivity preflight: this is also the escape path for broken DNS.
-    # Read and persist ALL originals before the first network mutation.
+     
+     
     $existing=Read-State
     $directory=Join-Path (Get-StoreRoot) ('reset-'+$Request.JobId)
     [IO.Directory]::CreateDirectory($directory)|Out-Null;Protect-Path $directory $true
     $warnings=New-Object 'Collections.Generic.List[string]'
-    # Enumerate once: filtering CIM by a phantom InterfaceIndex throws instead
-    # of returning an empty result (e.g. disconnected virtual adapter 37).
+     
+     
     $dnsRows=@(Get-DnsClientServerAddress -ErrorAction Stop)
     $adapters=@(foreach($adapter in @(Get-NetAdapter -IncludeHidden -ErrorAction Stop)){
         $families=@($dnsRows | Where-Object {$_.InterfaceIndex -eq $adapter.InterfaceIndex} | ForEach-Object {
-            # AddressFamily is 2/23 on the native CIM object; the fixture has Family.
+             
             if($_.AddressFamily -eq 2 -or $_.Family -eq 'IPv4'){'IPv4'}elseif($_.AddressFamily -eq 23 -or $_.Family -eq 'IPv6'){'IPv6'}
         } | Select-Object -Unique)
         if($families.Count){$snapshot=Read-Adapter $adapter;$snapshot.Families=@($snapshot.Families | Where-Object {$_.Family -in $families});$snapshot}
         else{$warnings.Add('Skipped adapter without DNS bindings: '+$adapter.Name+' ['+$adapter.InterfaceIndex+']')}
     })
     $rules=@(Get-DnsClientNrptRule -ErrorAction Stop)
-    # Raw registry exports retain DNSSEC/DirectAccess and all unknown rule fields.
+     
     $stores=@(Backup-ResetNrptStores $directory)
     $state=[pscustomobject]@{Version=1;Kind='ResetAll';Status='Clearing';Id=$Request.JobId;Server='';Preset='';ResetDirectory=$directory;
         OriginalAdapters=$adapters;OriginalRules=@($rules | Select-Object *);RegistryStores=$stores;NrptRestored=$false;Warnings=@($warnings.ToArray());Errors=@()}
@@ -553,8 +553,8 @@ function Invoke-Apply($Request) {
     $previousWarnings=@()
     if($existing -and $existing.Kind -ne 'ResetAll' -and $existing.Status -notin @('Restored','Released') -and -not $Request.ReplaceActiveSetup){throw 'A DNS backup is already active. Restore it before applying a new setup.'}
     $null=Read-SelectedAdapters $Request
-    # Network probes run before any DNS/NRPT change, even before undoing an
-    # existing setup. A server that cannot answer ordinary queries is refused.
+     
+     
     $baseline=@(Read-NetworkBaseline)
     if($Request.EncryptedStub -and $Request.ChangeAdapters){
         if(-not $Request.StubIpv6){throw 'Encrypted DNS preflight failed: IPv6 loopback resolver is unavailable. Use the selected-services mode. DNS settings were not changed.'}
@@ -571,7 +571,7 @@ function Invoke-Apply($Request) {
     $Request | Add-Member -NotePropertyName Servers -NotePropertyValue $workingServers -Force
     if($existing -and $existing.Kind -ne 'ResetAll' -and $existing.Status -notin @('Restored','Released')){
         if(-not $Request.ReplaceActiveSetup){throw 'A DNS backup is already active. Restore it before applying a new setup.'}
-        # Reject a stale adapter selection before touching the active setup.
+         
         $null=Read-SelectedAdapters $Request
         Undo-State $existing $false ([bool]$Request.KeepExternalChanges)
     }

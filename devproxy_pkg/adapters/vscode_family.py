@@ -1,10 +1,10 @@
-"""
-Generic VS Code Family Adapter for:
-- Visual Studio Code
-- Cursor
-- Windsurf
-- VSCodium
-"""
+
+
+
+
+
+
+
 
 import os
 import sys
@@ -36,12 +36,12 @@ class VSCodeFamilyAdapter(ApplicationAdapter):
         return ["win32", "darwin", "linux"]
 
     def detect_executable(self) -> Optional[str]:
-        # Check PATH first
+                          
         for b in self._bin_names:
             p = shutil.which(b)
             if p:
                 if sys.platform == "win32" and p.lower().endswith((".cmd", ".bat", ".ps1")):
-                    # PATH usually exposes bin/code.cmd; GUI needs the actual EXE.
+                                                                                  
                     exe = "Code.exe" if self.app_id == "vscode" else self._folder_name + ".exe"
                     for folder in (os.path.dirname(p), os.path.dirname(os.path.dirname(p))):
                         candidate = os.path.join(folder, exe)
@@ -49,7 +49,7 @@ class VSCodeFamilyAdapter(ApplicationAdapter):
                     continue
                 return p
 
-        # Check standard installation folders
+                                             
         candidates = []
         if sys.platform == "win32":
             local = os.environ.get("LOCALAPPDATA", "")
@@ -100,7 +100,7 @@ class VSCodeFamilyAdapter(ApplicationAdapter):
             home = os.path.expanduser("~")
             return [
                 os.path.join(os.environ.get("XDG_CONFIG_HOME", os.path.join(home, ".config")), self._folder_name, "User", "settings.json"),
-                # Flatpak path
+                              
                 os.path.expanduser(f"~/.var/app/{'com.vscodium.codium' if self.app_id == 'vscodium' else 'com.visualstudio.code'}/config/{self._folder_name}/User/settings.json")
             ]
 
@@ -123,7 +123,7 @@ class VSCodeFamilyAdapter(ApplicationAdapter):
         updates = {
             "http.proxy": proxy_url,
             "http.proxySupport": "override"
-            # Strict SSL remains unmodified (never disabled)
+                                                            
         }
 
         StateManager.record_applied_change(
@@ -151,7 +151,7 @@ class VSCodeFamilyAdapter(ApplicationAdapter):
         ]
 
 
-# Specific subclasses
+                     
 class VSCodeAdapter(VSCodeFamilyAdapter):
     def __init__(self):
         super().__init__("vscode", "Visual Studio Code", "Code", ["code", "Code"])

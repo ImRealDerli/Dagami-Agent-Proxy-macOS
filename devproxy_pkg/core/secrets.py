@@ -1,10 +1,10 @@
-"""
-SecretStore: Secure, OS-native storage for proxy passwords.
-- Windows: Windows Credential Manager / DPAPI (CryptProtectData via ctypes).
-- macOS: Keychain via security tool.
-- Linux: Secret Service via secret-tool or DBus.
-- Fallback: Ephemeral in-memory storage (never saves unencrypted secrets to disk).
-"""
+
+
+
+
+
+
+
 
 import sys
 import os
@@ -17,7 +17,7 @@ SERVICE_NAME = "devproxy-auth"
 
 
 class EphemeralStore:
-    """In-memory fallback for current process session only."""
+    
     _cache = {}
 
     @classmethod
@@ -34,10 +34,10 @@ class EphemeralStore:
 
 
 class WindowsCredentialStore:
-    """
-    Windows Credential Manager integration via Advapi32 CredWriteW / CredReadW / CredDeleteW.
-    Standard, robust and non-destructive.
-    """
+    
+
+
+
     CRED_TYPE_GENERIC = 1
     CRED_PERSIST_LOCAL_MACHINE = 2
 
@@ -129,51 +129,43 @@ class WindowsCredentialStore:
 
 
 class MacOSKeychainStore:
-    """macOS Keychain access using `/usr/bin/security`."""
+    
     @classmethod
     def is_available(cls) -> bool:
         return sys.platform == "darwin" and os.path.exists("/usr/bin/security")
 
     @classmethod
-    def set_password(cls, profile_name: str, username: str, password: str) -> bool:
-        if not cls.is_available():
-            return False
-        import subprocess
-        target = f"{SERVICE_NAME}:{profile_name}"
-        # -U updates if existing
-        cmd = [
-            "/usr/bin/security", "add-generic-password",
-            "-U", "-s", target, "-a", username or "proxy-user",
-            "-w", password
-        ]
-        res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=external_environment())
-        return res.returncode == 0
+    def set_password(cls, profile_name, username, password):
+        if not cls.is_available():return False
+        from .macos_keychain import Keychain
+        try:
+            Keychain(account="dagami-profile-v2").set(f"{SERVICE_NAME}:{profile_name}", "dagami-profile-v2", password)
+            return True
+        except (OSError, RuntimeError):return False
 
     @classmethod
-    def get_password(cls, profile_name: str) -> Optional[str]:
-        if not cls.is_available():
-            return None
-        import subprocess
-        target = f"{SERVICE_NAME}:{profile_name}"
-        cmd = ["/usr/bin/security", "find-generic-password", "-s", target, "-w"]
-        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, env=external_environment())
-        if res.returncode == 0:
-            return res.stdout.strip()
-        return None
+    def get_password(cls, profile_name):
+        if not cls.is_available():return None
+        from .macos_keychain import Keychain
+        service=f"{SERVICE_NAME}:{profile_name}"
+        value=Keychain(account="dagami-profile-v2").get(service)
+        return value if value is not None else Keychain().get(service)
 
     @classmethod
-    def delete_password(cls, profile_name: str) -> bool:
-        if not cls.is_available():
-            return False
-        import subprocess
-        target = f"{SERVICE_NAME}:{profile_name}"
-        cmd = ["/usr/bin/security", "delete-generic-password", "-s", target]
-        res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=external_environment())
-        return res.returncode == 0
+    def delete_password(cls, profile_name):
+        if not cls.is_available():return False
+        from .macos_keychain import Keychain
+        service=f"{SERVICE_NAME}:{profile_name}"
+        if not Keychain(account="dagami-profile-v2").delete(service):return False
+        legacy=Keychain()
+        for _ in range(64):
+            if legacy.get(service) is None:return True
+            if not legacy.delete(service):return False
+        return False
 
 
 class LinuxSecretStore:
-    """Linux Secret Service via `secret-tool`."""
+    
     @classmethod
     def is_available(cls) -> bool:
         if sys.platform != "linux":
@@ -226,14 +218,14 @@ class LinuxSecretStore:
 
 
 class SecretStore:
-    """
-    Unified SecretStore facade for secure credential storage.
-    Delegates to platform native store, with safe ephemeral session memory fallback.
-    Never prints secrets or writes them unencrypted to files.
-    """
+    
+
+
+
+
     @classmethod
     def store_password(cls, profile_name: str, username: str, password: str) -> str:
-        """Stores password securely. Returns backend used: 'os_keychain' or 'session_memory'."""
+        
         if not password:
             return "none"
 
@@ -246,21 +238,23 @@ class SecretStore:
             stored = LinuxSecretStore.set_password(profile_name, username, password)
 
         if stored:
+                                                                                
+            EphemeralStore.delete(profile_name)
             return "os_keychain"
         
-        # Ephemeral in-memory fallback
+                                      
         EphemeralStore.set(profile_name, password)
         return "session_memory"
 
     @classmethod
     def get_password(cls, profile_name: str) -> Optional[str]:
-        """Retrieves password from OS vault or ephemeral memory."""
-        # 1. Ephemeral cache first (if set during this run)
+        
+                                                           
         mem_val = EphemeralStore.get(profile_name)
         if mem_val:
             return mem_val
 
-        # 2. OS Keychain
+                        
         if sys.platform == "win32":
             return WindowsCredentialStore.get_password(profile_name)
         elif sys.platform == "darwin":
@@ -271,7 +265,7 @@ class SecretStore:
 
     @classmethod
     def delete_password(cls, profile_name: str) -> bool:
-        """Deletes password from OS vault and memory."""
+        
         EphemeralStore.delete(profile_name)
         if sys.platform == "win32":
             return WindowsCredentialStore.delete_password(profile_name)

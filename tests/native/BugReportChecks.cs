@@ -27,8 +27,8 @@ class BugReportChecks {
    if(args.Length>0){
     bool offline=false;try{BugReports.Send(report,root,args[0]+"/missing");}catch(System.Net.WebException){offline=true;}Assert(offline&&File.Exists(pending),"HTTP failure lost the pending report");
     BugReports.Send(report,root,args[0]);Assert(!File.Exists(pending)&&File.Exists(Path.ChangeExtension(pending,"receipt")),"Sent payload not reduced to receipt");
-    // Simulate a lost response: the exact payload must be accepted again once.
-    BugReports.Send(report,root,args[0]);Assert(!File.Exists(pending),"Idempotent resend failed");
+    
+     BugReports.Send(report,root,args[0]);Assert(!File.Exists(pending),"Idempotent resend failed");
     Console.WriteLine("REPORT_ID "+report.id);
    }
    Console.WriteLine("PASS "+checks+" native report checks");return 0;

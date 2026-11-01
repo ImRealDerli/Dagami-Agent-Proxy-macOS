@@ -1,4 +1,4 @@
-"""One desktop per user; a private file signals an existing window to show."""
+
 import os
 from .portable_runtime import runtime_dir
 from .system_dns import atomic

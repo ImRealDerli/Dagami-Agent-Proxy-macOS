@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dagami-agent-proxy"
-version = "0.4.0b0"
+version = "0.4.0b0+mac.10"
 description = "Dagami Agent Proxy: application proxy sessions and reversible launchers"
 requires-python = ">=3.10"
 readme = "PORTABLE.md"
 license = {text = "MIT"}
 
 [project.optional-dependencies]
+macos-build = ["ds-store>=1.3,<2", "mac-alias>=2,<3"]
 build = ["pyinstaller>=6.16,<7"]
 desktop = ["pystray>=0.19.5,<1", "Pillow>=10,<13"]
 

@@ -7,18 +7,18 @@ using System.Runtime.InteropServices;
 namespace DevProxyApp
 {
     public sealed class NativeSession : IDisposable {
-        // Keep GUI applications alive if the proxy process crashes. Explicit
-        // session disposal still terminates the job and its descendants.
-        public readonly JobObjectManager Job = new JobObjectManager(false);
+        
+         
+         public readonly JobObjectManager Job = new JobObjectManager(false);
         public readonly List<Process> Processes = new List<Process>();
         public Process RunningProcess {
             get {
                 Process first=null;
                 for (int i = Processes.Count - 1; i >= 0; i--) try { if (Processes[i].HasExited) { Processes[i].Dispose(); Processes.RemoveAt(i); } } catch (InvalidOperationException) { Processes.RemoveAt(i); }
                 foreach (var process in Processes) try { if (!process.HasExited) { if(process.MainWindowHandle!=IntPtr.Zero)return process; if(first==null)first=process; } } catch (InvalidOperationException) { }
-                // Launchers often exit after starting the actual app. The Job owns
-                // its descendants, so do not lose proxy/session state with the parent.
-                foreach(int id in Job.ProcessIds()) {
+                
+                 
+                 foreach(int id in Job.ProcessIds()) {
                     if(Processes.Exists(p=>p.Id==id))continue;
                     try { var process=Process.GetProcessById(id); if(process.HasExited){process.Dispose();continue;} Processes.Add(process); if(process.MainWindowHandle!=IntPtr.Zero)return process; if(first==null)first=process; }
                     catch(ArgumentException){} catch(System.ComponentModel.Win32Exception){}
@@ -35,9 +35,9 @@ namespace DevProxyApp
         public void StopAndWait(int timeoutMilliseconds = 5000) {
             if (timeoutMilliseconds < 1) throw new ArgumentOutOfRangeException("timeoutMilliseconds");
             var elapsed = Stopwatch.StartNew();
-            // Keep the Job until exit is verified, so failure does not lose
-            // ownership of remaining descendants or allow a route switch.
-            Job.Terminate();
+            
+             
+             Job.Terminate();
             var failures = new List<string>();
             foreach (var process in Processes) {
                 try { if (!process.HasExited) process.Kill(); }
@@ -141,9 +141,9 @@ namespace DevProxyApp
                     if (!antigravity) return;
                     try { before = AntigravityIntegration.Snapshot(target.ExePath); }
                     catch(UnsupportedAntigravityBinaryException) { before=null; }
-                    // Unexpected write/verification failures still enter the guarded
-                    // rollback path. Only a classified incompatibility is optional.
-                    binaryChanged=true;
+                    
+                     
+                     binaryChanged=true;
                     var result=AntigravityIntegration.PrepareClient(target.ExePath);
                     binaryPrepared=result.Prepared;
                     binaryComplete=result.Complete;

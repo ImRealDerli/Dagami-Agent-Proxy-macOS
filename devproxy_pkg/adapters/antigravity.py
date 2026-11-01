@@ -1,12 +1,12 @@
-"""
-Google Antigravity Application Adapter.
-Supports:
-- GUI (Electron / Chromium shell)
-- language_server.exe (Go / gRPC / Protobuf backend)
-- web_bundle_ru / web UI
-- Streaming gRPC / HTTP/2 responses
-- Chromium flags: --proxy-server=...
-"""
+
+
+
+
+
+
+
+
+
 
 import os
 import sys
@@ -25,7 +25,7 @@ class AntigravityAdapter(ApplicationAdapter):
 
     @property
     def display_name(self) -> str:
-        return "Google Antigravity"
+        return "Google Antigravity App"
 
     @property
     def supported_os(self) -> List[str]:
@@ -60,7 +60,7 @@ class AntigravityAdapter(ApplicationAdapter):
             if os.path.exists(p):
                 return p
 
-        # Check PATH
+                    
         which_path = shutil.which("antigravity") or shutil.which("Antigravity")
         return which_path
 
@@ -78,9 +78,9 @@ class AntigravityAdapter(ApplicationAdapter):
             return [os.path.join(home, ".config", "Antigravity", "User", "settings.json")]
 
     def get_cli_launch_flags(self, profile: ProxyProfile) -> List[str]:
-        # Electron / Chromium network flags
-        # Important: pass --proxy-server with the scheme and host:port
-        # If proxy requires auth or is SOCKS5, LocalTunnel will bridge it to http://127.0.0.1:port
+                                           
+                                                                      
+                                                                                                  
         return [
             "--proxy-server={PROXY_URL}",
             "--disable-quic",
@@ -100,14 +100,14 @@ class AntigravityAdapter(ApplicationAdapter):
             return False, f"Failed to parse JSONC in {target_path} (file may contain syntax errors). Refusing to overwrite."
 
         proxy_url = profile.to_url()
-        # Track original values
+                               
         orig_proxy = parsed.get("http.proxy")
         orig_support = parsed.get("http.proxySupport")
         
         updates = {
             "http.proxy": proxy_url,
             "http.proxySupport": "on"
-            # NOTE: http.proxyStrictSSL is NOT set to false (keeps certificates secure)
+                                                                                       
         }
 
         StateManager.record_applied_change(

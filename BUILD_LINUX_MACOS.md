@@ -1,3 +1,5 @@
+> Для локальной Mac-сборки 0.4.0 beta смотрите [MACOS_PORT.md](MACOS_PORT.md). Ниже сохранена исходная инструкция upstream для 0.2.0.
+
 # Как собрать Dagami Agent Proxy на Linux и macOS
 
 Выпуск `v0.2.0-alpha`: готовый файл есть для Windows. Для Linux и macOS

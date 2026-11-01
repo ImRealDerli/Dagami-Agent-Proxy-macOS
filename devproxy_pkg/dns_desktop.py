@@ -1,4 +1,4 @@
-"""Unix DNS dialog; all system operations run outside Tk's UI thread."""
+
 import queue
 import threading
 import tkinter as tk
@@ -62,7 +62,7 @@ class DnsDialog(tk.Toplevel):
 
     def perform(self,action,confirmed=False):
         values={'server':self.server.get().strip(),'mode':self.mode.get(),'preset':self.preset.get(),'replace':self.replace.get(),'services':list(self.services.selection()),'confirmed':confirmed}
-        # Validate captured inputs before requesting privileges.
+                                                                
         try:system_dns.validate_request(dict(values,action=action,job='0'*32))
         except Exception as exc:self.message(str(exc));return
         self.work(lambda:self.execute(action,**values),'operation')

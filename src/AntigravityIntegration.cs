@@ -21,10 +21,10 @@ namespace DevProxyApp
         public string Message { get; private set; }
         internal AntigravityPreparationResult(bool prepared, string message, bool complete = true) { Prepared=prepared; Complete=prepared && complete; Message=message; }
     }
-    // Independent implementation. Changes are limited to supported metadata/proxy
-    // literals and a verified local CLI eligibility test. TLS and server-side
-    // authentication/entitlement checks are not changed.
-    public static class AntigravityIntegration
+    
+     
+     
+     public static class AntigravityIntegration
     {
         private const string BackupSuffix = ".devproxy-region.bak";
         private const string ManifestSuffix = ".devproxy-region.json";
@@ -191,17 +191,17 @@ namespace DevProxyApp
 
         private static List<int> ValidatePatterns(byte[] original, out List<byte[]> replacements)
         {
-            // Validate every signature before touching any byte. Every descriptor
-            // and its matching Go tag must agree; partial or ambiguous builds fail.
-            var offsets = new List<int>();
+            
+             
+             var offsets = new List<int>();
             replacements = new List<byte[]>();
             bool legacy = true;
             foreach (string pattern in Patterns) if (FindAll(original, Encoding.ASCII.GetBytes(pattern)).Count == 0) { legacy = false; break; }
             if (!legacy) {
-                // Newer Go builds use different protobuf field numbers/layouts.
-                // Require both a descriptor and its Go tag, plus Go build data.
-                // Unknown/partially modified files are never patched by guesswork.
-                bool go = FindAll(original, Encoding.ASCII.GetBytes("Go build ID:")).Count > 0 ||
+                
+                 
+                 
+                 bool go = FindAll(original, Encoding.ASCII.GetBytes("Go build ID:")).Count > 0 ||
                     FindAll(original, Encoding.ASCII.GetBytes("Go buildinf:")).Count > 0;
                 bool descriptor = FindAll(original, Encoding.ASCII.GetBytes("\n\nineligible\x18")).Count > 0 || FindAll(original, Encoding.ASCII.GetBytes("\n\x10ineligible_tiers")).Count > 0 || FindAll(original, Encoding.ASCII.GetBytes("R\x0fineligibleTiers")).Count > 0;
                 bool tag = FindAll(original, Encoding.ASCII.GetBytes("name=ineligible,")).Count > 0 || FindAll(original, Encoding.ASCII.GetBytes("name=ineligible_tiers,")).Count > 0 || FindAll(original, Encoding.ASCII.GetBytes("json:\"ineligible_tiers,")).Count > 0;
@@ -236,16 +236,16 @@ namespace DevProxyApp
         }
 
         private static List<int> CliHubMetadataOffsets(byte[] data, out List<byte[]> replacements) {
-            // CLI and --hub share one executable. The command-line gate alone
-            // does not prepare the eight known protobuf metadata fields for IDE.
-            var matches = new List<int>[Patterns.Length]; bool hasHubMetadata = false;
+            
+             
+             var matches = new List<int>[Patterns.Length]; bool hasHubMetadata = false;
             for (int i=0;i<Patterns.Length;i++) {
                 matches[i] = FindAll(data, Encoding.ASCII.GetBytes(Patterns[i]));
                 if (i!=2 && i!=3 && i!=4 && matches[i].Count>0) hasHubMetadata = true;
             }
             replacements = new List<byte[]>(); var offsets = new List<int>();
-            if (!hasHubMetadata) return offsets; // CLI-only shape, no hub schema asserted.
-            for (int i=0;i<Patterns.Length;i++) {
+            if (!hasHubMetadata) return offsets; 
+             for (int i=0;i<Patterns.Length;i++) {
                 if(matches[i].Count!=1) throw new UnsupportedAntigravityBinaryException("CLI/IDE: неполная или неоднозначная структура региональных protobuf-полей. Файл не изменён.");
                 offsets.Add(matches[i][0]); replacements.Add(Encoding.ASCII.GetBytes(Patterns[i].Replace("ineligible", "dpeligible")));
             }
@@ -283,9 +283,9 @@ namespace DevProxyApp
             byte[] patched = (byte[])original.Clone();
             for (int i = 0; i < offsets.Count; i++) Array.Copy(replacements[i], 0, patched, offsets[i], replacements[i].Length);
             changes = offsets.Count;
-            // A private process environment variable lets managed LS/agy traffic
-            // use the existing bridge without changing Windows environment.
-            var proxyOffsets = FindAll(original, Encoding.ASCII.GetBytes("https_proxy"));
+            
+             
+             var proxyOffsets = FindAll(original, Encoding.ASCII.GetBytes("https_proxy"));
             if (proxyOffsets.Count > 32) throw new UnsupportedAntigravityBinaryException("Неоднозначные переменные прокси Antigravity; файл не изменён.");
             foreach (int offset in proxyOffsets) { Array.Copy(Encoding.ASCII.GetBytes("AG_LS_PROXY"), 0, patched, offset, 11); changes++; }
             return patched;
@@ -303,8 +303,8 @@ namespace DevProxyApp
         public static bool HasActivePatchRecord(string backend) {
             if(!File.Exists(backend+ManifestSuffix))return false;
             try{var manifest=Manifest(backend);object restored;return !manifest.TryGetValue("restored",out restored)||!object.Equals(restored,true);}
-            catch{return true;} // Damaged ownership data still needs a recovery action.
-        }
+            catch{return true;} 
+         }
         private static void RecordRestored(string backend,Dictionary<string,object> manifest) {
             manifest["restored"]=true;
             AtomicWrite(backend+ManifestSuffix,Encoding.UTF8.GetBytes(new JavaScriptSerializer().Serialize(manifest)));
@@ -387,9 +387,9 @@ namespace DevProxyApp
                 if (File.Exists(backup) && Hash(File.ReadAllBytes(backup)) != originalHash) {
                     if (previous == null || Hash(File.ReadAllBytes(backup)) != Convert.ToString(previous["original_sha256"]))
                         throw new InvalidOperationException("Резервная копия Antigravity не соответствует манифесту. Подготовка остановлена.");
-                    // Compatible application update: keep the previous generation
-                    // and take a new baseline, rather than blocking every upgrade.
-                    string archive = backend + ".devproxy-history"; Directory.CreateDirectory(archive);
+                    
+                     
+                     string archive = backend + ".devproxy-history"; Directory.CreateDirectory(archive);
                     string originalGenerationHash = Convert.ToString(previous["original_sha256"]);
                     string generation = originalGenerationHash.Substring(0, 16);
                     string archivedBackup = Path.Combine(archive, generation + ".bak");
@@ -420,9 +420,9 @@ namespace DevProxyApp
 
         public static AntigravityPreparationResult PrepareForProxy(string executable) {
             try {
-                // Classify compatibility using reads only. An unsupported client
-                // must not require writable installation files or a binary lock.
-                string backend=BackendPath(executable);
+                
+                 
+                 string backend=BackendPath(executable);
                 byte[] current=File.ReadAllBytes(backend);
                 var manifest=Manifest(backend);
                 if(manifest!=null && Hash(current)==Convert.ToString(manifest["patched_sha256"]))
@@ -531,8 +531,8 @@ namespace DevProxyApp
     public sealed class ScopedDnsResolver
     {
         public static readonly string[] Hosts = new string[] { "cloudcode-pa.googleapis.com", "daily-cloudcode-pa.googleapis.com" };
-        // Exact names served by the configured Smart DNS. No suffix/wildcard bypass.
-        public static readonly string[] GoogleDependencies = new string[] {
+        
+         public static readonly string[] GoogleDependencies = new string[] {
             "accounts.google.com", "oauth2.googleapis.com", "www.googleapis.com",
             "lh3.googleusercontent.com", "gemini.google.com", "gemini.google",
             "www.gstatic.com", "ssl.gstatic.com", "geminiweb-pa.clients6.google.com",
@@ -567,9 +567,9 @@ namespace DevProxyApp
                 bool delayed = _cooldown.TryGetValue(endpoint.Address + "/" + (endpoint.Protocol ?? "HTTPS"), out until) && until > DateTime.UtcNow;
                 (delayed ? cooling : ready).Add(endpoint);
             }
-            // A cooldown changes priority; it must not remove reserve nodes.
-            // Keep the configured provider order for every AI hostname.
-            ready.AddRange(cooling); return ready.ToArray();
+            
+             
+             ready.AddRange(cooling); return ready.ToArray();
         }
         private static int Read16(byte[] data, int offset) { if (offset < 0 || offset + 2 > data.Length) throw new InvalidDataException("Обрезанный DNS ответ."); return (data[offset] << 8) | data[offset + 1]; }
         private static string ReadName(byte[] data, ref int offset) {
@@ -665,9 +665,9 @@ namespace DevProxyApp
 
         public IPAddress Resolve(string host)
         {
-            // Route selection may exclude an OAuth host in DNS-only mode, but
-            // resolution must accept every host admitted by either route mode.
-            if (!IsScoped(host) && !IsScoped(host, true)) throw new InvalidOperationException("DNS-маршрут ограничен явным списком Google/Antigravity.");
+            
+             
+             if (!IsScoped(host) && !IsScoped(host, true)) throw new InvalidOperationException("DNS-маршрут ограничен явным списком Google/Antigravity.");
             lock (_sync) {
                 KeyValuePair<DateTime, IPAddress> cached;
                 if (_cache.TryGetValue(host, out cached) && cached.Key > DateTime.UtcNow) return cached.Value;
@@ -768,8 +768,8 @@ namespace DevProxyApp
 
         public static string ProbeToken(int bridgePort)
         {
-            // Deliberately invalid identifiers: no account state or real code is read.
-            return ProbeRequest("oauth2.googleapis.com", "/token", "application/x-www-form-urlencoded",
+            
+             return ProbeRequest("oauth2.googleapis.com", "/token", "application/x-www-form-urlencoded",
                 "grant_type=authorization_code&code=devproxy-invalid-diagnostic&client_id=devproxy-invalid-diagnostic&redirect_uri=http%3A%2F%2Flocalhost", bridgePort, true);
         }
 
@@ -779,8 +779,8 @@ namespace DevProxyApp
         }
 
         public static string ProbeUserInfo(int bridgePort) {
-            // The exact endpoint used after OAuth; no account token is read/sent.
-            return ProbeRequest("www.googleapis.com", "/oauth2/v2/userinfo", null, null, bridgePort, false);
+            
+             return ProbeRequest("www.googleapis.com", "/oauth2/v2/userinfo", null, null, bridgePort, false);
         }
 
         private static int HttpStatus(string status) {
@@ -794,8 +794,8 @@ namespace DevProxyApp
         private static string DescribeHttpResult(string host,string path,string status,bool token) {
             int code=HttpStatus(status);
             string endpoint=host+path;
-            // Successful CONNECT/TLS is not proof of a healthy inner HTTP route.
-            if(code>=500 || code==407 || code==429)
+            
+             if(code>=500 || code==407 || code==429)
                 throw new IOException(endpoint+": TLS проверен, но запрос вернул HTTP "+code+". Маршрут не прошёл проверку; вход не подтверждён.");
             if(path=="/oauth2/v2/userinfo") {
                 if(code!=401)throw new IOException(endpoint+": неожиданный HTTP "+code+" без токена (ожидается 401). Доступ аккаунта не проверен.");
@@ -816,9 +816,9 @@ namespace DevProxyApp
             try {report.AppendLine(ProbeUserInfo(bridgePort));}
             catch(Exception ex) {
                 report.AppendLine("ОШИБКА userinfo: "+ex.GetType().Name+": "+ex.Message);
-                // Compare only synthetic diagnostics, never replay the user's
-                // authenticated request and never change the running bridge.
-                bool compareDns=!useDns;
+                
+                 
+                 bool compareDns=!useDns;
                 if(string.IsNullOrWhiteSpace(proxy) || (compareDns && string.IsNullOrWhiteSpace(dnsHost))) {
                     report.AppendLine("Сравнение маршрутов недоступно: нет настроенного прокси или DNS.");
                     return report.ToString();

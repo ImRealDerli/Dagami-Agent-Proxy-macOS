@@ -1,4 +1,4 @@
-"""Tray callbacks communicate with Tk through a queue, never across threads."""
+
 from pathlib import Path
 import sys
 import threading

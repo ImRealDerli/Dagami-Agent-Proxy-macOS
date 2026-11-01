@@ -158,8 +158,8 @@ namespace DevProxyApp
         }
         public static ProcessStartInfo HelperStart(SystemDnsRequest request, string assemblyPath, bool elevated) {
             string payload = EncodeRequest(request);
-            // Reuse this GUI executable, including when the user renamed it.
-            string helper = Path.GetFullPath(assemblyPath);
+            
+             string helper = Path.GetFullPath(assemblyPath);
             var psi = new ProcessStartInfo(helper, "--system-dns-helper " + request.Operation + " " + payload);
             psi.WorkingDirectory = Path.GetDirectoryName(helper);
             psi.WindowStyle = ProcessWindowStyle.Hidden;

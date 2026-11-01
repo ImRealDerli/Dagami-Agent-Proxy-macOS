@@ -1,4 +1,4 @@
-"""Separate a frozen app's runtime from system tools and independent workers."""
+
 import os
 import sys
 
@@ -18,6 +18,9 @@ def external_environment(overrides=None):
                     env[key]=os.pathsep.join(value for value in env[key].split(os.pathsep)
                         if not value or not (os.path.abspath(value)==os.path.abspath(runtime) or os.path.abspath(value).startswith(os.path.abspath(runtime)+os.sep)))
         env={key:value for key,value in env.items() if not key.startswith('_PYI_') and key!='PYINSTALLER_RESET_ENVIRONMENT'}
+    if env.pop('DAGAMI_BUNDLED_ENGINE',None):
+        for key in ('PYTHONHOME','PYTHONPATH','PYTHONNOUSERSITE','PYTHONDONTWRITEBYTECODE'):
+            env.pop(key,None)
     if overrides:env.update(overrides)
     return env
 

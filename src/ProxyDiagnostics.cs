@@ -13,8 +13,8 @@ namespace DevProxyApp {
   public int Status {get;private set;}
   public UpstreamConnectException(int status):base("Upstream proxy refused CONNECT; HTTP status="+status){Status=status;}
  }
- // Availability of the selected bridge route, not just a separate upstream.
- public static class ConnectionDiagnostics {
+ 
+  public static class ConnectionDiagnostics {
   public static ProxyProbeResult Check(int bridgePort,Func<int,string> probe=null){
    if(bridgePort<=0)return new ProxyProbeResult{Message="Локальный мост не запущен."};
    try {
@@ -72,9 +72,9 @@ namespace DevProxyApp {
    if(status==403)return "Прокси запретил CONNECT к www.googleapis.com:443 (HTTP 403). Проверьте ограничения прокси; это не ответ аккаунта Google.";
    return "Прокси не выполнил CONNECT к www.googleapis.com:443 (HTTP "+status+"). Проверьте доступность и ограничения прокси; запрос к аккаунту Google не отправлялся.";
   }
-  // Probe the upstream itself: Smart DNS must not mask failed proxy authentication.
-  // No account tokens, OAuth codes or application requests are read or replayed.
-  public static ProxyProbeResult Check(string value,int timeoutMilliseconds=8000) {
+  
+   
+   public static ProxyProbeResult Check(string value,int timeoutMilliseconds=8000) {
    Uri proxy;
    if(!TryParse(value,out proxy))
     return new ProxyProbeResult{Message="Укажите HTTP/HTTPS-адрес прокси без пути, query и fragment. Спецсимволы в логине и пароле должны быть URL-кодированы."};

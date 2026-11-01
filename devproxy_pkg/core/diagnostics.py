@@ -1,11 +1,11 @@
-"""
-Diagnostics: Anonymized system inspection and routing diagnostics.
-- Checks local port binds and active listening sockets.
-- Shows current environment variables without printing passwords.
-- Checks configured IDE files.
-- Checks DNS reachability.
-- NEVER contacts external IP-echo services automatically without explicit user flag and disclosure.
-"""
+
+
+
+
+
+
+
+
 
 import os
 import sys
@@ -26,7 +26,7 @@ def get_environment_diagnostics() -> Dict[str, Any]:
     for k in env_keys:
         v = os.environ.get(k)
         if v:
-            # Mask potential credentials
+                                        
             if "@" in v:
                 try:
                     p = ProxyProfile.parse(v, name="env_check")
@@ -50,11 +50,11 @@ def check_port_open(host: str, port: int, timeout: float = 1.0) -> bool:
 
 
 def test_ip_echo(profile: ProxyProfile, service_name: str = "Cloudflare Trace", service_url: str = "https://cloudflare.com/cdn-cgi/trace") -> Dict[str, Any]:
-    """
-    OPTIONAL external IP diagnostic.
-    Explicitly discloses the target recipient.
-    Uses LocalTunnel for SOCKS/auth upstreams.
-    """
+    
+
+
+
+
     import urllib.request
     from .tunnel import LocalTunnel
     

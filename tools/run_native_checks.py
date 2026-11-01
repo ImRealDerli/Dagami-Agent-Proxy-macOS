@@ -1,4 +1,4 @@
-"""Selected Windows fixture checks; never runs activation or live DNS mutation tests."""
+
 import argparse
 import os
 import re

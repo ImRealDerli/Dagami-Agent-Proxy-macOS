@@ -124,8 +124,8 @@ namespace DevProxyApp {
     byte[] framed=new byte[query.Length+2];framed[0]=(byte)(query.Length>>8);framed[1]=(byte)query.Length;
     Buffer.BlockCopy(query,0,framed,2,query.Length);
     if(obfuscate){
-     // Split 2-byte DNS-over-TCP length prefix from body to evade simple TCP payload DPI signatures
-     stream.Write(framed,0,1);stream.Flush();
+     
+      stream.Write(framed,0,1);stream.Flush();
      stream.Write(framed,1,framed.Length-1);stream.Flush();
     }else{
      stream.Write(framed,0,framed.Length);stream.Flush();
@@ -170,9 +170,9 @@ namespace DevProxyApp {
      var dpiMode=DpiDesyncStream.ParseMode(ConfigManager.Instance.DpiDesyncMode);
      if(dpiMode!=DpiDesyncMode.Off&&dpiMode!=DpiDesyncMode.ExternalEngine)net=new DpiDesyncStream(net,client.Client,dpiMode);
     }
-    // Online CRL retrieval itself may require this DNS service. Keep OS trust,
-    // certificate dates and hostname validation, without recursive online CRL.
-    using(var tls=TlsDiagnostics.Connect(net,host,"dns-https",Remaining(watch,timeout),false)){
+    
+     
+     using(var tls=TlsDiagnostics.Connect(net,host,"dns-https",Remaining(watch,timeout),false)){
      string ua=ConfigManager.Instance.DnsObfuscation?"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36":"Dagami-Agent-Proxy";
      string header=method+" "+path+" HTTP/1.1\r\nHost: "+host+"\r\nConnection: close\r\nUser-Agent: "+ua+"\r\nAccept-Encoding: identity\r\n";
      if(body!=null)header+="Content-Type: application/dns-message\r\nAccept: application/dns-message\r\nContent-Length: "+body.Length+"\r\n";

@@ -1,4 +1,4 @@
-"""Reversible per-user Linux launchers and macOS proxy wrapper applications."""
+
 from __future__ import annotations
 import base64
 import hashlib
@@ -28,7 +28,7 @@ def atomic(path, data, mode=0o600):
 def desktop_quote(value):
     if any(c in value for c in '\r\n\x00'):
         raise ValueError('Недопустимые символы в пути запуска.')
-    # Desktop string escaping precedes Exec quoting; no shell is involved.
+                                                                          
     value=value.replace('%','%%')
     for char in ('\\','"','`','$'):value=value.replace(char,'\\'+char)
     return '"'+value.replace('\\','\\\\')+'"'
@@ -45,7 +45,7 @@ def rewrite_desktop(raw, command):
             if re.search(r'%(?![%fFuUickdDnNvm])',tail):raise ValueError('Неподдерживаемые подстановки Exec.')
             result.append('Exec='+' '.join(desktop_quote(x) for x in command)+' -- '+tail+'\n');found=True
         elif active and line.startswith(('DBusActivatable=','Actions=','TryExec=')):
-            # Otherwise D-Bus or a desktop action could bypass the managed Exec.
+                                                                                
             continue
         else:result.append(line)
     if not found:raise ValueError('В ярлыке отсутствует Exec.')
@@ -114,7 +114,7 @@ class PortableShortcuts:
                     if planned[0][0].exists():raise RuntimeError('Ярлык уже существует без записи в журнале.')
             else:raise RuntimeError('Эта ОС не поддерживается.')
             records=[]
-            # Persist recovery information for the entire plan before the first mutation.
+                                                                                         
             for path,payload,mode in planned:
                 old=path.read_bytes() if path.exists() else None
                 records.append({'path':str(path),'hash':digest(payload),'original':base64.b64encode(old).decode() if old is not None else None,'mode':path.stat().st_mode&0o777 if old is not None else mode,'profile':profile})
@@ -143,7 +143,7 @@ class PortableShortcuts:
         data.pop(app,None);self._save(data)
         if self.platform=='darwin' and records:
             bundle=Path(records[0]['path']).parents[1]
-            # Remove only empty directories created for the wrapper; never recurse.
+                                                                                   
             for path in (bundle/'Contents'/'MacOS',bundle/'Contents'/'Resources',bundle/'Contents',bundle):
                 try:path.rmdir()
                 except OSError:pass

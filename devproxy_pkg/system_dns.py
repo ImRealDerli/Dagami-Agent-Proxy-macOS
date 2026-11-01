@@ -1,8 +1,8 @@
-"""Transactional Unix DNS. No system writes occur on import or discovery.
 
-Linux: NetworkManager; split DNS requires its existing dnsmasq plugin.
-macOS: networksetup services and /private/etc/resolver domain files.
-"""
+
+
+
+
 from __future__ import annotations
 import base64
 import contextlib
@@ -34,7 +34,7 @@ def run(argv, timeout=25):
 
 
 def tool(name):
-    # A privileged helper must not execute programs from the caller's PATH.
+                                                                           
     for directory in ('/usr/sbin', '/usr/bin', '/sbin', '/bin'):
         path = Path(directory) / name
         if path.is_file():
@@ -116,7 +116,7 @@ class Store:
         if path.is_symlink():
             raise RuntimeError('Недопустимый файл блокировки DNS.')
         with path.open('a+b') as stream:
-            if os.name == 'nt':  # fixture runs on Windows; Unix production uses flock.
+            if os.name == 'nt':                                                        
                 import msvcrt
                 stream.write(b'0'); stream.flush(); stream.seek(0)
                 msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
@@ -149,7 +149,7 @@ class Store:
 
 def file_snapshot(path):
     path = Path(path)
-    # macOS backend uses /private/etc explicitly, avoiding the standard /etc link.
+                                                                                  
     if any(parent.is_symlink() for parent in (path, *path.parents)):
         raise RuntimeError(f'Ссылка вместо файла настроек: {path.name}')
     if not path.exists(): return {'exists': False, 'data': '', 'mode': 0o644}
@@ -164,7 +164,7 @@ def file_value(text, before):
 
 class Backend:
     def validate(self, request):
-        """Check support and selection before touching an active older setup."""
+        pass
 
     def missing(self, change):
         return False
@@ -175,7 +175,7 @@ class Backend:
 
     def write(self, change, value):
         if change['kind'] == 'file':
-            # Read again to reject a symlink introduced after the snapshot.
+                                                                           
             file_snapshot(change['id'])
             path = Path(change['id'])
             if value['exists']: atomic(path, base64.b64decode(value['data'], validate=True), value['mode'])
@@ -219,7 +219,15 @@ class MacBackend(Backend):
 
     def plan(self, request):
         if request['mode'] == 'domains':
-            return [self.file_change(self.resolver / domain, f'# Dagami Agent Proxy\nnameserver {request["server"]}\n', request.get('replace', False)) for domain in domains(request.get('preset', 'Development'))]
+            from .core.smart_dns import AI_ROOTS,AI_EXACT
+            shared={'challenges.cloudflare.com','featuregates.org','statsigapi.net','statsig.com','live.com','passport.net','msftidentity.com','msftauth.net','microsoftonline.com','www.gstatic.com','ssl.gstatic.com','accounts.google.com'}
+            selected=sorted((set(domains(request.get('preset','Development')))|AI_ROOTS|AI_EXACT)-shared)
+            changes=[self.file_change(self.resolver / domain, f'nameserver {request["server"]}\n', request.get('replace', False)) for domain in selected]
+            if request.get('restore_global'):
+                for service in self.services():
+                    before=self.read_dns(service['id'])
+                    if before==[request['server']]:changes.append({'kind':'dns','id':service['id'],'before':before,'after':[]})
+            return changes
         chosen = set(request.get('services', []))
         available = {item['id'] for item in self.services()}
         if not chosen or not chosen <= available: raise ValueError('Выберите существующие сетевые службы.')
@@ -265,7 +273,7 @@ class LinuxBackend(Backend):
     def read_dns(self, identity):
         connection, family = identity.split('/')
         if family not in ('4', '6') or not re.fullmatch(r'[0-9a-fA-F-]{36}', connection): raise ValueError('Некорректный ID подключения.')
-        # Separate property queries preserve empty values without positional ambiguity.
+                                                                                       
         return {key: self.execute([self.nmcli, '--escape', 'no', '-g', 'ipv'+family+'.'+key, 'connection', 'show', 'uuid', connection]) for key in self.properties}
 
     def write_dns(self, identity, value):
@@ -298,7 +306,7 @@ class LinuxBackend(Backend):
         if request['mode'] == 'domains':
             self.split_supported()
             selected = domains(request.get('preset', 'Development'))
-            # Refuse overlapping rules instead of relying on dnsmasq file ordering.
+                                                                                   
             for path in sorted(self.config.glob('*')):
                 if path.name == '90-dagami-agent-proxy.conf': continue
                 data = file_snapshot(path)
@@ -328,7 +336,7 @@ class LinuxBackend(Backend):
             for family in ('4', '6'):
                 identity = item['id']+'/'+family
                 result.append({'kind': 'dns', 'id': identity, 'before': self.read_dns(identity), 'after': {'dns': '', 'ignore-auto-dns': 'no', 'dns-search': ''}})
-        # Reset DNS routing directives, retaining unrelated DHCP/plugin settings.
+                                                                                 
         for path in sorted(self.config.glob('*')):
             before = file_snapshot(path)
             text = base64.b64decode(before['data']).decode('utf-8')
@@ -348,7 +356,7 @@ def backend(platform=None):
 
 
 def dns_addresses(host, server):
-    """Minimal bounded DNS A/AAAA query, with transaction and response checks."""
+    
     result = []
     for qtype in (1, 28):
         token = os.urandom(2)
@@ -454,7 +462,7 @@ class Engine:
             else: changes = self.system.reset_plan()
             if existing: self.store.archive(existing)
             state = {'id': request['job'], 'action': request['action'], 'status': 'Prepared', 'changes': changes, 'pending': -1, 'warnings': [], 'errors': [], 'targets': targets}
-            self.store.save(state)  # complete original backup before the first write
+            self.store.save(state)                                                   
             try:
                 state['status'] = 'Applying'
                 for index, change in enumerate(changes):
@@ -502,7 +510,7 @@ def helper(payload):
 
 
 def execute(action, **values):
-    """User-facing elevation bridge; request values never become shell syntax."""
+    
     from .portable_runtime import entry_command
     request = validate_request(dict(values, action=action, job=uuid.uuid4().hex))
     payload = base64.b64encode(json.dumps(request).encode()).decode()

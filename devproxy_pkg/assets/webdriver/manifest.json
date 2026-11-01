@@ -1,0 +1,16 @@
+{
+  "version": "156.0.8078.80",
+  "vendor_sha256": "57b93b7dac2537ca05b15a1c3ce1f60c91afcf1c84e9f5aa6a0254235e4f4dfd",
+  "drivers": {
+    "mac-x64": {
+      "url": "https://storage.googleapis.com/chrome-for-testing-public/156.0.8078.80/mac-x64/chromedriver-mac-x64.zip",
+      "zip_sha256": "9036ec0135938aa4303c03f88307c749a0ae45448e3431e51e740fa21610ff75",
+      "sha256": "da17fb835b15c1f2bec0621bae3d7f725133b5fd38fd5833d0419e175721794e"
+    },
+    "mac-arm64": {
+      "url": "https://storage.googleapis.com/chrome-for-testing-public/156.0.8078.80/mac-arm64/chromedriver-mac-arm64.zip",
+      "zip_sha256": "b5fe5abe5a82ca3ac49b3f2ea9e177b63f82fc3a4227883e0eaa9894a6bf3b7f",
+      "sha256": "c081b7e2f45f495c8b377458da61a9346edc8529d280eaf9a739685fda28e08a"
+    }
+  }
+}

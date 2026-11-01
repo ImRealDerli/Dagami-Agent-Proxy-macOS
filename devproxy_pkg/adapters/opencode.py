@@ -1,10 +1,10 @@
-"""
-OpenCode Application Adapter.
-Supports:
-- CLI mode (`opencode`)
-- Web/Desktop GUI if launched
-- Node.js network runtime environment (fetch, undici, node-fetch)
-"""
+
+
+
+
+
+
+
 
 import os
 import sys

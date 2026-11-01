@@ -1,8 +1,8 @@
-"""
-Codex Application Adapters:
-1. CodexCliAdapter: CLI binary (`codex.exe` or `codex`), `.codex/config.toml`, sandbox processes.
-2. CodexGuiAdapter: Codex Desktop GUI application (packaged MSIX/WindowsApps or Electron desktop binary).
-"""
+
+
+
+
+
 
 import os
 import sys
@@ -30,12 +30,12 @@ class CodexCliAdapter(ApplicationAdapter):
         return ["win32", "darwin", "linux"]
 
     def detect_executable(self) -> Optional[str]:
-        # 1. Check PATH
+                       
         p = shutil.which("codex") or shutil.which("codex.exe")
         if p and is_cli_executable(p):
             return p
 
-        # 2. Check OpenAI Codex standard installed path
+                                                       
         if sys.platform == "win32":
             local = os.environ.get("LOCALAPPDATA", "")
             base = os.path.join(local, "OpenAI", "Codex", "bin")
@@ -113,9 +113,9 @@ class CodexCliAdapter(ApplicationAdapter):
 
 
 class CodexGuiAdapter(ApplicationAdapter):
-    """
-    Adapter for Codex Desktop GUI (packaged app / desktop window).
-    """
+    
+
+
     @property
     def app_id(self) -> str:
         return "codex-gui"
@@ -129,9 +129,9 @@ class CodexGuiAdapter(ApplicationAdapter):
         return ["win32", "darwin"]
 
     def detect_executable(self) -> Optional[str]:
-        # On Windows, Codex Desktop can be launched via standard URI protocol or WindowsApps
+                                                                                            
         if sys.platform == "win32":
-            # Check Start menu shortcut or WindowsApps package
+                                                              
             winapps = "C:\\Program Files\\WindowsApps"
             if os.path.exists(winapps):
                 try:
@@ -173,7 +173,7 @@ class CodexGuiAdapter(ApplicationAdapter):
         return ["--proxy-server={PROXY_URL}"]
 
     def apply_persistent(self, profile: ProxyProfile) -> Tuple[bool, str]:
-        # Shares the underlying config.toml with Codex CLI
+                                                          
         cli = CodexCliAdapter()
         return cli.apply_persistent(profile)
 

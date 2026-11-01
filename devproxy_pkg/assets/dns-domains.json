@@ -74,7 +74,9 @@
     "aiplatform.googleapis.com",
     "play.googleapis.com",
     "firebaserules.googleapis.com",
-    "firebase.googleapis.com"
+    "firebase.googleapis.com",
+    "antigravity-cli-auto-updater-974169037036.us-central1.run.app",
+    "antigravity-ide-auto-updater-974169037036.us-central1.run.app"
   ],
   "Full": [
     "gemini.google.com",
@@ -161,6 +163,8 @@
     "aiplatform.googleapis.com",
     "play.googleapis.com",
     "firebaserules.googleapis.com",
-    "firebase.googleapis.com"
+    "firebase.googleapis.com",
+    "antigravity-cli-auto-updater-974169037036.us-central1.run.app",
+    "antigravity-ide-auto-updater-974169037036.us-central1.run.app"
   ]
 }

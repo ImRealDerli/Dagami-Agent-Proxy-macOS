@@ -244,8 +244,8 @@ namespace DevProxyApp
             _appActions.Items.Add(advanced);
             _removeAppItem = AppMenuItem("Удалить из списка", () => {
                 if (_shortcutRecords > 0 || _shortcutIssue != null) throw new InvalidOperationException("Сначала восстановите обычные ярлыки через «Действия → Дополнительно».");
-                // session checked inside EnsureSessionStoppedForPatch
-                NativeSession session; if (_nativeSessions.TryGetValue(SelectedNativeTarget().Id, out session) && session.RunningProcess != null)
+                
+                 NativeSession session; if (_nativeSessions.TryGetValue(SelectedNativeTarget().Id, out session) && session.RunningProcess != null)
                     throw new InvalidOperationException("Сначала остановите приложение.");
                 if (MessageBox.Show(this, "Удалить «" + SelectedNativeTarget().DisplayName + "» из списка Dagami Agent Proxy? Само приложение останется на компьютере.",
                     "Удалить из списка", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes) RemoveNativeTarget();
@@ -263,8 +263,8 @@ namespace DevProxyApp
             Logger.Log((ok ? "[✓] " : "[-] ") + target.DisplayName + ": " + message);
             if (!ok) throw new InvalidOperationException(message);
             if (!restore && ConfigManager.Instance.SetSystemEnv) ProxyEngine.ApplySystemEnvironment(GetIdeProxyUrl());
-            // Restoring one application must not clear shared Windows environment for other apps.
-            _appFeedback.Text = target.DisplayName + ": " + message;
+            
+             _appFeedback.Text = target.DisplayName + ": " + message;
         }
 
         private bool ConfirmSettingsRestore() {
@@ -335,8 +335,8 @@ namespace DevProxyApp
         private void UnpatchSelectedNativeTarget()
         {
             var target = SelectedNativeTarget();
-            // session checked inside EnsureSessionStoppedForPatch
-            if (!EnsureSessionStoppedForPatch(target, "Отмена патча")) return;
+            
+             if (!EnsureSessionStoppedForPatch(target, "Отмена патча")) return;
 
             if (!ConfirmSettingsRestore()) return;
             _nativeBusy = true; _patchInProgress = true; SetNativeButtonsEnabled(false);
@@ -377,9 +377,9 @@ namespace DevProxyApp
             if (_nativeSessions.TryGetValue(target.Id, out session) && session.RunningProcess != null) {
                 FocusSession(session.RunningProcess); return;
             }
-            // Diagnostics are advisory. Launch uses saved parameters and must not
-            // depend on a stale probe result or a writable settings directory.
-            if (_bridgePort <= 0) RestartRescueBridge();
+            
+             
+             if (_bridgePort <= 0) RestartRescueBridge();
             _nativeBusy = true; SetNativeButtonsEnabled(false);
             _primaryAppAction.Text = "Запуск…"; _primaryAppAction.Refresh();
             try {
@@ -474,8 +474,8 @@ namespace DevProxyApp
         internal static string NormalizeSavedProxy(string proxy, bool useProxy, bool useDns)
         {
             proxy = (proxy ?? "").Trim();
-            // Disabling a route must not erase its saved address/credentials.
-            if (!useProxy) return proxy;
+            
+             if (!useProxy) return proxy;
             if (IsDirectProxyValue(proxy) || (string.IsNullOrEmpty(proxy) && useDns)) return "direct";
             Uri parsed;
             if (!TryParseSupportedProxy(proxy, out parsed))
@@ -494,9 +494,9 @@ namespace DevProxyApp
             if (string.IsNullOrEmpty(dns)) dns = "dns.dagami.ru";
             if (!DnsProviders.IsValidSpec(dns))
                 throw new InvalidOperationException("Укажите корректный DNS: домен, IP, IP:порт, https://.../dns-query или tls://...");
-            // Closing sessions refreshes the UI using the old configuration.
-            // Capture every pending edit before asking for confirmation.
-            bool obfuscation = _dnsObfuscation != null ? _dnsObfuscation.Checked : ConfigManager.Instance.DnsObfuscation;
+            
+             
+             bool obfuscation = _dnsObfuscation != null ? _dnsObfuscation.Checked : ConfigManager.Instance.DnsObfuscation;
             string dpiMode = _dpiModeBox != null ? DpiModeValue(_dpiModeBox.SelectedIndex) : ConfigManager.Instance.DpiDesyncMode;
             bool blockUpdates = _blockAntigravityUpdates != null ? _blockAntigravityUpdates.Checked : ConfigManager.Instance.BlockAntigravityUpdates;
             bool systemEnvironment = _systemEnvironment.Checked, prepareClient = _prepareAntigravity.Checked;
@@ -521,9 +521,9 @@ namespace DevProxyApp
         private void SyncSelectedAntigravityUpdateBlock()
         {
             try {
-                // Update blocking applies only to requests through the bridge.
-                // A UI toggle must not delete pending installers.
-                if (_appFeedback != null) _appFeedback.Text = ConfigManager.Instance.BlockAntigravityUpdates ? "Запросы обновлений через мост блокируются; другие маршруты не изменены." : "Блокировка обновлений через мост выключена.";
+                
+                 
+                 if (_appFeedback != null) _appFeedback.Text = ConfigManager.Instance.BlockAntigravityUpdates ? "Запросы обновлений через мост блокируются; другие маршруты не изменены." : "Блокировка обновлений через мост выключена.";
                 UpdateAppActionState();
             } catch (Exception ex) { Logger.Log("[UpdateGuard] " + ex.Message); }
         }
@@ -597,10 +597,10 @@ namespace DevProxyApp
             foreach (var sessionEntry in _nativeSessions.Values) if (sessionEntry.RunningProcess != null) active++;
             _nativeStatus.Text = "Приложений: "+_cachedTargets.Count+" · Запущено через Dagami: "+active;
             var currentDns=DnsProviders.ForServer(ConfigManager.Instance.DnsHost);
-            // connection summary updated below
-            SyncRouteCheckboxes();
-            // connection summary updated below
-            if (_connectionSummary != null) {
+            
+             SyncRouteCheckboxes();
+            
+             if (_connectionSummary != null) {
                 bool flagsActive = ConfigManager.Instance.UseProxy || ConfigManager.Instance.UseDagamiDns;
                 string proxyText = ConfigManager.Instance.UseProxy ? (!string.IsNullOrEmpty(ConfigManager.Instance.LastProxy) && !IsDirectProxyValue(ConfigManager.Instance.LastProxy) ? "Прокси: включён" : "Прокси: прямой (direct)") : "Прокси: выключен";
                 string dnsText = ConfigManager.Instance.UseDagamiDns ? (currentDns==null?"Свой DNS":currentDns.Length>0&&currentDns[0].Provider=="magicdns"?"DNS: MagicDNS":"DNS: Dagami → MagicDNS") : "DNS: выключен";

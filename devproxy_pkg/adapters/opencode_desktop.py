@@ -1,4 +1,4 @@
-"""Current Electron and older Windows WebView2 OpenCode Desktop launch policies."""
+
 import os
 import sys
 from pathlib import Path

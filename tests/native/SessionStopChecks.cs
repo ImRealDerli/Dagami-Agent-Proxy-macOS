@@ -33,8 +33,8 @@ class SessionStopChecks {
    File.WriteAllText(pidFile+".go","");var wait=Stopwatch.StartNew();
    int childId=0;while(wait.ElapsedMilliseconds<5000){try{if(File.Exists(pidFile)&&int.TryParse(File.ReadAllText(pidFile),out childId))break;}catch(IOException){}Thread.Sleep(10);}
    Assert(childId>0,"Fixture descendant did not start");child=Process.GetProcessById(childId);
-   other=new NativeSession();second=Start("--wait");other.Processes.Add(Process.GetProcessById(second.Id)); // Tracked launcher whose Job assignment failed.
-   unrelated=Start("--wait");
+   other=new NativeSession();second=Start("--wait");other.Processes.Add(Process.GetProcessById(second.Id)); 
+    unrelated=Start("--wait");
    using(var form=new MainForm(null,false,true)){
     var sessions=(Dictionary<string,NativeSession>)typeof(MainForm).GetField("_nativeSessions",Private).GetValue(form);
     typeof(MainForm).GetField("_cachedTargets",Private).SetValue(form,new List<AppTarget>{new AppTarget{Id="one",DisplayName="Fixture editor"},new AppTarget{Id="two",DisplayName="Fixture CLI"}});

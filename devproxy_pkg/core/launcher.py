@@ -1,12 +1,12 @@
-"""
-Launcher: Safe process execution with isolated environment and command-line arguments.
-Rules:
-- NEVER uses shell=True.
-- Passes clean list of arguments.
-- Safely injects HTTP_PROXY / HTTPS_PROXY / ALL_PROXY into the target child process ONLY.
-- Leaves global machine / user environment untouched.
-- Integrates Win32 Job Objects on Windows to guarantee child process tree cleanup on exit.
-"""
+
+
+
+
+
+
+
+
+
 
 import os
 import sys
@@ -30,7 +30,7 @@ from .agent_ipc import EphemeralAgentIPC
 class Launcher:
     @staticmethod
     def command(executable, extra_args=None):
-        """Resolve standard npm wrappers without invoking cmd.exe or a shell."""
+        
         args = list(extra_args or [])
         wrapper = Path(executable)
         if sys.platform != "win32" or wrapper.suffix.lower() not in (".cmd", ".bat", ".ps1"):
@@ -64,14 +64,16 @@ class Launcher:
         stdin=None, stdout=None, stderr=None,
         new_session: bool = True
     ) -> subprocess.Popen:
-        """
-        Executes binary safely without shell=True.
-        Assigns process to WindowsJobManager if provided on Windows.
-        """
+        
+
+
+
         if not os.path.exists(executable) and not shutil_which(executable):
             raise FileNotFoundError(f"Executable not found: {executable}")
 
         cmd = Launcher.command(executable, extra_args)
+        from ..macos_architecture import require_compatible
+        require_compatible(cmd[0])
 
         env = external_environment(env_vars)
 
@@ -88,7 +90,7 @@ class Launcher:
 
         if sys.platform == "win32" and job_manager is not None:
             try:
-                # proc._handle is the OS handle opened by subprocess.Popen on Windows
+                                                                                     
                 job_manager.assign_process(proc._handle)
             except Exception:
                 proc.terminate()
@@ -110,17 +112,17 @@ class Launcher:
         enable_ipc: bool = True,
         environment_factory=None
     ) -> Tuple[subprocess.Popen, LocalTunnel]:
-        """
-        Starts ephemeral LocalTunnel and launches application configured to use it.
-        Guarantees that child processes are bound to a Win32 Job Object (on Windows)
-        and all tunnels and IPC threads are cleanly torn down upon exit.
-        """
+        
+
+
+
+
         tunnel = LocalTunnel(profile)
         port = tunnel.start()
 
         local_proxy_url = f"http://127.0.0.1:{port}"
         
-        # Prepare environment
+                             
         env_vars = {
             "HTTP_PROXY": local_proxy_url,
             "HTTPS_PROXY": local_proxy_url,
@@ -143,7 +145,7 @@ class Launcher:
                 tunnel.stop()
                 raise
 
-        # Combine arguments
+                           
         cmd_args = []
         if adapter_cli_flags:
             for flag in adapter_cli_flags:
@@ -151,7 +153,7 @@ class Launcher:
         if extra_args:
             cmd_args.extend(extra_args)
 
-        # Initialize per-session Job Object on Windows
+                                                      
         job_mgr = None
         if sys.platform == "win32":
             try:
@@ -160,7 +162,7 @@ class Launcher:
                 tunnel.stop()
                 raise
 
-        # Initialize Ephemeral per-session IPC server
+                                                     
         ipc_server = None
         if enable_ipc:
             try:
@@ -218,7 +220,7 @@ class Launcher:
             raise
         finally:
             if wait:
-                # If we waited for process exit, clean up resources
+                                                                   
                 tunnel.stop()
                 if ipc_server:
                     ipc_server.stop()

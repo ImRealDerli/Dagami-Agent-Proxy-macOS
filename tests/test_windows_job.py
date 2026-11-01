@@ -14,7 +14,7 @@ class TestWindowsJob(unittest.TestCase):
         with WindowsJobManager() as job:
             self.assertIsNotNone(job.job_handle)
 
-            # Spawn dummy Python process sleeping
+                                                 
             proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(5)"], stdout=subprocess.DEVNULL)
             try:
                 assigned = job.assign_process(proc._handle)

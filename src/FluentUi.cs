@@ -282,8 +282,8 @@ namespace DevProxyApp
                 }
                 SyncSelectedAntigravityUpdateBlock();
             };
-            // _blockAntigravityUpdates is added to optionsRow inside actionRows below
-            Disposed+=(sender,e)=>addMenu.Dispose();
+            
+             Disposed+=(sender,e)=>addMenu.Dispose();
             apps.Controls.Add(tools, 0, 1);
 
             var listCard = new FluentCard { Dock = DockStyle.Fill, Padding = new Padding(8), Margin = new Padding(0, 0, 0, 8) };

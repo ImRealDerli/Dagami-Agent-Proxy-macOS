@@ -1,4 +1,4 @@
-"""Opt-in, per-user login startup; never runs a desktop as root."""
+
 from __future__ import annotations
 import os
 from pathlib import Path

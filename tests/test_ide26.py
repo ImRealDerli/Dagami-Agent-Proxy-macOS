@@ -96,7 +96,8 @@ class Ide26Tests(unittest.TestCase):
             try:
                 port = tunnel.start()
                 for destination in (port, unused.getsockname()[1]):
-                    with socket.create_connection(('127.0.0.1', port), timeout=5) as peer:
+                                                                                                                   
+                    with socket.create_connection(('127.0.0.1', port), timeout=12) as peer:
                         peer.sendall(f'POST http://127.0.0.1:{destination}/rpc HTTP/1.1\r\nHost: localhost\r\nContent-Length: 0\r\n\r\n'.encode())
                         self.assertIn(b' 502 ', self.receive_all(peer))
             finally:

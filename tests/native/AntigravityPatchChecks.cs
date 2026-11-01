@@ -100,8 +100,8 @@ class AntigravityPatchChecks {
    Assert(partial.Prepared && !partial.Complete && partial.Message.Contains("Частичная"), "Skipped backend reported as complete preparation");
    Assert(File.ReadAllText(unsupported) == "unknown architecture fixture", "Unsupported secondary backend changed");
    File.Delete(unsupported); AntigravityIntegration.RestoreClient(app);
-   // Lock the second sorted target: an earlier successful write must roll back.
-   string[] ordered = AntigravityIntegration.BackendPaths(app).ToArray(); bool failed = false;
+   
+    string[] ordered = AntigravityIntegration.BackendPaths(app).ToArray(); bool failed = false;
    using (var held = new FileStream(ordered[1], FileMode.Open, FileAccess.Read, FileShare.Read)) {
     var recovery = AntigravityIntegration.PrepareClient(app); failed = !recovery.Prepared && !recovery.Complete && recovery.Message.Contains("Обычный запуск");
    }
