@@ -11,6 +11,9 @@ struct Snapshot:Decodable {
     var profiles:[Profile]=[];var apps:[ClientApp]=[];var services:[NetworkService]=[]
     var systemDNS:String="Нет данных";var activated:Bool=false;var startup:Bool=false;var providers:[String:[String]]=[:]
 }
+struct UpdateInfo:Codable {
+    var available:Bool=false;var current:String="";var currentBuild:Int=0;var tag:String="";var url:String="https://github.com/ImRealDerli/Dagami-Agent-Proxy-macOS/releases";var notes:String="";var severity:String="unspecified";var recommendation:String="optional";var lastResult:String=""
+}
 struct AuthState:Decodable {
     var service:String?=nil;var profile:String?=nil
     var message:String="Сессия входа не запущена";var url:String="";var code:String="";var running:Bool=false
@@ -58,12 +61,44 @@ final class RPC: @unchecked Sendable {
     @Published var client="";@Published var ready=false;@Published var journal="Журнал пока пуст."
     @Published var auth=AuthState()
     @Published var clipboardEnabled=true;@Published var authNetworkStatus=""
+    @Published var installingUpdate=false;@Published var update=UpdateInfo();@Published var updateStatus="Проверка обновлений ещё не выполнялась."
+    @Published var automaticUpdates=true {didSet{UserDefaults.standard.set(automaticUpdates,forKey:"automaticUpdateChecks")}}
+    private var updateTimer:Timer?;private var updateAcknowledged=false;private var showingUpdateOffer=false;private var lastOfferedTag="";private var lastOfferedAt=Date.distantPast;private var lastUpdateAttempt=Date.distantPast;private var startupUpdateCheck=false
     private let clipboard=OAuthClipboard()
     private var clipboardTimer:Timer?
     let rpc=RPC()
     init() {
+        UserDefaults.standard.register(defaults:["automaticUpdateChecks":true])
+        automaticUpdates=UserDefaults.standard.bool(forKey:"automaticUpdateChecks")
+        if let data=UserDefaults.standard.data(forKey:"cachedUpdate"),let cached=try? JSONDecoder().decode(UpdateInfo.self,from:data),cached.currentBuild==Int(Bundle.main.object(forInfoDictionaryKey:"CFBundleVersion") as? String ?? "0") {update=cached;updateStatus=cached.available ? "Доступна "+cached.tag:"Предыдущая проверка: новых версий не было."}
+        updateTimer=Timer.scheduledTimer(withTimeInterval:60,repeats:true){[weak self] _ in Task{@MainActor in self?.checkUpdatesIfDue()}}
         profile=UserDefaults.standard.string(forKey:"selectedProfile") ?? ""
         clipboardTimer=Timer.scheduledTimer(withTimeInterval:0.5,repeats:true){[weak self] _ in Task{@MainActor in self?.pollClipboard()}}
+    }
+    func checkUpdatesIfDue() {
+        guard automaticUpdates,!busy,!auth.running,!showingUpdateOffer,ready,ProcessInfo.processInfo.environment["DAGAMI_UI_PREVIEW"] != "1" else{return}
+        let last=UserDefaults.standard.double(forKey:"lastUpdateCheck"),now=Date().timeIntervalSince1970
+        guard Date().timeIntervalSince(lastUpdateAttempt)>900,(!startupUpdateCheck || now-last>21600 || now<last || update.currentBuild==0) else{return}
+        startupUpdateCheck=true;lastUpdateAttempt=Date();run("updateCheck",["profile":profile],refresh:false)
+    }
+    func showUpdateOffer(manual:Bool) {
+        guard update.available,!showingUpdateOffer else{return}
+        if !manual && (!automaticUpdates || (lastOfferedTag==update.tag && Date().timeIntervalSince(lastOfferedAt)<86400)) {return}
+        let deferredTag=UserDefaults.standard.string(forKey:"deferredUpdateTag") ?? ""
+        if !manual && deferredTag==update.tag && Date().timeIntervalSince1970<UserDefaults.standard.double(forKey:"deferredUpdateUntil") {return}
+        showingUpdateOffer=true;lastOfferedTag=update.tag;lastOfferedAt=Date()
+        let alert=NSAlert();alert.messageText="Вышло обновление Dagami "+update.tag
+        let severity=["normal":"Обычное обновление","important":"Важное обновление","critical":"Критическое обновление","unspecified":"Критичность не указана автором"]
+        alert.alertStyle=update.severity=="critical" ? .warning:.informational
+        alert.informativeText=(severity[update.severity] ?? "Обновление")+"\n"+(update.recommendation=="required" ? "Необходимо установить это обновление.":(update.recommendation=="recommended" ? "Рекомендуется установить сейчас.":"Можно установить позже."))+"\nПосле установки Dagami перезапустится. Профили и аккаунты сохранятся."
+        let scroll=NSScrollView(frame:NSRect(x:0,y:0,width:440,height:200));scroll.hasVerticalScroller=true;scroll.borderType = .bezelBorder
+        let text=NSTextView(frame:NSRect(x:0,y:0,width:420,height:200));text.isEditable=false;text.isSelectable=true;text.isVerticallyResizable=true;text.isHorizontallyResizable=false;text.maxSize=NSSize(width:440,height:CGFloat.greatestFiniteMagnitude);text.textContainer?.widthTracksTextView=true;text.font=NSFont.systemFont(ofSize:13);text.textContainerInset=NSSize(width:8,height:8);text.autoresizingMask=[.width];text.string=update.notes.isEmpty ? "Описание изменений не приложено. Подробности доступны на странице выпуска.":update.notes
+        scroll.documentView=text;alert.accessoryView=scroll
+        alert.addButton(withTitle:"Обновить");alert.addButton(withTitle:"Позже");alert.buttons[1].keyEquivalent="\u{1b}"
+        NSApp.activate(ignoringOtherApps:true)
+        let response=alert.runModal();showingUpdateOffer=false
+        if response == .alertFirstButtonReturn {run("updateInstall",["tag":update.tag,"profile":profile],refresh:false)}
+        else {UserDefaults.standard.set(update.tag,forKey:"deferredUpdateTag");UserDefaults.standard.set(Date().timeIntervalSince1970+86400,forKey:"deferredUpdateUntil");updateStatus="Установка отложена. Напомним через сутки; обновить вручную можно в настройках."}
     }
     private func pollClipboard() {
         let active=clipboardEnabled && auth.running && auth.profile==profile
@@ -81,7 +116,8 @@ final class RPC: @unchecked Sendable {
         run("snapshot",refresh:false)
     }
     func run(_ action:String,_ args:[String:Any]=[:],refresh:Bool=true) {
-        guard !busy else{return};busy=true
+        guard !busy,!showingUpdateOffer else{return};busy=true
+        if action=="updateInstall" {installingUpdate=true;message="Скачиваем обновление и проверяем SHA-256 и подпись…";updateStatus=message}
         Task {
             do {
                 let targetApp = (args["app"] as? String) ?? (action=="prepareAuth" ? "antigravity" : nil)
@@ -107,8 +143,14 @@ final class RPC: @unchecked Sendable {
                 if action=="snapshot" {
                     let data=try JSONSerialization.data(withJSONObject:json["result"]!)
                     state=try JSONDecoder().decode(Snapshot.self,from:data);ready=true
+                    if !updateAcknowledged {let _=try? await rpc.call("updateAck");updateAcknowledged=true}
                     if !state.profiles.contains(where:{$0.id==profile}) { profile=state.profiles.first?.id ?? "" }
                     if !state.apps.contains(where:{$0.id==client}) { client=state.apps.first(where:{$0.installed})?.id ?? state.apps.first?.id ?? "" }
+                } else if action=="updateCheck" {
+                    let data=try JSONSerialization.data(withJSONObject:json["result"]!)
+                    update=try JSONDecoder().decode(UpdateInfo.self,from:data);UserDefaults.standard.set(data,forKey:"cachedUpdate");UserDefaults.standard.set(Date().timeIntervalSince1970,forKey:"lastUpdateCheck")
+                    updateStatus=update.available ? "Вышла версия "+update.tag:"Установлена последняя доступная версия."
+                    if !update.lastResult.isEmpty {updateStatus+="\n"+update.lastResult}
                 } else if action=="probeAuth" {
                     authNetworkStatus=json["result"] as? String ?? "Проверка завершена"
                 } else if action=="authFind" {
@@ -123,8 +165,11 @@ final class RPC: @unchecked Sendable {
                     message=(json["result"] as? String) ?? "Готово"
                 }
                 busy=false
+                if action=="updateInstall" {NSApp.terminate(nil);return}
+                if action=="updateCheck" {showUpdateOffer(manual:args["manual"] as? Bool ?? false)}
+                if action=="snapshot" {checkUpdatesIfDue()}
                 if refresh { self.refresh() }
-            } catch { message=error.localizedDescription;if action=="authClipboard" {clipboard.reset()};if action.hasPrefix("auth") {auth.message=error.localizedDescription};if action=="probeAuth" {authNetworkStatus=error.localizedDescription};busy=false;ready=true }
+            } catch { message=error.localizedDescription;if action.hasPrefix("update") {installingUpdate=false;updateStatus=error.localizedDescription};if action=="authClipboard" {clipboard.reset()};if action.hasPrefix("auth") {auth.message=error.localizedDescription};if action=="probeAuth" {authNetworkStatus=error.localizedDescription};busy=false;ready=true }
         }
     }
     var chosen:Profile? {state.profiles.first{$0.id==profile}}
@@ -157,6 +202,7 @@ final class Delegate:NSObject,NSApplicationDelegate,NSWindowDelegate {
         MenuBarExtra("Dagami",systemImage:"network") {
             Button("Открыть Dagami"){NSApp.activate(ignoringOtherApps:true);NSApp.windows.first?.makeKeyAndOrderFront(nil)}
             Button("Проверить подключение"){model.run("check",["profile":model.profile])}.disabled(model.profile.isEmpty || model.busy)
+            Button(model.update.available ? "Обновление: "+model.update.tag:"Проверить обновления"){model.run("updateCheck",["profile":model.profile,"manual":true],refresh:false)}.disabled(model.busy)
             Divider();Button("Выход"){NSApp.terminate(nil)}
         }
     }
@@ -184,6 +230,7 @@ struct RootView:View {
                     Divider()
                     VStack(spacing:0) {
                         HStack { VStack(alignment:.leading,spacing:5){Text(page).font(.system(size:30,weight:.bold,design:.rounded));Text(subtitle).font(.subheadline).foregroundStyle(.secondary)};Spacer();if model.busy {ProgressView().controlSize(.small)};Button{model.refresh()}label:{Image(systemName:"arrow.clockwise")}.buttonStyle(.borderless).help("Обновить") }.padding(.horizontal,30).padding(.top,35).padding(.bottom,24)
+                        if model.update.available {HStack{Label("Доступна "+model.update.tag,systemImage:"arrow.down.circle");Spacer();Button("Подробнее"){model.showUpdateOffer(manual:true)}.disabled(model.busy)}.padding(.horizontal,30).padding(.bottom,12)}
                         ScrollView { VStack(spacing:20){pageContent}.padding(.horizontal,30).padding(.bottom,24) }
                         HStack(alignment:.top,spacing:10){Image(systemName:model.busy ? "hourglass":"info.circle").foregroundStyle(.blue);ScrollView{Text(model.message).font(.caption).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading)}.frame(maxHeight:64)}.padding(16).background(.bar)
                     }.background(Color(nsColor:.windowBackgroundColor))
@@ -191,6 +238,8 @@ struct RootView:View {
             }
         }
         .sheet(isPresented:$editor){ProfileSheet(profile:editProfile).environmentObject(model)}
+        .disabled(model.installingUpdate)
+        .overlay {if model.installingUpdate {VStack(spacing:14){ProgressView();Text("Скачиваем и проверяем обновление…").font(.headline);Text("После установки Dagami перезапустится.").foregroundStyle(.secondary)}.padding(30).background(.regularMaterial,in:RoundedRectangle(cornerRadius:18))}}
     }
     var subtitle:String {switch page {case "Обзор":return "Подключение, которое вы выбираете.";case "Профили":return "Smart DNS, прокси или их привычные настройки.";case "Приложения":return "Запускайте нужные инструменты одним нажатием.";case "DNS в системе":return "Настройки сети macOS с резервной копией и откатом.";default:return "Всё необходимое. Ничего лишнего."}}
     @ViewBuilder var pageContent:some View {
@@ -222,8 +271,8 @@ struct RootView:View {
         }
     }
     var settings:some View {
-        VStack(spacing:20){LicenseSettingsView();Card{Label("При входе в систему",systemImage:"power").font(.headline);Toggle("Запускать Dagami вместе с macOS",isOn:Binding(get:{model.state.startup},set:{model.run("startup",["enabled":$0])})).disabled(model.busy);Text("Настройка использует пользовательский LaunchAgent.").font(.caption).foregroundStyle(.secondary)}
-            Card{Text("Dagami Agent Proxy").font(.title2.bold());Text("Нативный интерфейс · Universal · 0.4.0 mac.25").foregroundStyle(.secondary);HStack{Link("Поддержка",destination:URL(string:"https://t.me/dagamvi")!);Link("Сообщить об ошибке",destination:URL(string:"https://dns.dagami.ru/support/agent-proxy/")!)};HStack{Link("Официальный репозиторий",destination:URL(string:"https://github.com/j46871417-ui/Dagami-Agent-Proxy")!);Link("Портер на Mac — ImRealDerli",destination:URL(string:"https://github.com/ImRealDerli")!)}.buttonStyle(.bordered)}
+        VStack(spacing:20){Card{Label("Обновления Dagami",systemImage:"arrow.triangle.2.circlepath").font(.headline);Toggle("Проверять новые версии автоматически",isOn:$model.automaticUpdates);Text(model.updateStatus).font(.callout).foregroundStyle(.secondary).textSelection(.enabled);Text("Бета-линия macOS. Проверка при запуске и раз в 6 часов. Плашка показывает изменения и критичность; «Позже» откладывает напоминание на сутки.").font(.caption).foregroundStyle(.secondary);HStack{Button("Проверить обновления"){model.run("updateCheck",["profile":model.profile,"manual":true],refresh:false)}.disabled(model.busy);if model.update.available {Button("Обновить сейчас"){model.showUpdateOffer(manual:true)}.disabled(model.busy)};Link("Все выпуски",destination:URL(string:"https://github.com/ImRealDerli/Dagami-Agent-Proxy-macOS/releases")!)}};LicenseSettingsView();Card{Label("При входе в систему",systemImage:"power").font(.headline);Toggle("Запускать Dagami вместе с macOS",isOn:Binding(get:{model.state.startup},set:{model.run("startup",["enabled":$0])})).disabled(model.busy);Text("Настройка использует пользовательский LaunchAgent.").font(.caption).foregroundStyle(.secondary)}
+            Card{Text("Dagami Agent Proxy").font(.title2.bold());Text("Нативный интерфейс · Universal · 0.4.0 mac.26").foregroundStyle(.secondary);HStack{Link("Поддержка",destination:URL(string:"https://t.me/dagamvi")!);Link("Сообщить об ошибке",destination:URL(string:"https://dns.dagami.ru/support/agent-proxy/")!)};HStack{Link("Официальный репозиторий",destination:URL(string:"https://github.com/j46871417-ui/Dagami-Agent-Proxy")!);Link("Портер на Mac — ImRealDerli",destination:URL(string:"https://github.com/ImRealDerli")!)}.buttonStyle(.bordered)}
         }
     }
 }

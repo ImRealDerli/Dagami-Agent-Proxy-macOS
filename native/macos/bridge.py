@@ -50,6 +50,11 @@ def snapshot():
 def perform(data):
     action=data.get('action');args=data.get('args',{})
     if action=='snapshot':return snapshot()
+    if action in ('updateCheck','updateInstall','updateAck'):
+        from devproxy_pkg import macos_updates
+        if action=='updateCheck':return macos_updates.check(args.get('profile',''))
+        if action=='updateAck':return macos_updates.acknowledge()
+        return macos_updates.install(args['tag'],args.get('profile',''))
     if action in ('appInspect','appClose'):
         from devproxy_pkg import desktop_processes
         return desktop_processes.inspect(args['app']) if action=='appInspect' else desktop_processes.close(args['app'])

@@ -58,7 +58,7 @@ def record_error(action,error):
     append(action,False,'\n'.join(parts),detail=True)
 
 def append(action,success,message='',detail=False):
-    if success and action in ('snapshot','journal','loginURL','authStatus'):return
+    if success and action in ('snapshot','journal','loginURL','authStatus','updateAck'):return
     path=location()
     if path.is_symlink():raise RuntimeError('Недопустимый путь журнала.')
     if path.exists() and path.stat().st_size>2*1024*1024:
