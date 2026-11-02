@@ -1,0 +1,1843 @@
+{
+  "method": "Premultiplied-alpha Lanczos; exact 1x/2x/3x display sizes",
+  "sizes": [
+    15,
+    18,
+    20,
+    26,
+    30,
+    36,
+    40,
+    45,
+    52,
+    54,
+    60,
+    78
+  ],
+  "files": [
+    {
+      "file": "raster/antigravity-dark/15.png",
+      "sha256": "8606b47aa9e8074ebc15f8457c2972c50a3afd908b1b5b4512947ddcf17daf14"
+    },
+    {
+      "file": "raster/antigravity-dark/18.png",
+      "sha256": "9267d8e776354243cb5b38634e4935a64acdcb18f9a388393be4756a11e4e122"
+    },
+    {
+      "file": "raster/antigravity-dark/20.png",
+      "sha256": "0ce76568420e97d10fc962ad5cfd14043ac34ea34578f471e08ee7097213dc91"
+    },
+    {
+      "file": "raster/antigravity-dark/26.png",
+      "sha256": "0c298d9a0d97ba79d6792559aadd4dc7866440ecafa6ca60366768c7bc109842"
+    },
+    {
+      "file": "raster/antigravity-dark/30.png",
+      "sha256": "89ad3bd16cb5ed5fc503dfde07ec9bc3926ad7b212adff6ec91068fbeb3591ac"
+    },
+    {
+      "file": "raster/antigravity-dark/36.png",
+      "sha256": "022e27b1de37b411e5508f988919604e8f3c3c3005e671e2ae5ca49002ceb6ef"
+    },
+    {
+      "file": "raster/antigravity-dark/40.png",
+      "sha256": "ef368bdd568ab9f615aa0097485cc0461dd774cef702bd92003bc37b41e449af"
+    },
+    {
+      "file": "raster/antigravity-dark/45.png",
+      "sha256": "f58832bd75c97794e8f605ef7d85d5778d06d9a5826602e8611010fcf6426d1d"
+    },
+    {
+      "file": "raster/antigravity-dark/52.png",
+      "sha256": "be18ecffcdb9c1f8b7dabd4fa016c744cb8985b62bd384b48e33bacd129531a5"
+    },
+    {
+      "file": "raster/antigravity-dark/54.png",
+      "sha256": "813d0117dbc90403e8c71115f285cffcbe610ce05a2995f8a593e846750b585c"
+    },
+    {
+      "file": "raster/antigravity-dark/60.png",
+      "sha256": "9fc83711bc829eca15dffeaf17711a48725948ac2720295d2083178e2ddb17d0"
+    },
+    {
+      "file": "raster/antigravity-dark/78.png",
+      "sha256": "744cbc9d3177b0f932f7d4432705bb33619685b1530eb5d12e84f764e2260e3f"
+    },
+    {
+      "file": "raster/antigravity-light/15.png",
+      "sha256": "8606b47aa9e8074ebc15f8457c2972c50a3afd908b1b5b4512947ddcf17daf14"
+    },
+    {
+      "file": "raster/antigravity-light/18.png",
+      "sha256": "9267d8e776354243cb5b38634e4935a64acdcb18f9a388393be4756a11e4e122"
+    },
+    {
+      "file": "raster/antigravity-light/20.png",
+      "sha256": "0ce76568420e97d10fc962ad5cfd14043ac34ea34578f471e08ee7097213dc91"
+    },
+    {
+      "file": "raster/antigravity-light/26.png",
+      "sha256": "0c298d9a0d97ba79d6792559aadd4dc7866440ecafa6ca60366768c7bc109842"
+    },
+    {
+      "file": "raster/antigravity-light/30.png",
+      "sha256": "89ad3bd16cb5ed5fc503dfde07ec9bc3926ad7b212adff6ec91068fbeb3591ac"
+    },
+    {
+      "file": "raster/antigravity-light/36.png",
+      "sha256": "022e27b1de37b411e5508f988919604e8f3c3c3005e671e2ae5ca49002ceb6ef"
+    },
+    {
+      "file": "raster/antigravity-light/40.png",
+      "sha256": "ef368bdd568ab9f615aa0097485cc0461dd774cef702bd92003bc37b41e449af"
+    },
+    {
+      "file": "raster/antigravity-light/45.png",
+      "sha256": "f58832bd75c97794e8f605ef7d85d5778d06d9a5826602e8611010fcf6426d1d"
+    },
+    {
+      "file": "raster/antigravity-light/52.png",
+      "sha256": "be18ecffcdb9c1f8b7dabd4fa016c744cb8985b62bd384b48e33bacd129531a5"
+    },
+    {
+      "file": "raster/antigravity-light/54.png",
+      "sha256": "813d0117dbc90403e8c71115f285cffcbe610ce05a2995f8a593e846750b585c"
+    },
+    {
+      "file": "raster/antigravity-light/60.png",
+      "sha256": "9fc83711bc829eca15dffeaf17711a48725948ac2720295d2083178e2ddb17d0"
+    },
+    {
+      "file": "raster/antigravity-light/78.png",
+      "sha256": "744cbc9d3177b0f932f7d4432705bb33619685b1530eb5d12e84f764e2260e3f"
+    },
+    {
+      "file": "raster/claude-dark/15.png",
+      "sha256": "d1dd131a6312717b0fe9392a2faa34621f69be06d47af55f0e2b56e3438657c2"
+    },
+    {
+      "file": "raster/claude-dark/18.png",
+      "sha256": "e733d59155c4e00f3ba9c93cfcbad19d65a0dd0347edcba406455e3f344ce233"
+    },
+    {
+      "file": "raster/claude-dark/20.png",
+      "sha256": "d7c42ca03623b001021ed7f6b4843df6fb5f99083043a980fd1a750a000213a3"
+    },
+    {
+      "file": "raster/claude-dark/26.png",
+      "sha256": "87a121c9ebab8e2389b19184427f824079cc20eae32669fa19a2447f792eae1d"
+    },
+    {
+      "file": "raster/claude-dark/30.png",
+      "sha256": "537a5fed10621be769fe02c50942a9ab7d9bc85f4e09d10fded21c423ffdf716"
+    },
+    {
+      "file": "raster/claude-dark/36.png",
+      "sha256": "9d9247d980d0d871b73d993b4de3b77e56e0a6393291174c949c3eedaab8a1cd"
+    },
+    {
+      "file": "raster/claude-dark/40.png",
+      "sha256": "32deafa95670ae50233f67b397988f2163d9ad6a596eed752721910e3ff3e1a3"
+    },
+    {
+      "file": "raster/claude-dark/45.png",
+      "sha256": "4ddc7dab54160a3504b9a82f8fc85e55586ad3b35205a213131c14f3c18c887f"
+    },
+    {
+      "file": "raster/claude-dark/52.png",
+      "sha256": "8f7fd801382a2edc811b6c0907affd12a3f77f7cf591f711dfe217d4bd78b066"
+    },
+    {
+      "file": "raster/claude-dark/54.png",
+      "sha256": "ce4cbf6f492729bfb75b0af2221e2a2c5efae55f2bdddbe560c3db16f18dd450"
+    },
+    {
+      "file": "raster/claude-dark/60.png",
+      "sha256": "6123a859d2ce4988f2696fd1b44ff876d3f3814a3c11c8f1de7c2e70409f22ba"
+    },
+    {
+      "file": "raster/claude-dark/78.png",
+      "sha256": "9f4c50a682c379ba71ef603486a0388216d3a3d55c13c2a5340adc1d87b6b9c8"
+    },
+    {
+      "file": "raster/claude-light/15.png",
+      "sha256": "d1dd131a6312717b0fe9392a2faa34621f69be06d47af55f0e2b56e3438657c2"
+    },
+    {
+      "file": "raster/claude-light/18.png",
+      "sha256": "e733d59155c4e00f3ba9c93cfcbad19d65a0dd0347edcba406455e3f344ce233"
+    },
+    {
+      "file": "raster/claude-light/20.png",
+      "sha256": "d7c42ca03623b001021ed7f6b4843df6fb5f99083043a980fd1a750a000213a3"
+    },
+    {
+      "file": "raster/claude-light/26.png",
+      "sha256": "87a121c9ebab8e2389b19184427f824079cc20eae32669fa19a2447f792eae1d"
+    },
+    {
+      "file": "raster/claude-light/30.png",
+      "sha256": "537a5fed10621be769fe02c50942a9ab7d9bc85f4e09d10fded21c423ffdf716"
+    },
+    {
+      "file": "raster/claude-light/36.png",
+      "sha256": "9d9247d980d0d871b73d993b4de3b77e56e0a6393291174c949c3eedaab8a1cd"
+    },
+    {
+      "file": "raster/claude-light/40.png",
+      "sha256": "32deafa95670ae50233f67b397988f2163d9ad6a596eed752721910e3ff3e1a3"
+    },
+    {
+      "file": "raster/claude-light/45.png",
+      "sha256": "4ddc7dab54160a3504b9a82f8fc85e55586ad3b35205a213131c14f3c18c887f"
+    },
+    {
+      "file": "raster/claude-light/52.png",
+      "sha256": "8f7fd801382a2edc811b6c0907affd12a3f77f7cf591f711dfe217d4bd78b066"
+    },
+    {
+      "file": "raster/claude-light/54.png",
+      "sha256": "ce4cbf6f492729bfb75b0af2221e2a2c5efae55f2bdddbe560c3db16f18dd450"
+    },
+    {
+      "file": "raster/claude-light/60.png",
+      "sha256": "6123a859d2ce4988f2696fd1b44ff876d3f3814a3c11c8f1de7c2e70409f22ba"
+    },
+    {
+      "file": "raster/claude-light/78.png",
+      "sha256": "9f4c50a682c379ba71ef603486a0388216d3a3d55c13c2a5340adc1d87b6b9c8"
+    },
+    {
+      "file": "raster/copilot-dark/15.png",
+      "sha256": "14294136864bb588bf9765c61d1ed593ab46f9a30e5133a90a8accfd7f74c3be"
+    },
+    {
+      "file": "raster/copilot-dark/18.png",
+      "sha256": "b6fd088c0113844fb2d3d9f743fe91427a06cc30e3c5868d47d980d3b6a8fa14"
+    },
+    {
+      "file": "raster/copilot-dark/20.png",
+      "sha256": "20757371ad4f134107fbb51c0d06a2980a0514ea4b86286dbdcb862379e9d9a5"
+    },
+    {
+      "file": "raster/copilot-dark/26.png",
+      "sha256": "654422924044d9106e0a4cfc1403bba5bda3657f2ae7964982e6244e1e8bd366"
+    },
+    {
+      "file": "raster/copilot-dark/30.png",
+      "sha256": "9a63c84c79b957dc5bd0bd290161f636239d7389542fbf74b13b9cc2f36597df"
+    },
+    {
+      "file": "raster/copilot-dark/36.png",
+      "sha256": "950230c6504565cf4ca8498dfc345bd711a9b3c2a2a12a6db34a1d85f3c53397"
+    },
+    {
+      "file": "raster/copilot-dark/40.png",
+      "sha256": "30e4a4f6f9e4408d64f118b0fd1e7515a1d9e87c938041f8277ce51a2a978bfa"
+    },
+    {
+      "file": "raster/copilot-dark/45.png",
+      "sha256": "c9aeaa9b82c484585457fc82c3ec62548406f89706b88141d6187582b88fc8ee"
+    },
+    {
+      "file": "raster/copilot-dark/52.png",
+      "sha256": "db4244f028cc306e08358a6c45ca3d8063981d2adc53ce9c748fea026dfd19f0"
+    },
+    {
+      "file": "raster/copilot-dark/54.png",
+      "sha256": "338bb030759b312b67ecc6308054aace379d17b56a503972206ce2348a53c90e"
+    },
+    {
+      "file": "raster/copilot-dark/60.png",
+      "sha256": "a4a37af5d0c09fe6ab88b28d65971ebe81890fd446531a3061f84fe0ed740bb6"
+    },
+    {
+      "file": "raster/copilot-dark/78.png",
+      "sha256": "28efaf2486da01fed45caece7e74235b9ee1eeaf567903de783da7ea46585d52"
+    },
+    {
+      "file": "raster/copilot-light/15.png",
+      "sha256": "14294136864bb588bf9765c61d1ed593ab46f9a30e5133a90a8accfd7f74c3be"
+    },
+    {
+      "file": "raster/copilot-light/18.png",
+      "sha256": "b6fd088c0113844fb2d3d9f743fe91427a06cc30e3c5868d47d980d3b6a8fa14"
+    },
+    {
+      "file": "raster/copilot-light/20.png",
+      "sha256": "20757371ad4f134107fbb51c0d06a2980a0514ea4b86286dbdcb862379e9d9a5"
+    },
+    {
+      "file": "raster/copilot-light/26.png",
+      "sha256": "654422924044d9106e0a4cfc1403bba5bda3657f2ae7964982e6244e1e8bd366"
+    },
+    {
+      "file": "raster/copilot-light/30.png",
+      "sha256": "9a63c84c79b957dc5bd0bd290161f636239d7389542fbf74b13b9cc2f36597df"
+    },
+    {
+      "file": "raster/copilot-light/36.png",
+      "sha256": "950230c6504565cf4ca8498dfc345bd711a9b3c2a2a12a6db34a1d85f3c53397"
+    },
+    {
+      "file": "raster/copilot-light/40.png",
+      "sha256": "30e4a4f6f9e4408d64f118b0fd1e7515a1d9e87c938041f8277ce51a2a978bfa"
+    },
+    {
+      "file": "raster/copilot-light/45.png",
+      "sha256": "c9aeaa9b82c484585457fc82c3ec62548406f89706b88141d6187582b88fc8ee"
+    },
+    {
+      "file": "raster/copilot-light/52.png",
+      "sha256": "db4244f028cc306e08358a6c45ca3d8063981d2adc53ce9c748fea026dfd19f0"
+    },
+    {
+      "file": "raster/copilot-light/54.png",
+      "sha256": "338bb030759b312b67ecc6308054aace379d17b56a503972206ce2348a53c90e"
+    },
+    {
+      "file": "raster/copilot-light/60.png",
+      "sha256": "a4a37af5d0c09fe6ab88b28d65971ebe81890fd446531a3061f84fe0ed740bb6"
+    },
+    {
+      "file": "raster/copilot-light/78.png",
+      "sha256": "28efaf2486da01fed45caece7e74235b9ee1eeaf567903de783da7ea46585d52"
+    },
+    {
+      "file": "raster/cursor-dark/15.png",
+      "sha256": "c34337ba68606dfd75450463c23ef14458e5b94a54b996b0ea887b0ba30cb38e"
+    },
+    {
+      "file": "raster/cursor-dark/18.png",
+      "sha256": "fc78134750977693673f66be51b496464b626fbfce9b74aa211877e353719267"
+    },
+    {
+      "file": "raster/cursor-dark/20.png",
+      "sha256": "84913f0b5400530f257c642d6383d05918791e42a38421267aa68b0cf8ec9eec"
+    },
+    {
+      "file": "raster/cursor-dark/26.png",
+      "sha256": "7c5e079e1997930af68833bc1a3797f8795e8f1f1124f3b9ca74db7fc609311c"
+    },
+    {
+      "file": "raster/cursor-dark/30.png",
+      "sha256": "555985afbbc39312ba3468b698208662a059d71c933c156ad2320f234cacf7d8"
+    },
+    {
+      "file": "raster/cursor-dark/36.png",
+      "sha256": "1ab43016120a1b76deb93b1bd5400c73e8c23193bebca7a3835c865d3babdc9e"
+    },
+    {
+      "file": "raster/cursor-dark/40.png",
+      "sha256": "c64ed5a7bb55a36d6ffe5ef5a0ebcaaee1c8d31b045b1561c78591b6ee92b10a"
+    },
+    {
+      "file": "raster/cursor-dark/45.png",
+      "sha256": "4ea04fbe0e9546f6b7094207d419a8c98ff751ad8c23893304f4b8d5f91d7fe5"
+    },
+    {
+      "file": "raster/cursor-dark/52.png",
+      "sha256": "207b65a9ec12154bd927f7188be0c3b2a6a6518515960f39e3e13815ac54ba0f"
+    },
+    {
+      "file": "raster/cursor-dark/54.png",
+      "sha256": "dfa19ca51992b6cad987beec000fc678cb1bf6bd102d0a8a506b19c0f7f6eac5"
+    },
+    {
+      "file": "raster/cursor-dark/60.png",
+      "sha256": "d6f6bf0a373f07005f1f3c20cb2d9fa9688604eee7a23f2c04c7ead96c46b71b"
+    },
+    {
+      "file": "raster/cursor-dark/78.png",
+      "sha256": "ed9cbd0ae2fa4e889d7cf43020ebfab4f9c3a970e6d041d2892cc1ffcdf12b8a"
+    },
+    {
+      "file": "raster/cursor-light/15.png",
+      "sha256": "c809bca812c6793f05404fb7e1f234773d5fb9c0dfdc2ed0a85afc62fe5b5de5"
+    },
+    {
+      "file": "raster/cursor-light/18.png",
+      "sha256": "ca297d92d65fe345b9bc95baeada29e177e9b2e3e0a316dd6e50b1e70a90d2f3"
+    },
+    {
+      "file": "raster/cursor-light/20.png",
+      "sha256": "e1c0ee436c06453af5e9fe0ebef0f459a4c95c73ee570eeddb8c6d8339544691"
+    },
+    {
+      "file": "raster/cursor-light/26.png",
+      "sha256": "c10b0ddec9623a960a1dac86d8a8f4f144ddab3f1cc5fbcdd7183a4cfd9d1233"
+    },
+    {
+      "file": "raster/cursor-light/30.png",
+      "sha256": "2e97d60a32b6e0ea55770dd8db16c857153eebe95060bfb9675eaae1c1dc9e17"
+    },
+    {
+      "file": "raster/cursor-light/36.png",
+      "sha256": "e8a29ffaf8e32f9d8541095c1d6d4bf02a5253e7de1473e7fedf3d9bdd19a7b8"
+    },
+    {
+      "file": "raster/cursor-light/40.png",
+      "sha256": "7da13a9aeb487117bc068bbd584893ec01d74cd5ea0f2ce83276791a369f3077"
+    },
+    {
+      "file": "raster/cursor-light/45.png",
+      "sha256": "b1babd2149337189e8cfade2b4326a383b979ec25a679e7a44c6cf8033b88385"
+    },
+    {
+      "file": "raster/cursor-light/52.png",
+      "sha256": "c36def8f7ac6675211df4714525f1c623f26e4fc001edd8ea89704b53a3f4db8"
+    },
+    {
+      "file": "raster/cursor-light/54.png",
+      "sha256": "41d8867da62c3df181bd637281e63429efb0174d75481b43305781c0c2a65119"
+    },
+    {
+      "file": "raster/cursor-light/60.png",
+      "sha256": "4ab4329c4a575f23c3eec9259682532dce0fa72f5b23bcc8ac7bc6dd7741bf80"
+    },
+    {
+      "file": "raster/cursor-light/78.png",
+      "sha256": "4abbd8b2fa38f2d0aa006abd1cfc644e7b3b2eb5a9cc2e201352d9b42bc03b0a"
+    },
+    {
+      "file": "raster/deepseek-dark/15.png",
+      "sha256": "472284d4841753de2ead9bb15e9a6f94cd7482fba14bc026b11d62326fa405f3"
+    },
+    {
+      "file": "raster/deepseek-dark/18.png",
+      "sha256": "ad5e036c8de6f69268af3c4b9759b2cdcd38a89884e570c5c70631e523bbf83b"
+    },
+    {
+      "file": "raster/deepseek-dark/20.png",
+      "sha256": "82b1b0a27806012cb5ce6154aa7a24df9637137eabe1661e9b6d1a7408d49160"
+    },
+    {
+      "file": "raster/deepseek-dark/26.png",
+      "sha256": "ad3938a446a885caf9b69f8ff59f8253aa01ec69f58f1d833e27a02c18840f68"
+    },
+    {
+      "file": "raster/deepseek-dark/30.png",
+      "sha256": "f209e1a166f4d509fe7bced9521889394c5337b8a7eba2b08caa83f0def16e02"
+    },
+    {
+      "file": "raster/deepseek-dark/36.png",
+      "sha256": "147fdc6ff46916718dadd9f777b4fb44a84421eacc104178638976ba0a6c5ee1"
+    },
+    {
+      "file": "raster/deepseek-dark/40.png",
+      "sha256": "6fbe1b38570840b2409b4ee46a9fb7ffc5f7866c482349844dc3a822fa65dfd3"
+    },
+    {
+      "file": "raster/deepseek-dark/45.png",
+      "sha256": "c9fbcf8da54aef63de3ca745f06de7c86b455962823694e15ab866d83f578d94"
+    },
+    {
+      "file": "raster/deepseek-dark/52.png",
+      "sha256": "244093c7309f42fb2cd4250ac4dc7e4de70ac1be0a9801e92da7a3f71de77743"
+    },
+    {
+      "file": "raster/deepseek-dark/54.png",
+      "sha256": "1b282bce1b98fa7793d58fa5cb311f555c6bc8ce942f2ec6b407409a610ea26b"
+    },
+    {
+      "file": "raster/deepseek-dark/60.png",
+      "sha256": "32e94b93fc6f6f1d1dda70b2b80eb18cf0406446d2eff7867573bd50429aad74"
+    },
+    {
+      "file": "raster/deepseek-dark/78.png",
+      "sha256": "1b376879ddd209b88f43e2985b7299594e32afa347a79609f235516a11cdf550"
+    },
+    {
+      "file": "raster/deepseek-light/15.png",
+      "sha256": "472284d4841753de2ead9bb15e9a6f94cd7482fba14bc026b11d62326fa405f3"
+    },
+    {
+      "file": "raster/deepseek-light/18.png",
+      "sha256": "ad5e036c8de6f69268af3c4b9759b2cdcd38a89884e570c5c70631e523bbf83b"
+    },
+    {
+      "file": "raster/deepseek-light/20.png",
+      "sha256": "82b1b0a27806012cb5ce6154aa7a24df9637137eabe1661e9b6d1a7408d49160"
+    },
+    {
+      "file": "raster/deepseek-light/26.png",
+      "sha256": "ad3938a446a885caf9b69f8ff59f8253aa01ec69f58f1d833e27a02c18840f68"
+    },
+    {
+      "file": "raster/deepseek-light/30.png",
+      "sha256": "f209e1a166f4d509fe7bced9521889394c5337b8a7eba2b08caa83f0def16e02"
+    },
+    {
+      "file": "raster/deepseek-light/36.png",
+      "sha256": "147fdc6ff46916718dadd9f777b4fb44a84421eacc104178638976ba0a6c5ee1"
+    },
+    {
+      "file": "raster/deepseek-light/40.png",
+      "sha256": "6fbe1b38570840b2409b4ee46a9fb7ffc5f7866c482349844dc3a822fa65dfd3"
+    },
+    {
+      "file": "raster/deepseek-light/45.png",
+      "sha256": "c9fbcf8da54aef63de3ca745f06de7c86b455962823694e15ab866d83f578d94"
+    },
+    {
+      "file": "raster/deepseek-light/52.png",
+      "sha256": "244093c7309f42fb2cd4250ac4dc7e4de70ac1be0a9801e92da7a3f71de77743"
+    },
+    {
+      "file": "raster/deepseek-light/54.png",
+      "sha256": "1b282bce1b98fa7793d58fa5cb311f555c6bc8ce942f2ec6b407409a610ea26b"
+    },
+    {
+      "file": "raster/deepseek-light/60.png",
+      "sha256": "32e94b93fc6f6f1d1dda70b2b80eb18cf0406446d2eff7867573bd50429aad74"
+    },
+    {
+      "file": "raster/deepseek-light/78.png",
+      "sha256": "1b376879ddd209b88f43e2985b7299594e32afa347a79609f235516a11cdf550"
+    },
+    {
+      "file": "raster/gemini-dark/15.png",
+      "sha256": "72f4ef9c992a25983be4a1b7fa9d92a2e2af5efc668358b5073c4c5454e36490"
+    },
+    {
+      "file": "raster/gemini-dark/18.png",
+      "sha256": "eb1949bd5c769af3598c448692202b37f192712de14d264a8826a6c3441b173c"
+    },
+    {
+      "file": "raster/gemini-dark/20.png",
+      "sha256": "2238ff327344f2477104f769cc5fbbdb01c9bfaca626ec03ab785edf28c9c214"
+    },
+    {
+      "file": "raster/gemini-dark/26.png",
+      "sha256": "49065cfffd6e1042865c5a5f6b691902b1f83569b9eca85c84f5df4522de1d98"
+    },
+    {
+      "file": "raster/gemini-dark/30.png",
+      "sha256": "4ec9372f432f5f2df48e28b8fab3f06ff19951b3a9a53800473a45b1d518a9db"
+    },
+    {
+      "file": "raster/gemini-dark/36.png",
+      "sha256": "3068be774ae01625f38be31061cc0d1dc3657944a0888f4745db23d8d07ef6f0"
+    },
+    {
+      "file": "raster/gemini-dark/40.png",
+      "sha256": "88adf873fd0fb5a100f59ba818d16842cac56b0c1d12e0980767512bf56c3c8d"
+    },
+    {
+      "file": "raster/gemini-dark/45.png",
+      "sha256": "67775b35df485a9eeb50acc7af98644f6c5ae2e9cbd6cdc60535d88486eecce8"
+    },
+    {
+      "file": "raster/gemini-dark/52.png",
+      "sha256": "ae9a87d1c1dd90476752efeb7b9c868b31af4e836ff08f0b858479be31f85fe3"
+    },
+    {
+      "file": "raster/gemini-dark/54.png",
+      "sha256": "40fe666f57283ae80fc82a512d7814c6d7798bf6f0ec6d4fd1a7dfe43222528c"
+    },
+    {
+      "file": "raster/gemini-dark/60.png",
+      "sha256": "56aed3483a15840b78d27bda6841ff93ce1d1183db6a614679264ec6bc15d304"
+    },
+    {
+      "file": "raster/gemini-dark/78.png",
+      "sha256": "ac5b8be71bfa2117ed31f8305fde4e48b8458d150112bef1cc173c2eedbcdea0"
+    },
+    {
+      "file": "raster/gemini-light/15.png",
+      "sha256": "72f4ef9c992a25983be4a1b7fa9d92a2e2af5efc668358b5073c4c5454e36490"
+    },
+    {
+      "file": "raster/gemini-light/18.png",
+      "sha256": "eb1949bd5c769af3598c448692202b37f192712de14d264a8826a6c3441b173c"
+    },
+    {
+      "file": "raster/gemini-light/20.png",
+      "sha256": "2238ff327344f2477104f769cc5fbbdb01c9bfaca626ec03ab785edf28c9c214"
+    },
+    {
+      "file": "raster/gemini-light/26.png",
+      "sha256": "49065cfffd6e1042865c5a5f6b691902b1f83569b9eca85c84f5df4522de1d98"
+    },
+    {
+      "file": "raster/gemini-light/30.png",
+      "sha256": "4ec9372f432f5f2df48e28b8fab3f06ff19951b3a9a53800473a45b1d518a9db"
+    },
+    {
+      "file": "raster/gemini-light/36.png",
+      "sha256": "3068be774ae01625f38be31061cc0d1dc3657944a0888f4745db23d8d07ef6f0"
+    },
+    {
+      "file": "raster/gemini-light/40.png",
+      "sha256": "88adf873fd0fb5a100f59ba818d16842cac56b0c1d12e0980767512bf56c3c8d"
+    },
+    {
+      "file": "raster/gemini-light/45.png",
+      "sha256": "67775b35df485a9eeb50acc7af98644f6c5ae2e9cbd6cdc60535d88486eecce8"
+    },
+    {
+      "file": "raster/gemini-light/52.png",
+      "sha256": "ae9a87d1c1dd90476752efeb7b9c868b31af4e836ff08f0b858479be31f85fe3"
+    },
+    {
+      "file": "raster/gemini-light/54.png",
+      "sha256": "40fe666f57283ae80fc82a512d7814c6d7798bf6f0ec6d4fd1a7dfe43222528c"
+    },
+    {
+      "file": "raster/gemini-light/60.png",
+      "sha256": "56aed3483a15840b78d27bda6841ff93ce1d1183db6a614679264ec6bc15d304"
+    },
+    {
+      "file": "raster/gemini-light/78.png",
+      "sha256": "ac5b8be71bfa2117ed31f8305fde4e48b8458d150112bef1cc173c2eedbcdea0"
+    },
+    {
+      "file": "raster/git-dark/15.png",
+      "sha256": "01947f814ffb4561cf73a50fd0e5a6997f87c419b43fe97793a2ac9b1dae56f6"
+    },
+    {
+      "file": "raster/git-dark/18.png",
+      "sha256": "853927c78cf07581ca8205374a696e8ed19f3db37137e96dba288d890d6709a7"
+    },
+    {
+      "file": "raster/git-dark/20.png",
+      "sha256": "b496b1965d312b219eadb014f3c82d63c9da2ab846de1b6c367103dca9bfabdd"
+    },
+    {
+      "file": "raster/git-dark/26.png",
+      "sha256": "9c26fbb45dc62bf6330233e0a0daa8475c88753da006228b4e7af0599195c59a"
+    },
+    {
+      "file": "raster/git-dark/30.png",
+      "sha256": "430eac16a97dbddc103f685777a98b308f1895b455ac9acdce84abeef132d4e2"
+    },
+    {
+      "file": "raster/git-dark/36.png",
+      "sha256": "cd9bc53bf31900a35a2dc26f3a615dfbb8f4440062b6367ba5ca81a1be95f0b3"
+    },
+    {
+      "file": "raster/git-dark/40.png",
+      "sha256": "5e0f7ef2b56908144d9bc341b755d259c49db2235d69f4b9186ab55cd6eb7eee"
+    },
+    {
+      "file": "raster/git-dark/45.png",
+      "sha256": "bc8f39367f85532a759d1a49dd93ae9ac66ccec931931c396b3ce3bdf9ad59aa"
+    },
+    {
+      "file": "raster/git-dark/52.png",
+      "sha256": "3e32ea6b77ef973d3c99ac6d74da51bc9cccb8d9cc18b05192997caf2ab77b19"
+    },
+    {
+      "file": "raster/git-dark/54.png",
+      "sha256": "dee22014968076a84956dd36ef88686f8e7a132a9626e5c6dcb589204a327032"
+    },
+    {
+      "file": "raster/git-dark/60.png",
+      "sha256": "a8d368c2930f883260564da3fdbc1c093d83f72b186db3a44ef687a154e83f5b"
+    },
+    {
+      "file": "raster/git-dark/78.png",
+      "sha256": "186ee8c3ecd0a751ef2d462bcab9a54bc26035997f9fdb8d43bea06534e7d5a3"
+    },
+    {
+      "file": "raster/git-light/15.png",
+      "sha256": "01947f814ffb4561cf73a50fd0e5a6997f87c419b43fe97793a2ac9b1dae56f6"
+    },
+    {
+      "file": "raster/git-light/18.png",
+      "sha256": "853927c78cf07581ca8205374a696e8ed19f3db37137e96dba288d890d6709a7"
+    },
+    {
+      "file": "raster/git-light/20.png",
+      "sha256": "b496b1965d312b219eadb014f3c82d63c9da2ab846de1b6c367103dca9bfabdd"
+    },
+    {
+      "file": "raster/git-light/26.png",
+      "sha256": "9c26fbb45dc62bf6330233e0a0daa8475c88753da006228b4e7af0599195c59a"
+    },
+    {
+      "file": "raster/git-light/30.png",
+      "sha256": "430eac16a97dbddc103f685777a98b308f1895b455ac9acdce84abeef132d4e2"
+    },
+    {
+      "file": "raster/git-light/36.png",
+      "sha256": "cd9bc53bf31900a35a2dc26f3a615dfbb8f4440062b6367ba5ca81a1be95f0b3"
+    },
+    {
+      "file": "raster/git-light/40.png",
+      "sha256": "5e0f7ef2b56908144d9bc341b755d259c49db2235d69f4b9186ab55cd6eb7eee"
+    },
+    {
+      "file": "raster/git-light/45.png",
+      "sha256": "bc8f39367f85532a759d1a49dd93ae9ac66ccec931931c396b3ce3bdf9ad59aa"
+    },
+    {
+      "file": "raster/git-light/52.png",
+      "sha256": "3e32ea6b77ef973d3c99ac6d74da51bc9cccb8d9cc18b05192997caf2ab77b19"
+    },
+    {
+      "file": "raster/git-light/54.png",
+      "sha256": "dee22014968076a84956dd36ef88686f8e7a132a9626e5c6dcb589204a327032"
+    },
+    {
+      "file": "raster/git-light/60.png",
+      "sha256": "a8d368c2930f883260564da3fdbc1c093d83f72b186db3a44ef687a154e83f5b"
+    },
+    {
+      "file": "raster/git-light/78.png",
+      "sha256": "186ee8c3ecd0a751ef2d462bcab9a54bc26035997f9fdb8d43bea06534e7d5a3"
+    },
+    {
+      "file": "raster/github-dark/15.png",
+      "sha256": "7d508ec1f9345e038a8b6f301885ab7dbe4ce8b0beeebb4874e8bc025c3e5ef7"
+    },
+    {
+      "file": "raster/github-dark/18.png",
+      "sha256": "45217b1bd07748d30b984f6de0bd930b0974deedaae56d36c8b813a820ab78de"
+    },
+    {
+      "file": "raster/github-dark/20.png",
+      "sha256": "917fd87b672ea68c913d97d960fbeb4c1427d4f1ef39f7f5bba6c7a39d4a44ed"
+    },
+    {
+      "file": "raster/github-dark/26.png",
+      "sha256": "9efac98a40718b1bc655dda34ed24a8b4ac8a6efa4ec4408f3228bbf7150670e"
+    },
+    {
+      "file": "raster/github-dark/30.png",
+      "sha256": "b26fcaf0b36fdce9cd212477620f03648358ab51aa059a92fea1a09d19ab56b0"
+    },
+    {
+      "file": "raster/github-dark/36.png",
+      "sha256": "898f40ff50cd11b6a6a13d69934604b75951404d82b7d4e57cfc5682d4fbfccf"
+    },
+    {
+      "file": "raster/github-dark/40.png",
+      "sha256": "c9c3f096b40ffb03079ff2062504278d1853eca62640ac43bde7f672b128d491"
+    },
+    {
+      "file": "raster/github-dark/45.png",
+      "sha256": "8f2554daf9d2f116340612ce91232a91c95a2c8644497845444009c270f58e36"
+    },
+    {
+      "file": "raster/github-dark/52.png",
+      "sha256": "d23691fd3bff55a1d31614c9210ad716dc663de97d857c66b3371118aae2134d"
+    },
+    {
+      "file": "raster/github-dark/54.png",
+      "sha256": "a7dbcc364f5c96719e524530b06aebf7ff5cfe5d828a6a31389b1c62356f40ff"
+    },
+    {
+      "file": "raster/github-dark/60.png",
+      "sha256": "60180fad9877fa89b709029098803ff254951a066e3302d3a9ec04367afc9cc8"
+    },
+    {
+      "file": "raster/github-dark/78.png",
+      "sha256": "3eaa25ff3a78417c866658ebc81c3a6b522e7f3cbde27113ec5d45c6f4c1d1b9"
+    },
+    {
+      "file": "raster/github-light/15.png",
+      "sha256": "109752efc90944286ce55627ab92e60f08bb58a2285947af6ca91025b6100927"
+    },
+    {
+      "file": "raster/github-light/18.png",
+      "sha256": "e15a899da99963bc81d5d4f5471ab569c2bdfd7b3e07179995ef359215fc49ef"
+    },
+    {
+      "file": "raster/github-light/20.png",
+      "sha256": "3f0f0384807682f437954ff9a6cc130bd55157bd422b594068e352a866181d35"
+    },
+    {
+      "file": "raster/github-light/26.png",
+      "sha256": "4b12408a39c313d59a679d97437c8f16ffe988f955e3634c99ac6348e8836a3b"
+    },
+    {
+      "file": "raster/github-light/30.png",
+      "sha256": "bc54d321cc22c345590ccf4483e0ca07bbf9a5f9dac8d8017a4b6e64d0d865a1"
+    },
+    {
+      "file": "raster/github-light/36.png",
+      "sha256": "a37ccbf27ef08a87e11ba6eab79f4c25d6b7f2770f0c56c294e2278201d09521"
+    },
+    {
+      "file": "raster/github-light/40.png",
+      "sha256": "3446d92ed8c3ef2341864c2ca390850efb086096e2d28927aad7d642b0b176c3"
+    },
+    {
+      "file": "raster/github-light/45.png",
+      "sha256": "c130634bdfdedc0a3480c51e4fbae580f693bce76b1c948b804259d8c343b1c2"
+    },
+    {
+      "file": "raster/github-light/52.png",
+      "sha256": "59192e0e2b56f3b78cd0e3c1e762e764c055160fa5792f08fff623ea2f8fee5f"
+    },
+    {
+      "file": "raster/github-light/54.png",
+      "sha256": "293b6fa84fc8fbb9fcef3d6896c999aafcfedd4323a64a770e8a73105b076044"
+    },
+    {
+      "file": "raster/github-light/60.png",
+      "sha256": "0eba76186fa0a3a15dbc77129d44b46e7e197a70441f59e4473074e92befb562"
+    },
+    {
+      "file": "raster/github-light/78.png",
+      "sha256": "e3fd5e00f25b50ae09beb9f2db3d8504de7c2f66e618bdab4cb770cb5244dc5a"
+    },
+    {
+      "file": "raster/grok-dark/15.png",
+      "sha256": "f2364bba6786efcb1c879abf4f1b9a96321bdd2eb55d1fd55c4796a710e22597"
+    },
+    {
+      "file": "raster/grok-dark/18.png",
+      "sha256": "4134664eacb0e757cd5a9dcffe7c27ff43e474ff5cf933d0dede2227aa331441"
+    },
+    {
+      "file": "raster/grok-dark/20.png",
+      "sha256": "8308b20598415f22222c13dbfe909b47f7fbc9fc867dbb57d67abccb2a01ce2e"
+    },
+    {
+      "file": "raster/grok-dark/26.png",
+      "sha256": "b7053e5b03d8ae3a491f783ddfb105ed9c53bb2e523400480314b3fea8b6e95e"
+    },
+    {
+      "file": "raster/grok-dark/30.png",
+      "sha256": "fad7e4d7db262e087e8b43cb02411cab1150cad341d63691ec9296ae2ac74f92"
+    },
+    {
+      "file": "raster/grok-dark/36.png",
+      "sha256": "058e5d4289eacded17d601ff0d7568d2cfebf4688f880869fbb5cce607599e37"
+    },
+    {
+      "file": "raster/grok-dark/40.png",
+      "sha256": "7ea59a183d90ff7df9d65586511b331eb18242d6fb0c63474f010a7643f87e7a"
+    },
+    {
+      "file": "raster/grok-dark/45.png",
+      "sha256": "c1565f391986231347eaa4389afc27aeff69b216459fe86d59dfc343dde240e9"
+    },
+    {
+      "file": "raster/grok-dark/52.png",
+      "sha256": "8d685199f688f2fcec8a899e8aeb8f8e479d63db02048a6b38f77bca2d4622e8"
+    },
+    {
+      "file": "raster/grok-dark/54.png",
+      "sha256": "d4ae213151a04d1a6c52baae2012355ac0c8caee69e76c72042b69f1d30ce932"
+    },
+    {
+      "file": "raster/grok-dark/60.png",
+      "sha256": "e75f6b4531a26d159f6c566455cf2fc9b7a53bfb3149360d52f2abf6bf1c1e37"
+    },
+    {
+      "file": "raster/grok-dark/78.png",
+      "sha256": "1de42584d4a93e9c1f0a3ce4f4cf7ddf539fa64a0e59471caec02cc819b45c84"
+    },
+    {
+      "file": "raster/grok-light/15.png",
+      "sha256": "30abf57817fb576a7dd076779a3dde1b74df141622b83f76671d0f6e3cb1a851"
+    },
+    {
+      "file": "raster/grok-light/18.png",
+      "sha256": "591b2fdf4f239e941e8c3e44790037c8a49b54f49cab93130862cf23eb9095ec"
+    },
+    {
+      "file": "raster/grok-light/20.png",
+      "sha256": "bf69665486730fb9bd1588305a9608f480389dab12ca206d264e01b2b2d03ca2"
+    },
+    {
+      "file": "raster/grok-light/26.png",
+      "sha256": "2bde2b825ec52ef4eaf5143a436dd1394fbf84068adbbb7fe0e34806902eeb96"
+    },
+    {
+      "file": "raster/grok-light/30.png",
+      "sha256": "fdf09ac1be6ec1eaa6a1fc2ed7ca43d42910161c512779bb41a9e7129f277bb5"
+    },
+    {
+      "file": "raster/grok-light/36.png",
+      "sha256": "83f213d254efb814b3e2086b983a8bfa872ad6227307b5642a6929aca429fa13"
+    },
+    {
+      "file": "raster/grok-light/40.png",
+      "sha256": "c1429256bf9e5d00ac84b0ca945bcf80e228dc79f9f00056fa4c7ed1983a3f86"
+    },
+    {
+      "file": "raster/grok-light/45.png",
+      "sha256": "e825d9b1890cf44e05d0b377c25af567fdf8c0fb01f64aa3102ebafc5eeb634d"
+    },
+    {
+      "file": "raster/grok-light/52.png",
+      "sha256": "8dd96f6904fe9cb20fb69156669f2505be76096ff168763a767fb405a8beba0c"
+    },
+    {
+      "file": "raster/grok-light/54.png",
+      "sha256": "843fc1b95742846993235393866094fb5fb34ea9274000b6a9d25541517b1822"
+    },
+    {
+      "file": "raster/grok-light/60.png",
+      "sha256": "164a18de03794dac798862d4c2fa52646ac59838a5c9211977e600024f047150"
+    },
+    {
+      "file": "raster/grok-light/78.png",
+      "sha256": "67b72ba7bcf36b08a6893429f7195f5f64056f01bfbfab5d86a8db9212170606"
+    },
+    {
+      "file": "raster/mistral-dark/15.png",
+      "sha256": "66a3891fb30714986082ed184364502cbe4dfcea6c4f7d5aae388792f83e5523"
+    },
+    {
+      "file": "raster/mistral-dark/18.png",
+      "sha256": "4e54e4bb6110682f4ea762c1a71315b860916ea1052372b8baeebd9fcda76083"
+    },
+    {
+      "file": "raster/mistral-dark/20.png",
+      "sha256": "8e706abd94e1eb1d5c644b0fc7696fd2807f8e562aac6118f6709b5545f6f651"
+    },
+    {
+      "file": "raster/mistral-dark/26.png",
+      "sha256": "1fad3483e21d4e7490a638cea9779ebfaf29bfb3d6ae76f0acd386d1f1d06b9d"
+    },
+    {
+      "file": "raster/mistral-dark/30.png",
+      "sha256": "f9606d33eec1f28ca7524e8dfcb308d4c71d004338236b1385e80fa2b072a615"
+    },
+    {
+      "file": "raster/mistral-dark/36.png",
+      "sha256": "8aeebda8a9a914c14bdb602c49116dabd1f88bf84f4cbc7e693708348dbb7fd2"
+    },
+    {
+      "file": "raster/mistral-dark/40.png",
+      "sha256": "72150ed1f7b686813179e945c7bde4961ccc1c2c329fb1a03c4dcd3a3ac1221a"
+    },
+    {
+      "file": "raster/mistral-dark/45.png",
+      "sha256": "4e4b0e91b4bcfaf507ac6469471761c4f2a06f31bcfe51724e175061e66b7519"
+    },
+    {
+      "file": "raster/mistral-dark/52.png",
+      "sha256": "e63a649fe7e137500f0592d09b4b197e29a9194a5bac2830f98e834cb63975bf"
+    },
+    {
+      "file": "raster/mistral-dark/54.png",
+      "sha256": "04195a81b3ab51ae15bf4146d30ad329cf25216946844457e2168e39783de56b"
+    },
+    {
+      "file": "raster/mistral-dark/60.png",
+      "sha256": "3b99466db0efef8930b0cf8d5fec9c0783e28db03fd4fd9f80872032d641121e"
+    },
+    {
+      "file": "raster/mistral-dark/78.png",
+      "sha256": "9363b5717185e7cfc8ce804039fbf100607c802573804e217daf7323687be676"
+    },
+    {
+      "file": "raster/mistral-light/15.png",
+      "sha256": "66a3891fb30714986082ed184364502cbe4dfcea6c4f7d5aae388792f83e5523"
+    },
+    {
+      "file": "raster/mistral-light/18.png",
+      "sha256": "4e54e4bb6110682f4ea762c1a71315b860916ea1052372b8baeebd9fcda76083"
+    },
+    {
+      "file": "raster/mistral-light/20.png",
+      "sha256": "8e706abd94e1eb1d5c644b0fc7696fd2807f8e562aac6118f6709b5545f6f651"
+    },
+    {
+      "file": "raster/mistral-light/26.png",
+      "sha256": "1fad3483e21d4e7490a638cea9779ebfaf29bfb3d6ae76f0acd386d1f1d06b9d"
+    },
+    {
+      "file": "raster/mistral-light/30.png",
+      "sha256": "f9606d33eec1f28ca7524e8dfcb308d4c71d004338236b1385e80fa2b072a615"
+    },
+    {
+      "file": "raster/mistral-light/36.png",
+      "sha256": "8aeebda8a9a914c14bdb602c49116dabd1f88bf84f4cbc7e693708348dbb7fd2"
+    },
+    {
+      "file": "raster/mistral-light/40.png",
+      "sha256": "72150ed1f7b686813179e945c7bde4961ccc1c2c329fb1a03c4dcd3a3ac1221a"
+    },
+    {
+      "file": "raster/mistral-light/45.png",
+      "sha256": "4e4b0e91b4bcfaf507ac6469471761c4f2a06f31bcfe51724e175061e66b7519"
+    },
+    {
+      "file": "raster/mistral-light/52.png",
+      "sha256": "e63a649fe7e137500f0592d09b4b197e29a9194a5bac2830f98e834cb63975bf"
+    },
+    {
+      "file": "raster/mistral-light/54.png",
+      "sha256": "04195a81b3ab51ae15bf4146d30ad329cf25216946844457e2168e39783de56b"
+    },
+    {
+      "file": "raster/mistral-light/60.png",
+      "sha256": "3b99466db0efef8930b0cf8d5fec9c0783e28db03fd4fd9f80872032d641121e"
+    },
+    {
+      "file": "raster/mistral-light/78.png",
+      "sha256": "9363b5717185e7cfc8ce804039fbf100607c802573804e217daf7323687be676"
+    },
+    {
+      "file": "raster/ollama-dark/15.png",
+      "sha256": "60d3c4e772061ca97ec236dca0239669bc57fc085b4f497ba543eb0715f9c313"
+    },
+    {
+      "file": "raster/ollama-dark/18.png",
+      "sha256": "6a9a5cd50127cb179c8606490e320750b9a069ca9fe9707da5a8ad8401d31cfb"
+    },
+    {
+      "file": "raster/ollama-dark/20.png",
+      "sha256": "1640ce50592e9cd83951bb1d1fdd8314d49d3c97a4da554b3fc1b9eff08bf0f5"
+    },
+    {
+      "file": "raster/ollama-dark/26.png",
+      "sha256": "258b957d457f3ea9e5583db2a3961b04f655bc616314839eecd2c8624955202f"
+    },
+    {
+      "file": "raster/ollama-dark/30.png",
+      "sha256": "e37bd2e1c9e60fb6fe435a805d5551a8f6c21227ce912b19b7b860920bb8e540"
+    },
+    {
+      "file": "raster/ollama-dark/36.png",
+      "sha256": "5be446e10ab535f365ac1be31000be486595ced5eae6c6cc11b36d5c94d2c2f7"
+    },
+    {
+      "file": "raster/ollama-dark/40.png",
+      "sha256": "50cb3258a057b5691744796983fc424aec3f263d540dabb3472115b2b7cc7b43"
+    },
+    {
+      "file": "raster/ollama-dark/45.png",
+      "sha256": "e1805a7537a9eb2e2869fc912eb2880e7fecbda55d7210ab83645e9c8110b44e"
+    },
+    {
+      "file": "raster/ollama-dark/52.png",
+      "sha256": "8e96cbb419306aaea6b38f1a58c3372e6a651dfb51e25cc592c2d0d143a8fc00"
+    },
+    {
+      "file": "raster/ollama-dark/54.png",
+      "sha256": "d54966ef32bcefbc9e6cdb38aeab30fda56e717fd278d969e0e1b25d5093fcd7"
+    },
+    {
+      "file": "raster/ollama-dark/60.png",
+      "sha256": "cdb03e445878928966b088f2e2c143f746114ea160e76ceab930cd73c28c4b84"
+    },
+    {
+      "file": "raster/ollama-dark/78.png",
+      "sha256": "18c312dff10f32e857da3b63675b8cc8c861bb985085dc8c3cb6cbcc6e39adf8"
+    },
+    {
+      "file": "raster/ollama-light/15.png",
+      "sha256": "9cf670ad1aa89d2328993ceb70f4e1b9ea0c873cad9636efbafcc33035ae99ad"
+    },
+    {
+      "file": "raster/ollama-light/18.png",
+      "sha256": "774224b889fd97c41919ceac49a88ec8c25855ecdd497761b8f8ec3a9d6d1117"
+    },
+    {
+      "file": "raster/ollama-light/20.png",
+      "sha256": "3542ce7daee0badee3aaf2f04806219c49c573d168015c205fbeab49100dc791"
+    },
+    {
+      "file": "raster/ollama-light/26.png",
+      "sha256": "4ea7e252680102613a81bd85096655d26904d12d5c0bf6c41fedbb2d2ccab8f4"
+    },
+    {
+      "file": "raster/ollama-light/30.png",
+      "sha256": "54ff4293d1ef27ab7e93ad3b56bf4b0100e4295d7e1bc12a6ebce8f50f92ee4f"
+    },
+    {
+      "file": "raster/ollama-light/36.png",
+      "sha256": "0cc4d12f8008c0ad2bb76b32bb8aa4f3433107ae603487708c35d02bb158624e"
+    },
+    {
+      "file": "raster/ollama-light/40.png",
+      "sha256": "27d054d668225dd99ae908ec6b80a5114440b45654b58dd5e2ce98db6701c4e6"
+    },
+    {
+      "file": "raster/ollama-light/45.png",
+      "sha256": "4f6fec940b518e833ee207c56b74ff67f58a81a1d803b1043d63e4740a7fc83c"
+    },
+    {
+      "file": "raster/ollama-light/52.png",
+      "sha256": "5359f41d688065316c8891df0003ea34e74750edfc09d7e4020612437e0a8501"
+    },
+    {
+      "file": "raster/ollama-light/54.png",
+      "sha256": "e3408ee5ccf7b643eeaa240265097dd9b5d3b6738175d12448531d50c6d99100"
+    },
+    {
+      "file": "raster/ollama-light/60.png",
+      "sha256": "73f198448ea4d62e1878b11bf3cf53ffebf208e21ff7113f9190df9ba6c0d631"
+    },
+    {
+      "file": "raster/ollama-light/78.png",
+      "sha256": "5a61fc5c4aeab985ad3a0c9ab28cb43472faf9d24f21f4443a25a84e6e511c7a"
+    },
+    {
+      "file": "raster/openai-dark/15.png",
+      "sha256": "943b2cd0930f19fc5d33236ef5a3302887717721126e8a055379e44b2d12b042"
+    },
+    {
+      "file": "raster/openai-dark/18.png",
+      "sha256": "45f60b5e45bedae04d551535ba4482094b5852fc3564ca09696514fa52920886"
+    },
+    {
+      "file": "raster/openai-dark/20.png",
+      "sha256": "3fe5f704519ae61f709ab6da32b61d838ed1daab19ff8f6735a860731789a50c"
+    },
+    {
+      "file": "raster/openai-dark/26.png",
+      "sha256": "2360705f5b8dfed179d924b11f36fbd283bd9abc25e3f38ef87646e7cbe4f95f"
+    },
+    {
+      "file": "raster/openai-dark/30.png",
+      "sha256": "6f704f063a807710de63aad98f4f7b10a162356b8880cfb15f9f50514ad309ac"
+    },
+    {
+      "file": "raster/openai-dark/36.png",
+      "sha256": "b904b59090148280d1384e720a1cdbce392c3abeb0210584ace95c2e7430a67a"
+    },
+    {
+      "file": "raster/openai-dark/40.png",
+      "sha256": "3af0616c99ab3304c514ed4bed7d6d2ceb2f55bb058902c7c1dc809d643e13ca"
+    },
+    {
+      "file": "raster/openai-dark/45.png",
+      "sha256": "e4873f20f4e8e6816da3878962640a7153f62ec09cbdb38eb7e95cdc538ed802"
+    },
+    {
+      "file": "raster/openai-dark/52.png",
+      "sha256": "980d14a9ce087b1a0a6e24e0bae261ebdf81276a4efcee7d63f9aa2edd6da675"
+    },
+    {
+      "file": "raster/openai-dark/54.png",
+      "sha256": "fa3a67f0daa0fd91713ff11a43454d52421746c67b81faba71bb7614971312e7"
+    },
+    {
+      "file": "raster/openai-dark/60.png",
+      "sha256": "39d080803c43493c6b2be9867adfb3cecce77574b19a348f9cb5527605ff0ad1"
+    },
+    {
+      "file": "raster/openai-dark/78.png",
+      "sha256": "0369ee1e99d6469602a3fd72d71aec9f2ed9f25222ff21322d4ad2ae84439e07"
+    },
+    {
+      "file": "raster/openai-light/15.png",
+      "sha256": "d6da3d8e46b6ca333acca3ec9ccaba35e92e8e466916b9336fbc4d133eea3625"
+    },
+    {
+      "file": "raster/openai-light/18.png",
+      "sha256": "2640438287b9f52d0d0676590522c0a19fdcb80177a1a8131c0ee5ba41cd4fa0"
+    },
+    {
+      "file": "raster/openai-light/20.png",
+      "sha256": "06802e75f736b920a647c632733a04a949be8776786340b116e81218d0119b7b"
+    },
+    {
+      "file": "raster/openai-light/26.png",
+      "sha256": "4fe8d0b29381319af74dca860c1670c4705d147e0446821dca0a72b2cb5aa07e"
+    },
+    {
+      "file": "raster/openai-light/30.png",
+      "sha256": "c0fafa4e5926a1f2f20f63a248a4a520b19be2e786b03727a122870ee0951455"
+    },
+    {
+      "file": "raster/openai-light/36.png",
+      "sha256": "99b9ed03c64d4731e2ac79807b0dad23a860602461136e11719cd2d7d5db48ab"
+    },
+    {
+      "file": "raster/openai-light/40.png",
+      "sha256": "28178ecba10be980faec665018d92b3b5be3ddba5c3c94f9e7727c1f309c2e7b"
+    },
+    {
+      "file": "raster/openai-light/45.png",
+      "sha256": "6333817dccf88dbd72729ad2deda3a03196f93128d2c8637e2af9ce4d3a4918c"
+    },
+    {
+      "file": "raster/openai-light/52.png",
+      "sha256": "62eeb08b9e1e4aaf374e95e5fc8d4888d704e162e3ac1386e24346d3d77f1df8"
+    },
+    {
+      "file": "raster/openai-light/54.png",
+      "sha256": "31a093014216ab529228203d4d63faf92aba76578e2a273b991a3a48a9f81c86"
+    },
+    {
+      "file": "raster/openai-light/60.png",
+      "sha256": "c3d23198a1ad3bd08b56269b18887ce18ae21812389bb86782432248c95bb193"
+    },
+    {
+      "file": "raster/openai-light/78.png",
+      "sha256": "3bbc9f5bfbc32fe5de1027f2782d287990ead3b4fd4460dfa0b20a3136b5e208"
+    },
+    {
+      "file": "raster/opencode-dark/15.png",
+      "sha256": "9e96e0dc2ffbca9f88bc28e61b6ec6ba4f2205963c30873e824bac4ec56869f1"
+    },
+    {
+      "file": "raster/opencode-dark/18.png",
+      "sha256": "1226e1210a71d781e1d65cecaee52bf4e5042267c2236cdc1366f107cf38f02f"
+    },
+    {
+      "file": "raster/opencode-dark/20.png",
+      "sha256": "6aee2f8b8fd1394bf138657e2ce73b4784699c8a03651ab0e08ef7d23dd09f0d"
+    },
+    {
+      "file": "raster/opencode-dark/26.png",
+      "sha256": "17c0c89842e45b06312ce2be15fa5aeb5212d52141406b77a8fbb1f51be8827c"
+    },
+    {
+      "file": "raster/opencode-dark/30.png",
+      "sha256": "4574ad1c46f7d956380d32a42dbbc98326e0a2ca44b77e8a4673e53d695ed194"
+    },
+    {
+      "file": "raster/opencode-dark/36.png",
+      "sha256": "024cb6f5aadb7348289933b0585eccf52c7d8beb631c5c99f9d588a4272aa1da"
+    },
+    {
+      "file": "raster/opencode-dark/40.png",
+      "sha256": "3f82bc91fca46572cacf8da006c8b6bec3cedff2a79c1617fc6a07397c891473"
+    },
+    {
+      "file": "raster/opencode-dark/45.png",
+      "sha256": "408b4e2a405e2b8adf6fdacae619c571b9760545d22d277fd201ca82bfe093b4"
+    },
+    {
+      "file": "raster/opencode-dark/52.png",
+      "sha256": "29dcb130003c48eef6c483d47626068f4775318df751d65640fe7bea5682756b"
+    },
+    {
+      "file": "raster/opencode-dark/54.png",
+      "sha256": "f9f54a4aeb39edb3852fca45fe81ba588744b93549d03316404c0456dcfcc402"
+    },
+    {
+      "file": "raster/opencode-dark/60.png",
+      "sha256": "476db876d973969b360d58519531a66c82f64c344b74b3e188aae306c110a948"
+    },
+    {
+      "file": "raster/opencode-dark/78.png",
+      "sha256": "a69d967fda0b8fae4be49fb3f337f86174d22c0b70f0539964364c42fc20e9a5"
+    },
+    {
+      "file": "raster/opencode-light/15.png",
+      "sha256": "e80688ab428c1e52144245e39ede3c971f46b2306dcc49e0d1c9e66bae830e18"
+    },
+    {
+      "file": "raster/opencode-light/18.png",
+      "sha256": "b68987333e685609fb06c8051f2d3e58d6ce626c903cde048eab5ac1ca3e4942"
+    },
+    {
+      "file": "raster/opencode-light/20.png",
+      "sha256": "ce1f86199e7e2dbe654f8f5152d81d38e65d7b0ccd590bbe89966565981b5bee"
+    },
+    {
+      "file": "raster/opencode-light/26.png",
+      "sha256": "9c8f1e003f2aef79c2e387938c9c9dd211ec75dbde5b1ba68a57fd1e63b9767a"
+    },
+    {
+      "file": "raster/opencode-light/30.png",
+      "sha256": "fc5a3269ef91fa17c6e5ca2561e259e87523e9111b0640d53e9931be4147cd15"
+    },
+    {
+      "file": "raster/opencode-light/36.png",
+      "sha256": "a853b5cb8d85cc63f3abd8cbba3640656797ac0fe620e4f3d83e8a1cb30515db"
+    },
+    {
+      "file": "raster/opencode-light/40.png",
+      "sha256": "035000c9ff556fe5e8aab110a444203fb94674cd4dc6d2ddbd012d91c7aae118"
+    },
+    {
+      "file": "raster/opencode-light/45.png",
+      "sha256": "c313389e15fbf8e5d694718e69854bee5542f80f128e09cf8c61d81e25c2b480"
+    },
+    {
+      "file": "raster/opencode-light/52.png",
+      "sha256": "4cec2ce03ecc229dfae783b4967a68510d829808c6fb9eb1f808d6e6af41ff86"
+    },
+    {
+      "file": "raster/opencode-light/54.png",
+      "sha256": "e3b2a34adb6539a3b14967fbe86589f29371deeb39a7cc1ee5b849415012a4e2"
+    },
+    {
+      "file": "raster/opencode-light/60.png",
+      "sha256": "a2e03b42381a83a6393f21330b876815713664262456ae7e789eeb3141185ce9"
+    },
+    {
+      "file": "raster/opencode-light/78.png",
+      "sha256": "1f3e7fbd84c537ba240112cdbcf0d35376883d7aa50b6c0324dbb99795fa5dad"
+    },
+    {
+      "file": "raster/openrouter-dark/15.png",
+      "sha256": "0ac5e3ae58ef2795f3bb0fd9e25c66980d9cd6413463dcd706c450daaa2ca869"
+    },
+    {
+      "file": "raster/openrouter-dark/18.png",
+      "sha256": "97fa2f6ba7e524b00c9fd00654886adf71a5a0978bd802846d91278ee8d1c87e"
+    },
+    {
+      "file": "raster/openrouter-dark/20.png",
+      "sha256": "4242362c19b3fbd0661e855a415cc019f636a6d2dd28cf74b1c0e5e9c40a28cb"
+    },
+    {
+      "file": "raster/openrouter-dark/26.png",
+      "sha256": "2da3b31405463cfa34db7dd4a45d766b18f6de4ec70665b4754a5f48ca5a8061"
+    },
+    {
+      "file": "raster/openrouter-dark/30.png",
+      "sha256": "3caec723b5394534b4939bcd67803978f07a347c401d7043ee7b79d02b77b1b4"
+    },
+    {
+      "file": "raster/openrouter-dark/36.png",
+      "sha256": "7863cc93e12bbad8a7807918b3b8f7eca1cc07b22473d02c16564df780d93105"
+    },
+    {
+      "file": "raster/openrouter-dark/40.png",
+      "sha256": "887965299397330d27047502b3ad572033f851034b424466ac94c0f34993e118"
+    },
+    {
+      "file": "raster/openrouter-dark/45.png",
+      "sha256": "4cb80a3776bccfb0b1b80ed064b92d36b1a008109b4561138c39152958f0c760"
+    },
+    {
+      "file": "raster/openrouter-dark/52.png",
+      "sha256": "6fe4577328de7d41eea77c1a6e2dce6f4303dd45fd22e2dcf01308314296c0ff"
+    },
+    {
+      "file": "raster/openrouter-dark/54.png",
+      "sha256": "c047408ce506dd45a15101699ee099dc6fb52c7bcc1a909d08320c026e77548f"
+    },
+    {
+      "file": "raster/openrouter-dark/60.png",
+      "sha256": "d3f6fc3d185cb918b22ed9671b27ee8c71800f24c9608fad5605a7e5dbe886e7"
+    },
+    {
+      "file": "raster/openrouter-dark/78.png",
+      "sha256": "f8162457af8d8d6d9bed1dac497e468165fd37c9d39763a84d5c28779b16a981"
+    },
+    {
+      "file": "raster/openrouter-light/15.png",
+      "sha256": "0ac5e3ae58ef2795f3bb0fd9e25c66980d9cd6413463dcd706c450daaa2ca869"
+    },
+    {
+      "file": "raster/openrouter-light/18.png",
+      "sha256": "97fa2f6ba7e524b00c9fd00654886adf71a5a0978bd802846d91278ee8d1c87e"
+    },
+    {
+      "file": "raster/openrouter-light/20.png",
+      "sha256": "4242362c19b3fbd0661e855a415cc019f636a6d2dd28cf74b1c0e5e9c40a28cb"
+    },
+    {
+      "file": "raster/openrouter-light/26.png",
+      "sha256": "2da3b31405463cfa34db7dd4a45d766b18f6de4ec70665b4754a5f48ca5a8061"
+    },
+    {
+      "file": "raster/openrouter-light/30.png",
+      "sha256": "3caec723b5394534b4939bcd67803978f07a347c401d7043ee7b79d02b77b1b4"
+    },
+    {
+      "file": "raster/openrouter-light/36.png",
+      "sha256": "7863cc93e12bbad8a7807918b3b8f7eca1cc07b22473d02c16564df780d93105"
+    },
+    {
+      "file": "raster/openrouter-light/40.png",
+      "sha256": "887965299397330d27047502b3ad572033f851034b424466ac94c0f34993e118"
+    },
+    {
+      "file": "raster/openrouter-light/45.png",
+      "sha256": "4cb80a3776bccfb0b1b80ed064b92d36b1a008109b4561138c39152958f0c760"
+    },
+    {
+      "file": "raster/openrouter-light/52.png",
+      "sha256": "6fe4577328de7d41eea77c1a6e2dce6f4303dd45fd22e2dcf01308314296c0ff"
+    },
+    {
+      "file": "raster/openrouter-light/54.png",
+      "sha256": "c047408ce506dd45a15101699ee099dc6fb52c7bcc1a909d08320c026e77548f"
+    },
+    {
+      "file": "raster/openrouter-light/60.png",
+      "sha256": "d3f6fc3d185cb918b22ed9671b27ee8c71800f24c9608fad5605a7e5dbe886e7"
+    },
+    {
+      "file": "raster/openrouter-light/78.png",
+      "sha256": "f8162457af8d8d6d9bed1dac497e468165fd37c9d39763a84d5c28779b16a981"
+    },
+    {
+      "file": "raster/perplexity-dark/15.png",
+      "sha256": "8ef4b1c8718416bd9d1a90621044225dd36247009e87242cf973ef5b53a1619b"
+    },
+    {
+      "file": "raster/perplexity-dark/18.png",
+      "sha256": "567e3070c3f70bcb47b63826fc2649579b02ff26e935a50bcbcd3418c8967a86"
+    },
+    {
+      "file": "raster/perplexity-dark/20.png",
+      "sha256": "8ceaf26ffecc6d9d45345858eda20bef27db3bc504335f3dc741dad0f9a06188"
+    },
+    {
+      "file": "raster/perplexity-dark/26.png",
+      "sha256": "9e934497dc8b87964f318d19824f29157f0644ea490a013251eeb880353ee474"
+    },
+    {
+      "file": "raster/perplexity-dark/30.png",
+      "sha256": "de00690b9df8bb9834350c332225c01cc7ac7effe6965fb4051bd1944b86ad10"
+    },
+    {
+      "file": "raster/perplexity-dark/36.png",
+      "sha256": "01beef01c2f352d64122df56e8925c05fe8343bc38a81e1d584d7b81d48af67b"
+    },
+    {
+      "file": "raster/perplexity-dark/40.png",
+      "sha256": "627d87432d099c8c84275dcda743063e7728ea5bb3685fd0e740e0ebadd780f9"
+    },
+    {
+      "file": "raster/perplexity-dark/45.png",
+      "sha256": "fa35154dbaf2bd23da920956fd1688089268d07bcdd75c1fffd0830b4fc43929"
+    },
+    {
+      "file": "raster/perplexity-dark/52.png",
+      "sha256": "ebe1744af5916c67dda93698a0b2db4020c3a4a9232da642062bd6cc6a5928f4"
+    },
+    {
+      "file": "raster/perplexity-dark/54.png",
+      "sha256": "772be1e115587ed19484277df3c4b5b568724019f9f3caa3b17d1a6462b68967"
+    },
+    {
+      "file": "raster/perplexity-dark/60.png",
+      "sha256": "8376ee3011f76031e77a19abbd1ceac80bf39ffe19d84a576c7c8984aa7d22ed"
+    },
+    {
+      "file": "raster/perplexity-dark/78.png",
+      "sha256": "7aead0b6fb532c7f1c28ab3e298c12db56bca055c5c0d2a473f45731faf44a85"
+    },
+    {
+      "file": "raster/perplexity-light/15.png",
+      "sha256": "8ef4b1c8718416bd9d1a90621044225dd36247009e87242cf973ef5b53a1619b"
+    },
+    {
+      "file": "raster/perplexity-light/18.png",
+      "sha256": "567e3070c3f70bcb47b63826fc2649579b02ff26e935a50bcbcd3418c8967a86"
+    },
+    {
+      "file": "raster/perplexity-light/20.png",
+      "sha256": "8ceaf26ffecc6d9d45345858eda20bef27db3bc504335f3dc741dad0f9a06188"
+    },
+    {
+      "file": "raster/perplexity-light/26.png",
+      "sha256": "9e934497dc8b87964f318d19824f29157f0644ea490a013251eeb880353ee474"
+    },
+    {
+      "file": "raster/perplexity-light/30.png",
+      "sha256": "de00690b9df8bb9834350c332225c01cc7ac7effe6965fb4051bd1944b86ad10"
+    },
+    {
+      "file": "raster/perplexity-light/36.png",
+      "sha256": "01beef01c2f352d64122df56e8925c05fe8343bc38a81e1d584d7b81d48af67b"
+    },
+    {
+      "file": "raster/perplexity-light/40.png",
+      "sha256": "627d87432d099c8c84275dcda743063e7728ea5bb3685fd0e740e0ebadd780f9"
+    },
+    {
+      "file": "raster/perplexity-light/45.png",
+      "sha256": "fa35154dbaf2bd23da920956fd1688089268d07bcdd75c1fffd0830b4fc43929"
+    },
+    {
+      "file": "raster/perplexity-light/52.png",
+      "sha256": "ebe1744af5916c67dda93698a0b2db4020c3a4a9232da642062bd6cc6a5928f4"
+    },
+    {
+      "file": "raster/perplexity-light/54.png",
+      "sha256": "772be1e115587ed19484277df3c4b5b568724019f9f3caa3b17d1a6462b68967"
+    },
+    {
+      "file": "raster/perplexity-light/60.png",
+      "sha256": "8376ee3011f76031e77a19abbd1ceac80bf39ffe19d84a576c7c8984aa7d22ed"
+    },
+    {
+      "file": "raster/perplexity-light/78.png",
+      "sha256": "7aead0b6fb532c7f1c28ab3e298c12db56bca055c5c0d2a473f45731faf44a85"
+    },
+    {
+      "file": "raster/qwen-dark/15.png",
+      "sha256": "fe7d759249bad07037710f4bfc65d285b700ff0b32ebe05789bc4a6b92b8b4d3"
+    },
+    {
+      "file": "raster/qwen-dark/18.png",
+      "sha256": "f802fd9410efe69c3b26191f2cf8511b69ea92c7bd8f4f7740a26c42c3b58d3d"
+    },
+    {
+      "file": "raster/qwen-dark/20.png",
+      "sha256": "9fbd6e3a1f25338eb0b823adf3da40ee6f8e15fbc4315f1d51fbafc55e87a96f"
+    },
+    {
+      "file": "raster/qwen-dark/26.png",
+      "sha256": "00f58f9e9b90adaf2a0f048f7bbca0ea66b99799f6b9bcb13245b2c3d87d7b8c"
+    },
+    {
+      "file": "raster/qwen-dark/30.png",
+      "sha256": "84fe1d61c34f52a0ace369073b15c5dbf1f01c9874373c3bda5ff3311d726c15"
+    },
+    {
+      "file": "raster/qwen-dark/36.png",
+      "sha256": "0c98d152a5e6fe3e3040642cfeabbbc049a7b6532092ac52061fdb39e2acfabb"
+    },
+    {
+      "file": "raster/qwen-dark/40.png",
+      "sha256": "66f652e60cb0842f28ad4bd3c9cb4e6c95792033e1cc50e63039ea43aaf7df57"
+    },
+    {
+      "file": "raster/qwen-dark/45.png",
+      "sha256": "f69eca197f92f3e461107a2bc4cd045bb94aaf0c60da119c1287e9ed255fac16"
+    },
+    {
+      "file": "raster/qwen-dark/52.png",
+      "sha256": "e36fb98e96fb367ebad7fd6ceaf59a209930613605fd41be11eca0c71d1b8309"
+    },
+    {
+      "file": "raster/qwen-dark/54.png",
+      "sha256": "8661c0364a20c9be1cb5029b07e9e3d7cc8a5e49730d0c70269fe731706eb632"
+    },
+    {
+      "file": "raster/qwen-dark/60.png",
+      "sha256": "0f8edcc29ac6df48a9d066840e636c27acc5ac4ddfc7068605f7e840da240938"
+    },
+    {
+      "file": "raster/qwen-dark/78.png",
+      "sha256": "9719e566acffbe3d5a98e81bdcf21e2c6ea0a5ab339e495afd833bc53205dcbd"
+    },
+    {
+      "file": "raster/qwen-light/15.png",
+      "sha256": "fe7d759249bad07037710f4bfc65d285b700ff0b32ebe05789bc4a6b92b8b4d3"
+    },
+    {
+      "file": "raster/qwen-light/18.png",
+      "sha256": "f802fd9410efe69c3b26191f2cf8511b69ea92c7bd8f4f7740a26c42c3b58d3d"
+    },
+    {
+      "file": "raster/qwen-light/20.png",
+      "sha256": "9fbd6e3a1f25338eb0b823adf3da40ee6f8e15fbc4315f1d51fbafc55e87a96f"
+    },
+    {
+      "file": "raster/qwen-light/26.png",
+      "sha256": "00f58f9e9b90adaf2a0f048f7bbca0ea66b99799f6b9bcb13245b2c3d87d7b8c"
+    },
+    {
+      "file": "raster/qwen-light/30.png",
+      "sha256": "84fe1d61c34f52a0ace369073b15c5dbf1f01c9874373c3bda5ff3311d726c15"
+    },
+    {
+      "file": "raster/qwen-light/36.png",
+      "sha256": "0c98d152a5e6fe3e3040642cfeabbbc049a7b6532092ac52061fdb39e2acfabb"
+    },
+    {
+      "file": "raster/qwen-light/40.png",
+      "sha256": "66f652e60cb0842f28ad4bd3c9cb4e6c95792033e1cc50e63039ea43aaf7df57"
+    },
+    {
+      "file": "raster/qwen-light/45.png",
+      "sha256": "f69eca197f92f3e461107a2bc4cd045bb94aaf0c60da119c1287e9ed255fac16"
+    },
+    {
+      "file": "raster/qwen-light/52.png",
+      "sha256": "e36fb98e96fb367ebad7fd6ceaf59a209930613605fd41be11eca0c71d1b8309"
+    },
+    {
+      "file": "raster/qwen-light/54.png",
+      "sha256": "8661c0364a20c9be1cb5029b07e9e3d7cc8a5e49730d0c70269fe731706eb632"
+    },
+    {
+      "file": "raster/qwen-light/60.png",
+      "sha256": "0f8edcc29ac6df48a9d066840e636c27acc5ac4ddfc7068605f7e840da240938"
+    },
+    {
+      "file": "raster/qwen-light/78.png",
+      "sha256": "9719e566acffbe3d5a98e81bdcf21e2c6ea0a5ab339e495afd833bc53205dcbd"
+    },
+    {
+      "file": "raster/vscode-dark/15.png",
+      "sha256": "8b9880970226d33cb17b4bb2e6df92046518270bc77a0856149c1737daf09669"
+    },
+    {
+      "file": "raster/vscode-dark/18.png",
+      "sha256": "a029e22227e3882aa8ea10936b75fc01d01b3d35a6fc556fcc4b04529b39b960"
+    },
+    {
+      "file": "raster/vscode-dark/20.png",
+      "sha256": "7d535c3c3c04b5dc511eea99c3f5763e3645a7d06c23bc240935837a66cd5ba2"
+    },
+    {
+      "file": "raster/vscode-dark/26.png",
+      "sha256": "584b9537c37069d8921f077d6e1efd9b290a2ab6de20abb014025204c4ae2ec6"
+    },
+    {
+      "file": "raster/vscode-dark/30.png",
+      "sha256": "41fe9d7c2f17d637ddf70411520d821024b6b119219efd3da5b33ff1a2026f68"
+    },
+    {
+      "file": "raster/vscode-dark/36.png",
+      "sha256": "4181e500086b9141f59164b27f3066073b0a94c9c9422870e8ac06a27ad7a37d"
+    },
+    {
+      "file": "raster/vscode-dark/40.png",
+      "sha256": "4d558dabe487ddcd22c4a07582e54d046f23c462627e3086ba35110b52865111"
+    },
+    {
+      "file": "raster/vscode-dark/45.png",
+      "sha256": "784cccdf28f93321bed1035e0171d130a09a5ecdeb2fd43dce8cf38936f7c19f"
+    },
+    {
+      "file": "raster/vscode-dark/52.png",
+      "sha256": "6081efdca16dabece9321e5a0319df2aac9dcbe71e427184fd6dfbdfdcda9c9d"
+    },
+    {
+      "file": "raster/vscode-dark/54.png",
+      "sha256": "01beaf43a503915876b34b61dda737b2f6252a236d98d58074709feaaa55440f"
+    },
+    {
+      "file": "raster/vscode-dark/60.png",
+      "sha256": "0c46374f3d0fb6d0dcc40357a5ee185cc472a9bf64fdc4e82093d8f823fb834e"
+    },
+    {
+      "file": "raster/vscode-dark/78.png",
+      "sha256": "ceb1b3bb2ca1402e46ae8c9d6407192d287d90829f6789bfe45440c8e8da580b"
+    },
+    {
+      "file": "raster/vscode-light/15.png",
+      "sha256": "8b9880970226d33cb17b4bb2e6df92046518270bc77a0856149c1737daf09669"
+    },
+    {
+      "file": "raster/vscode-light/18.png",
+      "sha256": "a029e22227e3882aa8ea10936b75fc01d01b3d35a6fc556fcc4b04529b39b960"
+    },
+    {
+      "file": "raster/vscode-light/20.png",
+      "sha256": "7d535c3c3c04b5dc511eea99c3f5763e3645a7d06c23bc240935837a66cd5ba2"
+    },
+    {
+      "file": "raster/vscode-light/26.png",
+      "sha256": "584b9537c37069d8921f077d6e1efd9b290a2ab6de20abb014025204c4ae2ec6"
+    },
+    {
+      "file": "raster/vscode-light/30.png",
+      "sha256": "41fe9d7c2f17d637ddf70411520d821024b6b119219efd3da5b33ff1a2026f68"
+    },
+    {
+      "file": "raster/vscode-light/36.png",
+      "sha256": "4181e500086b9141f59164b27f3066073b0a94c9c9422870e8ac06a27ad7a37d"
+    },
+    {
+      "file": "raster/vscode-light/40.png",
+      "sha256": "4d558dabe487ddcd22c4a07582e54d046f23c462627e3086ba35110b52865111"
+    },
+    {
+      "file": "raster/vscode-light/45.png",
+      "sha256": "784cccdf28f93321bed1035e0171d130a09a5ecdeb2fd43dce8cf38936f7c19f"
+    },
+    {
+      "file": "raster/vscode-light/52.png",
+      "sha256": "6081efdca16dabece9321e5a0319df2aac9dcbe71e427184fd6dfbdfdcda9c9d"
+    },
+    {
+      "file": "raster/vscode-light/54.png",
+      "sha256": "01beaf43a503915876b34b61dda737b2f6252a236d98d58074709feaaa55440f"
+    },
+    {
+      "file": "raster/vscode-light/60.png",
+      "sha256": "0c46374f3d0fb6d0dcc40357a5ee185cc472a9bf64fdc4e82093d8f823fb834e"
+    },
+    {
+      "file": "raster/vscode-light/78.png",
+      "sha256": "ceb1b3bb2ca1402e46ae8c9d6407192d287d90829f6789bfe45440c8e8da580b"
+    },
+    {
+      "file": "raster/vscodium-dark/15.png",
+      "sha256": "908f848e6ff0d0b331b5f857c6995635963510803ad9ad50323fbd18a543bb83"
+    },
+    {
+      "file": "raster/vscodium-dark/18.png",
+      "sha256": "4560b5ba71c0fc0d359f2d7a4a6b2fee3b096c23ae30461e73d2e92aff9598c8"
+    },
+    {
+      "file": "raster/vscodium-dark/20.png",
+      "sha256": "3ccbf67a4a8bb7ae7055e8db36a7b16c33145fde2790c9038916068ccb9b3797"
+    },
+    {
+      "file": "raster/vscodium-dark/26.png",
+      "sha256": "c8ad0cf061c78fb60247ab89d825e1eb9f627d76ab3c12098d454091898b4401"
+    },
+    {
+      "file": "raster/vscodium-dark/30.png",
+      "sha256": "d3f2bff97841cc96fefe2ede338867908133ae3f9540107ddbf952732e4c3d9f"
+    },
+    {
+      "file": "raster/vscodium-dark/36.png",
+      "sha256": "6eb6c10d81eacea9c5d74ebdbe4e47bc2a56dffed4d681c83c9345764824fbc0"
+    },
+    {
+      "file": "raster/vscodium-dark/40.png",
+      "sha256": "f1935bdf445b2adc8411840774a5f4cffb17009f98ec436d9c8df5a7cb476aa8"
+    },
+    {
+      "file": "raster/vscodium-dark/45.png",
+      "sha256": "1d9fc107865f922adb4f64f2707ad4b01df2384e1da3be946e8ebf8a8922fc47"
+    },
+    {
+      "file": "raster/vscodium-dark/52.png",
+      "sha256": "ba895ff073799ecc41b36144d9d7d5f035f7f3c730ebfaae3db956109c67eec3"
+    },
+    {
+      "file": "raster/vscodium-dark/54.png",
+      "sha256": "fd48323b0451b0c772d55b4b8d8b51543ff9e566c83c37ee5beb997a42a36cbc"
+    },
+    {
+      "file": "raster/vscodium-dark/60.png",
+      "sha256": "166a3d0bd17a2d1341fc5ee696515297639981dd7f2a59af0794c54931b7dae2"
+    },
+    {
+      "file": "raster/vscodium-dark/78.png",
+      "sha256": "0ece2d6204b87a13f6d8f21c83bcb897841db7be2bbb8eceef87ce1493fffa2a"
+    },
+    {
+      "file": "raster/vscodium-light/15.png",
+      "sha256": "908f848e6ff0d0b331b5f857c6995635963510803ad9ad50323fbd18a543bb83"
+    },
+    {
+      "file": "raster/vscodium-light/18.png",
+      "sha256": "4560b5ba71c0fc0d359f2d7a4a6b2fee3b096c23ae30461e73d2e92aff9598c8"
+    },
+    {
+      "file": "raster/vscodium-light/20.png",
+      "sha256": "3ccbf67a4a8bb7ae7055e8db36a7b16c33145fde2790c9038916068ccb9b3797"
+    },
+    {
+      "file": "raster/vscodium-light/26.png",
+      "sha256": "c8ad0cf061c78fb60247ab89d825e1eb9f627d76ab3c12098d454091898b4401"
+    },
+    {
+      "file": "raster/vscodium-light/30.png",
+      "sha256": "d3f2bff97841cc96fefe2ede338867908133ae3f9540107ddbf952732e4c3d9f"
+    },
+    {
+      "file": "raster/vscodium-light/36.png",
+      "sha256": "6eb6c10d81eacea9c5d74ebdbe4e47bc2a56dffed4d681c83c9345764824fbc0"
+    },
+    {
+      "file": "raster/vscodium-light/40.png",
+      "sha256": "f1935bdf445b2adc8411840774a5f4cffb17009f98ec436d9c8df5a7cb476aa8"
+    },
+    {
+      "file": "raster/vscodium-light/45.png",
+      "sha256": "1d9fc107865f922adb4f64f2707ad4b01df2384e1da3be946e8ebf8a8922fc47"
+    },
+    {
+      "file": "raster/vscodium-light/52.png",
+      "sha256": "ba895ff073799ecc41b36144d9d7d5f035f7f3c730ebfaae3db956109c67eec3"
+    },
+    {
+      "file": "raster/vscodium-light/54.png",
+      "sha256": "fd48323b0451b0c772d55b4b8d8b51543ff9e566c83c37ee5beb997a42a36cbc"
+    },
+    {
+      "file": "raster/vscodium-light/60.png",
+      "sha256": "166a3d0bd17a2d1341fc5ee696515297639981dd7f2a59af0794c54931b7dae2"
+    },
+    {
+      "file": "raster/vscodium-light/78.png",
+      "sha256": "0ece2d6204b87a13f6d8f21c83bcb897841db7be2bbb8eceef87ce1493fffa2a"
+    },
+    {
+      "file": "raster/windsurf-dark/15.png",
+      "sha256": "e97b1b46330145a5de6910361e52ed3c65c78774362658fb083d71cf3871ad00"
+    },
+    {
+      "file": "raster/windsurf-dark/18.png",
+      "sha256": "2e59a5dcaf39b0a206e0826bd65110006ddd3caac655dadb76d5143e43906dc0"
+    },
+    {
+      "file": "raster/windsurf-dark/20.png",
+      "sha256": "4ec0cc9feb1fa3a1e25ce7d8341cecc765df9d1a040750da59c5bc1d3bc982de"
+    },
+    {
+      "file": "raster/windsurf-dark/26.png",
+      "sha256": "2764b4666091f6471a6ab74b342f86452dc5f9b9b38dc9a6fb3f48f4112f8b07"
+    },
+    {
+      "file": "raster/windsurf-dark/30.png",
+      "sha256": "e65c1949445a7979b7d3a513e6791e0688134bcffcc54cb91f64e327be109bc6"
+    },
+    {
+      "file": "raster/windsurf-dark/36.png",
+      "sha256": "6ff655a77cfc35c7ba9ce5b5de8817ef7b32722bf180f842ab2bf1c05bd80d9d"
+    },
+    {
+      "file": "raster/windsurf-dark/40.png",
+      "sha256": "4f067d912243990a551be8286371556c2d62b66fb8e1fccff1153f9ad09e5d65"
+    },
+    {
+      "file": "raster/windsurf-dark/45.png",
+      "sha256": "36c1f8692f52793f0194707fac1520b08169131077f504b7312a060ea1be6384"
+    },
+    {
+      "file": "raster/windsurf-dark/52.png",
+      "sha256": "71a8342bbe1a114ac3cc4004c76ce427a6ea6e70fa55cf22de535192fcd54a6e"
+    },
+    {
+      "file": "raster/windsurf-dark/54.png",
+      "sha256": "7d49590bb26dad084c44b05c4a3b3db99ce31aa9471f5ad2c83963f9aca73272"
+    },
+    {
+      "file": "raster/windsurf-dark/60.png",
+      "sha256": "28e628f5658a8b4a067d6234c40fed9e0dff156bfcd1b57d32c2be71af457d47"
+    },
+    {
+      "file": "raster/windsurf-dark/78.png",
+      "sha256": "1ef43d16767549685506b041f25e16e733acb24e5f2ca1f9b9b61dfe3cc24d8a"
+    },
+    {
+      "file": "raster/windsurf-light/15.png",
+      "sha256": "46c9ff54a1783d73f07ac620552cb67e880d4ef4697130ba41297bcd24e4cbe5"
+    },
+    {
+      "file": "raster/windsurf-light/18.png",
+      "sha256": "be2e33f73a8526c7cbbc75b73e2bda64d82592c62426dcee5e457af40688bb2b"
+    },
+    {
+      "file": "raster/windsurf-light/20.png",
+      "sha256": "b35f410d2cc83a2ea273931d3dd958d0d42c72a35ec61b10e69d383a6ae7d0e4"
+    },
+    {
+      "file": "raster/windsurf-light/26.png",
+      "sha256": "f77113c006d6784001fd603e51be31b744b4259c7b89e7a06a7facee53fe02d0"
+    },
+    {
+      "file": "raster/windsurf-light/30.png",
+      "sha256": "5d5ae51c43e6988f5b5245ff59f7d348161e069b0974a9f01f6e5d7b7bee6e47"
+    },
+    {
+      "file": "raster/windsurf-light/36.png",
+      "sha256": "07f568e7fe31bca402deec75f4ebfd72487c7507595f2890b6ffbab20b525505"
+    },
+    {
+      "file": "raster/windsurf-light/40.png",
+      "sha256": "1872938a3da4c8c4641a3b1ca8d3ff2759cc4d9fde381e330416055e9d3d5778"
+    },
+    {
+      "file": "raster/windsurf-light/45.png",
+      "sha256": "aa9f227e2871c236c4b8bce5348e4d7949521cde5fd31a02bdfa2270a85bb598"
+    },
+    {
+      "file": "raster/windsurf-light/52.png",
+      "sha256": "1bbf06fa070dc9b8977982c8536d184faae9b7c0a24b82979a23c054baa88b86"
+    },
+    {
+      "file": "raster/windsurf-light/54.png",
+      "sha256": "047476f5f7f3b9a44ce0a3775ada45dee6ad40e4d3603b85a500e8aaa09e32c1"
+    },
+    {
+      "file": "raster/windsurf-light/60.png",
+      "sha256": "3fa185d8ad7e7a8b4d07df6b4b6c01822c750e8e8227f6c5d7cf07bbb3dc2c55"
+    },
+    {
+      "file": "raster/windsurf-light/78.png",
+      "sha256": "959aa5839d5ae5506ca1e6d6dad8d9fae15922380d182e09c1138d1e9c228021"
+    }
+  ]
+}

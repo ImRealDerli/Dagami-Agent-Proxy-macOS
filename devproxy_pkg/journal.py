@@ -58,12 +58,12 @@ def record_error(action,error):
     append(action,False,'\n'.join(parts),detail=True)
 
 def append(action,success,message='',detail=False):
-    if success and action in ('snapshot','journal','loginURL','authStatus','updateAck'):return
+    if success and action in ('snapshot','journal','loginURL','authStatus','updateAck','sessions','journalEntries','profileDetails','sessionQuota'):return
     path=location()
     if path.is_symlink():raise RuntimeError('Недопустимый путь журнала.')
     if path.exists() and path.stat().st_size>2*1024*1024:
         old=path.with_suffix('.previous');old.unlink(missing_ok=True);path.replace(old)
-    entry={'time':datetime.datetime.now().astimezone().isoformat(timespec='seconds'),'action':action,'success':bool(success),'message':clean(message,limit=None) if detail else clean(message) if not action.startswith('auth') and action not in ('activate','licenseReset','saveProxy','login') else ('Готово' if success else 'Операция не завершена')}
+    entry={'time':datetime.datetime.now().astimezone().isoformat(timespec='seconds'),'action':action,'success':bool(success),'message':clean(message,limit=None) if detail else clean(message) if not action.startswith('auth') and action not in ('activate','licenseReset','saveProxy','profileSave','login') else ('Готово' if success else 'Операция не завершена')}
     with path.open('a',encoding='utf-8') as stream:stream.write(json.dumps(entry,ensure_ascii=False)+'\n')
     path.chmod(0o600)
 

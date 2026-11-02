@@ -45,7 +45,7 @@ class License:
         if not validate(raw):
             raise ValueError('Неверный ключ доступа. Проверьте правильность ввода.')
         if not MacOSKeychainStore.set_password(ACCOUNT, 'Dagami', normalize(raw)):
-            raise RuntimeError('Не удалось сохранить ключ. Разблокируйте Связку ключей macOS и повторите.')
+            raise RuntimeError('Не удалось сохранить ключ. '+(MacOSKeychainStore.last_error or 'Разрешите доступ в системном окне Связки ключей и повторите.'))
 
 
 def ensure_activation(autostart=False):

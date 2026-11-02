@@ -111,8 +111,10 @@ class FakeSocket:
 
 
 class RouteTests(unittest.TestCase):
+    def setUp(self):
+        peer=patch("devproxy_pkg.core.tunnel.is_current_user",return_value=True);peer.start();self.addCleanup(peer.stop)
     def call(self,profile,request,upstream=None):
-        tunnel=LocalTunnel(profile);client=FakeSocket(request);upstream=upstream or FakeSocket()
+        tunnel=LocalTunnel(profile);tunnel.is_running=True;client=FakeSocket(request);upstream=upstream or FakeSocket(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n")
         with patch('devproxy_pkg.core.tunnel.socket.create_connection',return_value=upstream) as connect,patch('devproxy_pkg.core.tunnel.FastDuplexRelay.pipe'):
             tunnel._handle_client(client)
         return client,upstream,connect
@@ -137,16 +139,16 @@ class RouteTests(unittest.TestCase):
             self.assertIn(b'200',client.sent);connect.assert_called_once()
 
     def test_failed_upstream_never_falls_back_direct(self):
-        profile=ProxyProfile.parse('http://proxy.example:8080');t=LocalTunnel(profile);client=FakeSocket(b'CONNECT example.com:443 HTTP/1.1\r\n\r\n')
+        profile=ProxyProfile.parse('http://proxy.example:8080');t=LocalTunnel(profile);t.is_running=True;client=FakeSocket(b'CONNECT example.com:443 HTTP/1.1\r\n\r\n')
         with patch('devproxy_pkg.core.tunnel.socket.create_connection',side_effect=OSError('fixture')) as connect:t._handle_client(client)
         self.assertIn(b'502',client.sent);self.assertEqual(1,connect.call_count);self.assertEqual(('proxy.example',8080),connect.call_args.args[0])
     def test_smart_dns_failure_uses_upstream_before_tunnel_open(self):
-        profile=ProxyProfile.parse('http://proxy.example:8080');profile.smart_dns=True;t=LocalTunnel(profile)
+        profile=ProxyProfile.parse('http://proxy.example:8080');profile.smart_dns=True;t=LocalTunnel(profile);t.is_running=True
         client=FakeSocket(b'CONNECT cloudcode-pa.googleapis.com:443 HTTP/1.1\r\n\r\n');upstream=FakeSocket(b'HTTP/1.1 200 OK\r\n\r\n')
         with patch.object(t.resolver,'resolve',side_effect=OSError('DNS down')),patch('devproxy_pkg.core.tunnel.socket.create_connection',return_value=upstream) as connect,patch('devproxy_pkg.core.tunnel.FastDuplexRelay.pipe'):t._handle_client(client)
         self.assertEqual(('proxy.example',8080),connect.call_args.args[0]);self.assertIn(b'200',client.sent)
     def test_smart_dns_target_preserves_connect_hostname(self):
-        profile=ProxyProfile.parse('direct://');profile.smart_dns=True;t=LocalTunnel(profile)
+        profile=ProxyProfile.parse('direct://');profile.smart_dns=True;t=LocalTunnel(profile);t.is_running=True
         client=FakeSocket(b'CONNECT cloudcode-pa.googleapis.com:443 HTTP/1.1\r\n\r\n');upstream=FakeSocket()
         with patch.object(t.resolver,'resolve',return_value='8.8.8.8'),patch('devproxy_pkg.core.tunnel.socket.create_connection',return_value=upstream) as connect,patch('devproxy_pkg.core.tunnel.FastDuplexRelay.pipe'):t._handle_client(client)
         self.assertEqual(('8.8.8.8',443),connect.call_args.args[0]);self.assertIn(b'200',client.sent)

@@ -6,6 +6,9 @@ ack=$4
 oldpid=$5
 pending=$6
 result=$7
+if [ "$(/usr/bin/id -u)" -eq 0 ]; then
+    exit 1
+fi
 workdir=$(/usr/bin/dirname "$ack")
 cleanup() {
     case "${workdir##*/}" in install-*) /bin/rm -rf "$workdir" ;; esac

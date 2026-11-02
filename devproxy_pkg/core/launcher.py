@@ -110,7 +110,8 @@ class Launcher:
         extra_args: Optional[List[str]] = None,
         wait: bool = True,
         enable_ipc: bool = True,
-        environment_factory=None
+        environment_factory=None,
+        session_factory=None
     ) -> Tuple[subprocess.Popen, LocalTunnel]:
         
 
@@ -175,7 +176,7 @@ class Launcher:
                     ipc_server.stop()
                 ipc_server = None
 
-        proc = None
+        proc = None;session_monitor=None
         try:
             proc = cls.launch(
                 executable,
@@ -185,6 +186,7 @@ class Launcher:
                 job_manager=job_mgr,
                 new_session=not wait
             )
+            if session_factory:session_monitor=session_factory(proc,local_proxy_url)
             if wait:
                 proc.wait()
             if not wait:
@@ -192,6 +194,7 @@ class Launcher:
                     try:
                         proc.wait()
                     finally:
+                        if session_monitor:session_monitor.close()
                         tunnel.stop()
                         if ipc_server:
                             ipc_server.stop()
@@ -220,7 +223,7 @@ class Launcher:
             raise
         finally:
             if wait:
-                                                                   
+                if session_monitor:session_monitor.close()
                 tunnel.stop()
                 if ipc_server:
                     ipc_server.stop()

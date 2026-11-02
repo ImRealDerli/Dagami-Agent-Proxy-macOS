@@ -176,6 +176,7 @@ def helper_active(data):
 
 
 def install(tag,profile=''):
+    if hasattr(os,'geteuid') and os.geteuid()==0:raise ValueError('Автоматическое обновление не запускается от root. Откройте Dagami с обычными правами.')
     from . import __version__
     from .portable_runtime import session_lock
     gui_pid=os.getppid()

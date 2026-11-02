@@ -76,7 +76,7 @@ def run_cli(executable,profile,args=None,environment_factory=None,stdin_fd=None,
         try:os.write(output_fd,('\r\nDagami: '+message+'\r\n').encode())
         except OSError:pass
     session.code_error=report_error
-    master=slave=None;process=None;original=None;old_resize=None;worker=None;old_signals={}
+    master=slave=None;process=None;monitor=None;telemetry=None;original=None;old_resize=None;worker=None;old_signals={}
     links=queue.Queue(maxsize=8);done=threading.Event();seen=set()
     def dispatch():
         while not done.is_set():
@@ -93,7 +93,9 @@ def run_cli(executable,profile,args=None,environment_factory=None,stdin_fd=None,
         script='#!/bin/sh\nexec '+shlex.join([sys.executable,'-B','-I',str(hook)])+' "$@"\n'
         for name in ('open','browser'):
             path=session.hookdir/name;path.write_text(script);path.chmod(0o700)
-        env=dict(session.env)
+        from .session_telemetry import Telemetry
+        telemetry=Telemetry('agy',executable)
+        env=dict(session.env);env.update(telemetry.environment)
         if environment_factory:env.update(environment_factory(session.local,executable))
         env.update(ANTIGRAVITY_VSCODE_HOST='1',DAGAMI_AUTH_PORT=str(session.capture.server_port),DAGAMI_AUTH_TOKEN=session.token,BROWSER=str(session.hookdir/'browser'),PATH=str(session.hookdir)+os.pathsep+os.environ.get('PATH','/usr/bin:/bin'))
         master,slave=pty.openpty()
@@ -109,7 +111,9 @@ def run_cli(executable,profile,args=None,environment_factory=None,stdin_fd=None,
             def terminate(signum,frame):raise SystemExit(128+signum)
             for signum in (signal.SIGTERM,signal.SIGHUP):old_signals[signum]=signal.signal(signum,terminate)
         helper=Path(__file__).resolve().parent.parent/'native/macos/cli_pty_exec.py'
-        process=Launcher.launch(sys.executable,['-B','-I',str(helper),str(executable),*(args or [])],env,stdin=slave,stdout=slave,stderr=slave,new_session=True)
+        process=Launcher.launch(sys.executable,['-B','-I',str(helper),str(executable),*telemetry.flags,*(args or [])],env,stdin=slave,stdout=slave,stderr=slave,new_session=True)
+        from .terminal_sessions import TerminalSession
+        monitor=TerminalSession("agy",profile,process,session.local,telemetry=telemetry).start()
         os.close(slave);slave=None
         worker=threading.Thread(target=dispatch,daemon=True,name='DagamiCLILogin');worker.start()
         if os.isatty(input_fd):original=termios.tcgetattr(input_fd);tty.setraw(input_fd)
@@ -156,6 +160,8 @@ def run_cli(executable,profile,args=None,environment_factory=None,stdin_fd=None,
         code=process.wait()
         return code if code>=0 else 128-code
     finally:
+        if monitor:monitor.close()
+        if telemetry:telemetry.close()
         if original is not None:
             try:termios.tcsetattr(input_fd,termios.TCSADRAIN,original)
             except (OSError,termios.error):pass

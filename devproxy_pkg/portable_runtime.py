@@ -113,7 +113,10 @@ def descriptor(app):
     app_adapter(app)
     return runtime_dir() / f'{app}.json'
 
-def request(app, command='status', **data):
+def request(app, command='status', _timeout=None, **data):
+    if app.startswith('cli_'):
+        from .terminal_sessions import request as terminal_request
+        return terminal_request(app,command,timeout=_timeout if _timeout is not None else 10)
     
     path = descriptor(app)
     try:
@@ -127,7 +130,7 @@ def request(app, command='status', **data):
     if len(body) > 32768:
         raise ValueError('Запрос слишком большой.')
     import http.client
-    client = http.client.HTTPConnection('127.0.0.1', record['port'], timeout=60 if command in ('open','login') else 15)
+    client = http.client.HTTPConnection('127.0.0.1', record['port'], timeout=_timeout if _timeout is not None else (60 if command in ('open','login') else 15))
     try:
         client.request('POST', '/', body, {'Authorization': 'Bearer ' + record['token'], 'Content-Type': 'application/json'})
         reply = client.getresponse()
@@ -251,7 +254,8 @@ def serve_session(app, profile_name):
     exe = executable(adapter)
     from .macos_backend import checked_executable
     checked_executable(app)
-    profile = load_profile(profile_name)
+    from .launch_policy import route_profile,environment as launch_environment,clean_flags
+    profile = route_profile(app,load_profile(profile_name))
     stop = threading.Event(); guard = threading.RLock(); processes = []; applications=[]; retired=set();auth_url=''
     token = secrets.token_hex(32)
     path = descriptor(app)
@@ -262,10 +266,13 @@ def serve_session(app, profile_name):
         if os.name!='nt':(runtime_dir()/(app+'.log')).chmod(0o600)
         tunnel = LocalTunnel(profile)
         local = f'http://127.0.0.1:{tunnel.start()}'
+        from .session_telemetry import Telemetry
+        telemetry=Telemetry(app,exe)
         env = {key: local for key in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy','AG_LS_PROXY','AGY_PROXY_URL','agy_proxy_url')}
+        env.update(telemetry.environment)
         env.update(NO_PROXY='localhost,127.0.0.1,::1', no_proxy='localhost,127.0.0.1,::1')
         try:
-            env.update(adapter.get_launch_environment(local,exe))
+            env.update(launch_environment(adapter,local,exe))
         except BaseException:
             tunnel.stop()
             raise
@@ -280,7 +287,7 @@ def serve_session(app, profile_name):
                 raise ValueError('Некорректные аргументы приложения.')
             if cwd is not None and (not isinstance(cwd,str) or not Path(cwd).is_absolute() or not Path(cwd).is_dir()):raise ValueError('Некорректный рабочий каталог.')
             if not any(alive(p) for p in applications) and getattr(adapter,'isolated_browser',False) is not True:require_stopped(exe)
-            proc=Launcher.launch(exe, flags + args, env, cwd=cwd or str(Path(exe).parent),job_manager=job,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+            proc=Launcher.launch(exe, flags + clean_flags(args), env, cwd=cwd or str(Path(exe).parent),job_manager=job,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             processes.append(proc);applications.append(proc)
             try:proc.wait(timeout=.35)
             except subprocess.TimeoutExpired:pass
@@ -326,7 +333,7 @@ def serve_session(app, profile_name):
                             auth_url=url
                             log.info('Login browser launched app=%s',app)
                         elif command not in ('status','authStatus'): raise ValueError('Неизвестная команда.')
-                    result = {'app': app, 'application':adapter.display_name, 'executable':exe, 'application_pids':[p.pid for p in applications if alive(p)], 'profile': profile_name, 'pid': os.getpid(), 'bridge': local, 'running': any(alive(p) for p in applications), 'browser_running': any(alive(p) for p in processes if p not in applications), 'account_verified': False,'auth_route':1}
+                    result = {'app': app, 'application':adapter.display_name, 'executable':exe, 'application_pids':[p.pid for p in applications if alive(p)], 'profile': profile_name, 'pid': os.getpid(), 'bridge': local, 'running': any(alive(p) for p in applications), 'browser_running': any(alive(p) for p in processes if p not in applications), 'account_verified': False,'auth_route':1,'telemetry':telemetry.snapshot()}
                     if command=='authStatus':result['url']=auth_url
                     body = json.dumps(result).encode(); status = 200
                 except Exception as exc:
@@ -352,6 +359,7 @@ def serve_session(app, profile_name):
                     idle=0 if live else idle+1
                     if processes and idle>=10 and os.name!='nt':break
         finally:
+            telemetry.close()
             server.shutdown(); server.server_close()
             errors=[]
             for proc in processes:
@@ -407,6 +415,9 @@ def main(argv=None):
             for adapter in list_adapters():
                 data=request(adapter.app_id)
                 if data: print(json.dumps(data,ensure_ascii=False))
+            from .terminal_sessions import list_sessions,legacy_sessions
+            terminals=list_sessions();terminals+=legacy_sessions({row.get('pid') for row in terminals})
+            for value in terminals:print(json.dumps(value,ensure_ascii=False))
         elif args.command=='session':serve_session(args.app,args.profile)
         elif args.command=='run':
             if app_adapter(args.app).is_cli:
@@ -415,8 +426,21 @@ def main(argv=None):
                 checked_executable(args.app)
                 if sys.platform=='darwin' and args.app=='agy':
                     from .cli_auth_runtime import run_cli
-                    return run_cli(exe,args.profile,[*adapter.launch_flags(load_profile(args.profile),exe),*extra],adapter.get_launch_environment)
-                process,_=Launcher.launch_with_tunnel(exe,load_profile(args.profile),adapter.launch_flags(load_profile(args.profile),exe),extra,wait=True,environment_factory=adapter.get_launch_environment)
+                    from .launch_policy import environment as launch_environment
+                    return run_cli(exe,args.profile,[*adapter.launch_flags(load_profile(args.profile),exe),*extra],lambda local,path:launch_environment(adapter,local,path))
+                from .launch_policy import route_profile,environment as launch_environment
+                selected=route_profile(args.app,load_profile(args.profile))
+                session_factory=None;telemetry=None;flags=adapter.launch_flags(selected,exe)
+                environment_factory=lambda local,path:launch_environment(adapter,local,path)
+                if sys.platform=='darwin':
+                    from .terminal_sessions import TerminalSession
+                    from .session_telemetry import Telemetry
+                    telemetry=Telemetry(args.app,exe);flags=telemetry.flags+flags
+                    def environment_factory(local,executable):return dict(launch_environment(adapter,local,executable),**telemetry.environment)
+                    session_factory=lambda process,local:TerminalSession(args.app,args.profile,process,local,telemetry=telemetry).start()
+                try:process,_=Launcher.launch_with_tunnel(exe,selected,flags,extra,wait=True,environment_factory=environment_factory,session_factory=session_factory)
+                finally:
+                    if telemetry:telemetry.close()
                 return process.returncode
             data=start_session(args.app,args.profile,extra); print(json.dumps(data,ensure_ascii=False))
             if args.wait:

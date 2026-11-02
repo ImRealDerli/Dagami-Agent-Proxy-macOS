@@ -33,3 +33,11 @@ PYTHONPATH=../BuildTools python3 tools/build_dmg.py
 Проверенные зависимости и драйверы двух архитектур находятся в `devproxy_pkg/assets/webdriver`. Для их обновления есть `tools/prepare_webdriver.py` и `tools/requirements-webdriver.txt`. Обновление драйвера требует проверки его совместимости с браузером, SHA-256 в manifest и записей доверенных бинарников в `tools/source-policy.json`.
 
 Сборки сейчас не нотарифицированы Apple. Ad-hoc подпись проверяет целостность пакета, но не подтверждает личность разработчика. Не публикуйте артефакты со сбоями проверки подписи.
+
+## Логотипы интерфейса
+
+Готовые логотипы не требуют дополнительных библиотек при запуске. Чтобы повторно подготовить их из исходных SVG, установите зависимости из `tools/requirements-brand-icons.txt` в отдельное окружение и запустите `python3 tools/prepare_brand_icons.py`. Используется resvg, поскольку нативный ImageIO некорректно масштабирует некоторые SVG-маски. SVG, лицензии, URL и SHA-256 сохранены в `native/macos/BrandIcons`. VS Code использует официальный PNG 1024 px.
+
+Маленькие иконки для реальных размеров интерфейса готовит `python3 tools/prepare_icon_rasters.py` (Pillow из requirements-brand-icons.txt). Скрипт загрузки логотипов вызывает его автоматически. Готовые размеры и SHA-256 сохранены в BrandIcons/raster-manifest.json. При запуске приложение использует AppKit и готовые варианты, дополнительных Python-зависимостей для иконок не требуется.
+
+Если Xcode требует незавершённую настройку, сборку можно выполнить с установленными Command Line Tools: `DEVELOPER_DIR=/Library/Developer/CommandLineTools python3 tools/build_universal.py`.

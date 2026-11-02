@@ -20,11 +20,11 @@ def parse_connection(raw,name):
     return profile
 
 
-def save_connection(name,raw,replace=False):
+def save_connection(name,raw,replace=False,settings=None):
     profile=parse_connection(raw,name);name=profile.name
     old=StateManager.get_profile(name)
     if old and not replace:raise ValueError('Профиль уже существует. Откройте «Изменить прокси» или выберите другое имя.')
-    previous=SecretStore.get_password(name)
+    previous=SecretStore.get_password(name) if profile.password or (old and (old.get("requires_password") or old.get("username"))) else None
     if old and old.get('requires_password') and previous is None:
         raise RuntimeError('Прежний пароль недоступен. Разблокируйте Keychain и повторите сохранение.')
     data=profile.to_dict()
@@ -34,6 +34,9 @@ def save_connection(name,raw,replace=False):
     data.pop('password',None);data['requires_password']=bool(profile.password)
     if profile.protocol=='direct':data['proxy_enabled']=False
     elif not old or old.get('protocol')=='direct':data['proxy_enabled']=True
+    if settings is not None:
+        for key in ("proxy_enabled","smart_dns","dns_endpoints","dns_scope","dns_domains"):
+            if key in settings:data[key]=settings[key]
     changed=False
     try:
         if profile.password:

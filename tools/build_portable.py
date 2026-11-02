@@ -80,7 +80,7 @@ def main():
     names=['.gitignore','.gitattributes','.gitleaks.toml','.githooks/pre-commit',
            'devproxy_gui.py','pyproject.toml','PORTABLE.md','BUILD_LINUX_MACOS.md',
            'MACOS_PORT.md','README.md','MATRIX.md','APPLICATIONS.md','BUG_REPORTS.md','RELEASE_NOTES.md','CHANGELOG.md','AGENTS.md',
-           'SYSTEM_DNS.md','SOURCE_POLICY.md','STARTUP.md','LICENSE',
+           'SYSTEM_DNS.md','SOURCE_POLICY.md','STARTUP.md','LICENSE','UPSTREAM_0_4_1.md','docs/SESSION_MONITORING.md',
            'tools/build_portable.py','tools/build_native_app.py','tools/install_portable.py','install.sh',
            'src/SystemDns.ps1','src/app.manifest',*['src/'+name for name in NATIVE_SOURCES]]
     staged=output/('source-'+uuid.uuid4().hex+'.tmp')

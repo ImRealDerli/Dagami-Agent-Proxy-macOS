@@ -129,6 +129,15 @@ class WindowsCredentialStore:
 
 
 class MacOSKeychainStore:
+    last_error = ''
+
+    @staticmethod
+    def keychain(account=None):
+        if sys.platform == 'darwin' or os.environ.get('DAGAMI_BUNDLED_ENGINE') == '1':
+            from .macos_security_tool import SecurityToolKeychain
+            return SecurityToolKeychain(account=account)
+        from .macos_keychain import Keychain
+        return Keychain(account=account)
     
     @classmethod
     def is_available(cls) -> bool:
@@ -137,27 +146,27 @@ class MacOSKeychainStore:
     @classmethod
     def set_password(cls, profile_name, username, password):
         if not cls.is_available():return False
-        from .macos_keychain import Keychain
+        cls.last_error = ''
         try:
-            Keychain(account="dagami-profile-v2").set(f"{SERVICE_NAME}:{profile_name}", "dagami-profile-v2", password)
+            cls.keychain(account="dagami-profile-v2").set(f"{SERVICE_NAME}:{profile_name}", "dagami-profile-v2", password)
             return True
-        except (OSError, RuntimeError):return False
+        except (OSError, RuntimeError) as error:
+            cls.last_error = str(error)
+            return False
 
     @classmethod
     def get_password(cls, profile_name):
         if not cls.is_available():return None
-        from .macos_keychain import Keychain
         service=f"{SERVICE_NAME}:{profile_name}"
-        value=Keychain(account="dagami-profile-v2").get(service)
-        return value if value is not None else Keychain().get(service)
+        value=cls.keychain(account="dagami-profile-v2").get(service)
+        return value if value is not None else cls.keychain().get(service)
 
     @classmethod
     def delete_password(cls, profile_name):
         if not cls.is_available():return False
-        from .macos_keychain import Keychain
         service=f"{SERVICE_NAME}:{profile_name}"
-        if not Keychain(account="dagami-profile-v2").delete(service):return False
-        legacy=Keychain()
+        if not cls.keychain(account="dagami-profile-v2").delete(service):return False
+        legacy=cls.keychain()
         for _ in range(64):
             if legacy.get(service) is None:return True
             if not legacy.delete(service):return False

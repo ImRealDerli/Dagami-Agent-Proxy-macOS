@@ -3,4 +3,4 @@
 
 
 
-__version__ = "0.4.0b0+mac.26"
+__version__ = "0.4.1b0+mac.27"

@@ -19,10 +19,15 @@ import urllib.parse
 from typing import Optional
 from .profile import ProxyProfile
 from .transport import AdaptiveTLSGate, tune_socket, FastDuplexRelay
+from .peer_identity import is_current_user
+from . import http_wire
 
 
 class LocalTunnel:
+    MAX_CONNECTIONS = 128
     def __init__(self, profile: ProxyProfile, bind_host: str = "127.0.0.1", bind_port: int = 0):
+        if not ipaddress.ip_address(bind_host).is_loopback:
+            raise ValueError("The application proxy must bind loopback")
         self.profile = profile
         from .smart_dns import Resolver
         self.resolver = Resolver(profile.dns_endpoints,profile.dns_padding) if profile.smart_dns else None
@@ -33,15 +38,18 @@ class LocalTunnel:
         self._thread: Optional[threading.Thread] = None
         self.allocated_port: int = 0
         self.tls_gate = AdaptiveTLSGate()
-        self._slots = threading.BoundedSemaphore(128)
         self._connections = set()
+        self._work_slots = threading.BoundedSemaphore(self.MAX_CONNECTIONS)
         self._connections_lock = threading.Lock()
 
     def start(self, timeout: float = 3.0) -> int:
-        
+
         family = socket.AF_INET6 if ":" in self.bind_host else socket.AF_INET
         self.server_sock = socket.socket(family, socket.SOCK_STREAM)
-        self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+            self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        else:
+            self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_sock.bind((self.bind_host, self.bind_port))
         self.server_sock.listen(128)
         self.allocated_port = self.server_sock.getsockname()[1]
@@ -50,7 +58,7 @@ class LocalTunnel:
         self._thread = threading.Thread(target=self._serve_loop, daemon=True, name="DevProxyTunnel")
         self._thread.start()
 
-                         
+
         t0 = time.time()
         while time.time() - t0 < timeout:
             try:
@@ -63,7 +71,7 @@ class LocalTunnel:
         return self.allocated_port
 
     def stop(self):
-        
+
         self.is_running = False
         if self.server_sock:
             try:
@@ -88,29 +96,41 @@ class LocalTunnel:
         while self.is_running:
             try:
                 client_sock, addr = self.server_sock.accept()
-                tune_socket(client_sock)
-                if not self._slots.acquire(blocking=False):
-                    client_sock.settimeout(1)
-                    try:client_sock.sendall(b'HTTP/1.1 503 Service Unavailable\r\nContent-Length: 0\r\nConnection: close\r\n\r\n')
-                    except OSError:pass
-                    client_sock.close()
+                if not self._work_slots.acquire(blocking=False):
+                    try:
+                        client_sock.settimeout(.5)
+                        client_sock.sendall(b'HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\nContent-Length: 0\r\n\r\n')
+                    finally:
+                        client_sock.close()
                     continue
-                t = threading.Thread(target=self._limited_client, args=(client_sock,), daemon=True)
-                t.start()
+                try:
+                    self._track_socket(client_sock, True)
+                    tune_socket(client_sock)
+                    threading.Thread(target=self._limited_client, args=(client_sock,), daemon=True).start()
+                except Exception:
+                    self._track_socket(client_sock, False)
+                    client_sock.close()
+                    self._work_slots.release()
+                    raise
             except Exception:
                 if not self.is_running:
                     break
 
     def _limited_client(self, client_sock):
         try:self._handle_client(client_sock)
-        finally:self._slots.release()
+        finally:self._work_slots.release()
 
     def _handle_client(self, client_sock: socket.socket):
         upstream_sock = None
         response_started = False
-        self._track_socket(client_sock, True)
+        def started():
+            nonlocal response_started
+            response_started = True
         try:
             client_sock.settimeout(15.0)
+            if not is_current_user(client_sock):
+                client_sock.sendall(b'HTTP/1.1 403 Forbidden\r\nConnection: close\r\nContent-Length: 0\r\n\r\n')
+                return
             req_data = self._recv_headers(client_sock)
             header_end = req_data.find(b"\r\n\r\n") + 4
             header_bytes = req_data[:header_end]
@@ -128,7 +148,7 @@ class LocalTunnel:
                 return
 
             method, target_uri, proto = parts[0].upper(), parts[1], parts[2]
-            
+
             dest_host = ""
             dest_port = 80
 
@@ -137,7 +157,7 @@ class LocalTunnel:
                 dest_host = parsed_target.hostname or ""
                 dest_port = parsed_target.port or 443
             else:
-                                                                                                         
+
                 if target_uri.startswith("http://") or target_uri.startswith("https://"):
                     p = urllib.parse.urlsplit(target_uri)
                     dest_host = p.hostname
@@ -164,9 +184,9 @@ class LocalTunnel:
                 client_sock.sendall(b'HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n')
                 return
 
-                                                                           
-                                                                            
-                                                                                   
+
+
+
             try:
                 address = ipaddress.ip_address('127.0.0.1' if dest_host.lower() == 'localhost' else dest_host)
                 address = getattr(address, 'ipv4_mapped', None) or address
@@ -198,17 +218,18 @@ class LocalTunnel:
                     response_started = True
                     self._send_initial(upstream_sock,initial_payload)
                 else:
-                    local_header = self._origin_form_request(header_bytes, target_uri)
-                    safe = [line for line in local_header.split(b'\r\n') if line and
-                            line.split(b':', 1)[0].strip().lower() not in (b'proxy-authorization', b'proxy-connection', b'connection')]
-                    upstream_sock.sendall(b'\r\n'.join(safe) + b'\r\nConnection: close\r\n\r\n' + initial_payload)
+                    authority = f'[{dest_host}]:{dest_port}' if ':' in dest_host else f'{dest_host}:{dest_port}'
+                    absolute_target = target_uri if target_uri.startswith(('http://', 'https://')) else 'http://' + authority + target_uri
+                    outgoing = http_wire.request_headers(header_bytes, absolute_target, False)
+                    http_wire.exchange(client_sock, upstream_sock, header_bytes, outgoing, initial_payload, started, FastDuplexRelay.pipe)
+                    return
                 client_sock.settimeout(None)
                 upstream_sock.settimeout(None)
                 response_started = True
                 FastDuplexRelay.pipe(client_sock, upstream_sock, self.profile.tls_fragment)
                 return
 
-                                                                                     
+
             try:
                 upstream_sock = self._open_upstream_socket()
             except TimeoutError:
@@ -216,14 +237,14 @@ class LocalTunnel:
                 client_sock.close()
                 return
             except Exception:
-                                                                
+
                 client_sock.sendall(b"HTTP/1.1 502 Bad Gateway (Proxy Unreachable)\r\n\r\n")
                 client_sock.close()
                 return
 
-                                                              
+
             if self.profile.is_socks:
-                                    
+
                 if not self._socks5_connect_upstream(upstream_sock, dest_host, dest_port):
                     client_sock.sendall(b"HTTP/1.1 502 Bad Gateway (SOCKS5 Handshake Failed)\r\n\r\n")
                     client_sock.close()
@@ -231,16 +252,23 @@ class LocalTunnel:
                     return
 
                 if method == "CONNECT":
-                                                                 
+
                     client_sock.sendall(b"HTTP/1.1 200 Connection established\r\n\r\n")
                 else:
-                                                                           
-                    upstream_sock.sendall(self._origin_form_request(header_bytes, target_uri) + initial_payload)
+
+                    if target_uri.startswith('https://'):
+                        upstream_sock = ssl.create_default_context().wrap_socket(upstream_sock, server_hostname=dest_host)
+                        self._track_socket(upstream_sock, True)
+                    authority = f'[{dest_host}]:{dest_port}' if ':' in dest_host else f'{dest_host}:{dest_port}'
+                    absolute_target = target_uri if target_uri.startswith(('http://', 'https://')) else 'http://' + authority + target_uri
+                    outgoing = http_wire.request_headers(header_bytes, absolute_target, False)
+                    http_wire.exchange(client_sock, upstream_sock, header_bytes, outgoing, initial_payload, started, FastDuplexRelay.pipe)
+                    return
 
             else:
-                                              
+
                 if method == "CONNECT":
-                                                                                         
+
                     resp_buf, response_end, status_code = self._http_proxy_connect(upstream_sock,dest_host,dest_port)
                     if status_code==403 and dest_host.lower().rstrip('.')=='accounts.google.ru' and dest_port==443 and self.profile.host.lower().rstrip('.') in ('test-dns.dagami.ru','dns.dagami.ru'):
                         self._track_socket(upstream_sock,False);upstream_sock.close()
@@ -251,24 +279,26 @@ class LocalTunnel:
                         client_sock.close()
                         upstream_sock.close()
                         return
-                    
-                                          
+
+
                     client_sock.sendall(b"HTTP/1.1 200 Connection established\r\n\r\n")
                     if response_end < len(resp_buf):
                         client_sock.sendall(resp_buf[response_end:])
                 else:
-                                                                            
-                    if self.profile.has_auth and b"proxy-authorization:" not in header_bytes.lower():
+                    authorization = None
+                    if self.profile.has_auth:
                         cred = f"{self.profile.username or ''}:{self.profile.password or ''}"
-                        b64 = base64.b64encode(cred.encode("utf-8")).decode("ascii")
-                        auth_hdr = f"Proxy-Authorization: Basic {b64}\r\n".encode("latin-1")
-                        header_bytes = header_bytes.replace(b"\r\n", b"\r\n" + auth_hdr, 1)
-                    upstream_sock.sendall(header_bytes + initial_payload)
+                        authorization = b'Basic ' + base64.b64encode(cred.encode('utf-8'))
+                    authority = f'[{dest_host}]:{dest_port}' if ':' in dest_host else f'{dest_host}:{dest_port}'
+                    absolute_target = target_uri if target_uri.startswith(('http://', 'https://')) else 'http://' + authority + target_uri
+                    outgoing = http_wire.request_headers(header_bytes, absolute_target, True, authorization)
+                    http_wire.exchange(client_sock, upstream_sock, header_bytes, outgoing, initial_payload, started, FastDuplexRelay.pipe)
+                    return
 
             if method == "CONNECT" and initial_payload:
                 self._send_initial(upstream_sock,initial_payload)
 
-                                                                                                
+
             client_sock.settimeout(None)
             upstream_sock.settimeout(None)
             response_started = True
@@ -349,23 +379,26 @@ class LocalTunnel:
     def _track_socket(self, sock: socket.socket, add: bool):
         with self._connections_lock:
             if add:
+                if not self.is_running:
+                    sock.close()
+                    raise RuntimeError('Tunnel is stopping')
                 self._connections.add(sock)
             else:
                 self._connections.discard(sock)
 
     def _socks5_connect_upstream(self, sock: socket.socket, host: str, port: int) -> bool:
-        
+
         try:
             sock.settimeout(10.0)
             if self.profile.has_auth:
                 sock.sendall(b"\x05\x02\x00\x02")
             else:
                 sock.sendall(b"\x05\x01\x00")
-            
+
             resp = self._recv_exact(sock, 2)
             if len(resp) < 2 or resp[0] != 0x05:
                 return False
-            
+
             auth_method = resp[1]
             if auth_method == 0x02:
                 user_b = (self.profile.username or "").encode("utf-8")
@@ -378,7 +411,7 @@ class LocalTunnel:
             elif auth_method != 0x00:
                 return False
 
-                                           
+
             hb = host.encode("utf-8")
             pb = port.to_bytes(2, byteorder="big")
             cmd = bytearray([0x05, 0x01, 0x00, 0x03, len(hb)]) + hb + pb
@@ -387,14 +420,14 @@ class LocalTunnel:
             conn_resp = self._recv_exact(sock, 4)
             if len(conn_resp) < 4 or conn_resp[1] != 0x00:
                 return False
-            
+
             atyp = conn_resp[3]
             if atyp == 0x01: self._recv_exact(sock, 4 + 2)
             elif atyp == 0x03:
                 dlen = self._recv_exact(sock, 1)[0]
                 self._recv_exact(sock, dlen + 2)
             elif atyp == 0x04: self._recv_exact(sock, 16 + 2)
-            
+
             return True
         except Exception:
             return False

@@ -27,15 +27,11 @@ def snapshot():
             if AntigravityIDEAdapter.identify(adapter.detect_executable() or '') and not request(adapter.app_id):continue
         try:path=executable(adapter)
         except Exception:path=''
-        from devproxy_pkg.macos_backend import record
-        from devproxy_pkg.codex_preparation import status as codex_status
-        prepared=codex_status(adapter.app_id) if adapter.app_id in ('codex','codex-gui') else bool(record(adapter.app_id))
-        if adapter.app_id=='chatgpt':
-            from devproxy_pkg.chatgpt_preparation import status as chatgpt_status
-            prepared=chatgpt_status()
+        from devproxy_pkg.preparation_state import inspect as preparation_state
+        preparation=preparation_state(adapter.app_id);prepared=preparation['prepared']
         from devproxy_pkg.macos_architecture import compatibility_error
         launch_error=compatibility_error(path) if path else None
-        apps.append({'launchError':launch_error,'prepared':prepared,'id':adapter.app_id,'name':adapter.display_name,'path':path,'installed':bool(path)})
+        apps.append({'preparationError':preparation['error'] or None,'recoverable':preparation['recoverable'],'launchError':launch_error,'prepared':prepared,'id':adapter.app_id,'name':adapter.display_name,'path':path,'installed':bool(path)})
     try:services=backend().services()
     except Exception:services=[]
     try:dns=json.loads((Store().root/'status.json').read_text());dns_status=dns.get('status','Не настроен')
@@ -45,11 +41,38 @@ def snapshot():
     from devproxy_pkg.portable_startup import Startup
     try:startup=Startup(command=[os.environ['DAGAMI_NATIVE_APP']]).enabled()
     except Exception:startup=False
-    return {'profiles':profiles,'apps':apps,'services':services,'systemDNS':dns_status,'activated':active,'startup':startup,'providers':PROVIDERS}
+    from devproxy_pkg.session_telemetry import enabled as monitoring_enabled
+    from devproxy_pkg.desktop_monitoring import installed as desktop_monitoring
+    return {'monitoring':monitoring_enabled(),'desktopMonitoring':desktop_monitoring(),'profiles':profiles,'apps':apps,'services':services,'systemDNS':dns_status,'activated':active,'startup':startup,'providers':PROVIDERS}
 
 def perform(data):
     action=data.get('action');args=data.get('args',{})
     if action=='snapshot':return snapshot()
+    if action=='sessionMonitoring':
+        state=StateManager.load_state();state['session_monitoring']=bool(args['enabled']);StateManager.save_state(state);return 'Настройка статистики сохранена. Для новых подключений перезапустите нужный клиент.'
+    if action=='desktopMonitoring':
+        from devproxy_pkg.desktop_monitoring import configure
+        return configure(bool(args['enabled']))
+    if action=='sessionQuota':
+        from devproxy_pkg.macos_activity import sessions
+        row=next((r for r in sessions() if r['id']==args['session']),None)
+        if not row:raise ValueError('Сессия уже завершилась.')
+        app=row.get('app') or row['id']
+        if app in ('antigravity','antigravity-ide'):
+            from devproxy_pkg.antigravity_limits import for_session
+        else:
+            from devproxy_pkg.codex_limits import for_session
+        return for_session(args['session'])
+    if action in ('profileDetails','profileSave','profileDelete'):
+        from devproxy_pkg import macos_profile_editor
+        name=args['name']
+        if action=='profileDetails':return macos_profile_editor.details(name)
+        if AUTH.session and not AUTH.session.closed and AUTH.session.profile==name:raise ValueError('Сначала завершите вход, который использует этот профиль.')
+        if action=='profileDelete':return macos_profile_editor.delete(name)
+        return macos_profile_editor.save(name,args,replace=args.get('replace',False))
+    if action in ('sessions','journalEntries'):
+        from devproxy_pkg import macos_activity
+        return macos_activity.sessions() if action=='sessions' else macos_activity.entries()
     if action in ('updateCheck','updateInstall','updateAck'):
         from devproxy_pkg import macos_updates
         if action=='updateCheck':return macos_updates.check(args.get('profile',''))
@@ -127,9 +150,10 @@ def perform(data):
         return save_connection(args['name'],args['url'],replace=args.get('replace',False))
     if action=='launch':return launch_desktop_app(args['app'],args['profile'])
     if action=='stop':return request(args['app'],'stop') or 'Сессия не запущена'
-    if action=='check':
+    if action in ('check','checkConnection'):
         from devproxy_pkg.core.validator import ProxyValidator
         profile=load_profile(args['profile']);r=ProxyValidator.validate(profile,timeout=12)
+        if action=='checkConnection':return {'success':r.overall_success,'targets':r.target_checks,'errors':r.errors}
         return '\n'.join(('✓ ' if v['success'] else '✕ ')+v['name']+': '+('TLS проверен' if v['success'] else v['error'] or 'Нет ответа') for v in r.target_checks) or '; '.join(r.errors)
     if action=='probeDNS':
         from devproxy_pkg.core.smart_dns import Resolver
@@ -182,7 +206,11 @@ if __name__=='__main__':
             data=json.loads(line)
             value=perform(data)
             from devproxy_pkg.journal import append
-            try:append(data.get('action','unknown'),True,str(value))
+            try:
+                if data.get('action')=='checkConnection':
+                    text='\n'.join(('✓ ' if v['success'] else '✕ ')+v['name']+': '+('TLS проверен' if v['success'] else v.get('error') or 'Нет ответа') for v in value['targets']) or '; '.join(value['errors'])
+                    append('check',value['success'],text)
+                else:append(data.get('action','unknown'),True,str(value))
             except Exception:pass
             answer={'ok':True,'result':value}
         except Exception as exc:

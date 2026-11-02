@@ -12,6 +12,9 @@ def active_sessions(profile):
     for adapter in list_adapters():
         status=request(adapter.app_id)
         if status and status.get('profile')==profile:result.append((adapter.app_id,adapter.display_name))
+    from .terminal_sessions import list_sessions,legacy_sessions
+    terminals=list_sessions();terminals+=legacy_sessions({row.get('pid') for row in terminals})
+    result.extend((row['id'],row.get('application','CLI')) for row in terminals if row.get('profile')==profile)
     return result
 
 

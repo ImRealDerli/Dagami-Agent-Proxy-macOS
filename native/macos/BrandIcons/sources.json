@@ -1,0 +1,310 @@
+{
+  "sources": [
+    "https://github.com/lobehub/lobe-icons",
+    "https://github.com/simple-icons/simple-icons",
+    "https://github.com/VSCodium/vscodium"
+  ],
+  "conversion": "resvg-py 0.5.0; SVG rendered at 1024px with antialiasing; official VS Code PNG unchanged",
+  "icons": [
+    {
+      "file": "antigravity-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/antigravity-color.svg",
+      "sha256": "97cfe5b0ebf1ea0908c1dbb061d7fafe52da619fb70dee60c64a2661e1fc566d",
+      "svg": "svg/antigravity.svg",
+      "svg_sha256": "652128cf55a28bb958563ee372d0bd00208d9e6fd446f523f77aafd811eef8ca",
+      "size": 1024
+    },
+    {
+      "file": "antigravity-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/antigravity-color.svg",
+      "sha256": "97cfe5b0ebf1ea0908c1dbb061d7fafe52da619fb70dee60c64a2661e1fc566d",
+      "svg": "svg/antigravity.svg",
+      "svg_sha256": "652128cf55a28bb958563ee372d0bd00208d9e6fd446f523f77aafd811eef8ca",
+      "size": 1024
+    },
+    {
+      "file": "openai-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/openai.svg",
+      "sha256": "6ea0dc97ff9337a52f77ef6e74ebaa5750d2de7e567ddbacf6e28a89708e4146",
+      "svg": "svg/openai.svg",
+      "svg_sha256": "a595df6b423920c67a7f8f73c063e4bfb72d415948097b6cac063a2366bb5186",
+      "size": 1024
+    },
+    {
+      "file": "openai-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/openai.svg",
+      "sha256": "2a45989a32e6c1ebff7213f29cd6098d3e81adb421b9e148a3a487a8bb75f608",
+      "svg": "svg/openai.svg",
+      "svg_sha256": "a595df6b423920c67a7f8f73c063e4bfb72d415948097b6cac063a2366bb5186",
+      "size": 1024
+    },
+    {
+      "file": "claude-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/claude-color.svg",
+      "sha256": "9ea7ebe47ebda03b809dfd887d11c68699d7fc2341f5261620377a7ff41f392f",
+      "svg": "svg/claude.svg",
+      "svg_sha256": "a3101f3047a119aa11825ad9369510f0c472428c8c52d420e31bc62db44a8364",
+      "size": 1024
+    },
+    {
+      "file": "claude-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/claude-color.svg",
+      "sha256": "9ea7ebe47ebda03b809dfd887d11c68699d7fc2341f5261620377a7ff41f392f",
+      "svg": "svg/claude.svg",
+      "svg_sha256": "a3101f3047a119aa11825ad9369510f0c472428c8c52d420e31bc62db44a8364",
+      "size": 1024
+    },
+    {
+      "file": "gemini-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/gemini-color.svg",
+      "sha256": "bf1f012a8c816e2b7d4eeb9cb915f6458921289ceece6aac132bbbff0be45977",
+      "svg": "svg/gemini.svg",
+      "svg_sha256": "8ab0a9bafec11f7e69bcb9fc4ffd8f1bc927d1ddcbbb6ff36dee5ae8b5a9d602",
+      "size": 1024
+    },
+    {
+      "file": "gemini-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/gemini-color.svg",
+      "sha256": "bf1f012a8c816e2b7d4eeb9cb915f6458921289ceece6aac132bbbff0be45977",
+      "svg": "svg/gemini.svg",
+      "svg_sha256": "8ab0a9bafec11f7e69bcb9fc4ffd8f1bc927d1ddcbbb6ff36dee5ae8b5a9d602",
+      "size": 1024
+    },
+    {
+      "file": "github-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/github.svg",
+      "sha256": "127afad87a3584f36bcc356d566ef16aa24334c49f4bc5a0d56e7b2b5d21457b",
+      "svg": "svg/github.svg",
+      "svg_sha256": "1bd763b5d53ab1618e0afce72aacffc7e93d1249c395f713b3b055c087526625",
+      "size": 1024
+    },
+    {
+      "file": "github-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/github.svg",
+      "sha256": "96eefbbd72260743ed9ee0576d50bf2072c20d296e625ce1342c9b204fa45add",
+      "svg": "svg/github.svg",
+      "svg_sha256": "1bd763b5d53ab1618e0afce72aacffc7e93d1249c395f713b3b055c087526625",
+      "size": 1024
+    },
+    {
+      "file": "deepseek-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/deepseek-color.svg",
+      "sha256": "fa01191011173101692acef2ad087de00f4180b203b734eb734e99a6ff6175ff",
+      "svg": "svg/deepseek.svg",
+      "svg_sha256": "deba5f98a5c1796e20fcac3149bcd7eb8a32f0bdd04d048819400b1f28bd1439",
+      "size": 1024
+    },
+    {
+      "file": "deepseek-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/deepseek-color.svg",
+      "sha256": "fa01191011173101692acef2ad087de00f4180b203b734eb734e99a6ff6175ff",
+      "svg": "svg/deepseek.svg",
+      "svg_sha256": "deba5f98a5c1796e20fcac3149bcd7eb8a32f0bdd04d048819400b1f28bd1439",
+      "size": 1024
+    },
+    {
+      "file": "qwen-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/qwen-color.svg",
+      "sha256": "a09ae23a5d8eff535a8cee73070c872eb2fd4026d617aa9fa860f9a6b9dbe63a",
+      "svg": "svg/qwen.svg",
+      "svg_sha256": "a158a0e3ed5b541e4f91384ece02c3acf0a0d81b7b11a46d77bafb248b09e32c",
+      "size": 1024
+    },
+    {
+      "file": "qwen-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/qwen-color.svg",
+      "sha256": "a09ae23a5d8eff535a8cee73070c872eb2fd4026d617aa9fa860f9a6b9dbe63a",
+      "svg": "svg/qwen.svg",
+      "svg_sha256": "a158a0e3ed5b541e4f91384ece02c3acf0a0d81b7b11a46d77bafb248b09e32c",
+      "size": 1024
+    },
+    {
+      "file": "grok-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/grok.svg",
+      "sha256": "557cae8c78e43a22e81d8c245e3ace12f20b8f11811ff8e1c669bf0b1e0aa452",
+      "svg": "svg/grok.svg",
+      "svg_sha256": "9175fc90c22655160231976c849f25a03b888d7cc0e04c5f1b987b659bb07c95",
+      "size": 1024
+    },
+    {
+      "file": "grok-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/grok.svg",
+      "sha256": "860292e093797632204f94a1b541a93b562f8def716b05ab75162f80fd6f98d4",
+      "svg": "svg/grok.svg",
+      "svg_sha256": "9175fc90c22655160231976c849f25a03b888d7cc0e04c5f1b987b659bb07c95",
+      "size": 1024
+    },
+    {
+      "file": "perplexity-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/perplexity-color.svg",
+      "sha256": "755354e5385be68bfa8c1c2cb60338db97f15b6f1c88b350978fad7330b40119",
+      "svg": "svg/perplexity.svg",
+      "svg_sha256": "8353f3ab20822f1a933224b0ea32cc39f0c32d5740f4af8c254b0f418e0a3a70",
+      "size": 1024
+    },
+    {
+      "file": "perplexity-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/perplexity-color.svg",
+      "sha256": "755354e5385be68bfa8c1c2cb60338db97f15b6f1c88b350978fad7330b40119",
+      "svg": "svg/perplexity.svg",
+      "svg_sha256": "8353f3ab20822f1a933224b0ea32cc39f0c32d5740f4af8c254b0f418e0a3a70",
+      "size": 1024
+    },
+    {
+      "file": "mistral-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/mistral-color.svg",
+      "sha256": "31f27ac42870928673ccb1822a250844245af6f45e2ff193a12092853e0c2a5c",
+      "svg": "svg/mistral.svg",
+      "svg_sha256": "722f74b289d95486b43662fe24fa883b333701296f618406cd0ed502299170b6",
+      "size": 1024
+    },
+    {
+      "file": "mistral-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/mistral-color.svg",
+      "sha256": "31f27ac42870928673ccb1822a250844245af6f45e2ff193a12092853e0c2a5c",
+      "svg": "svg/mistral.svg",
+      "svg_sha256": "722f74b289d95486b43662fe24fa883b333701296f618406cd0ed502299170b6",
+      "size": 1024
+    },
+    {
+      "file": "openrouter-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/openrouter-color.svg",
+      "sha256": "e0655c242b1d8320f617b16e934f2eaca7351212404e772046abdcaab728e14b",
+      "svg": "svg/openrouter.svg",
+      "svg_sha256": "17bede1b89166f824ee06753dc526a3f5e18b769706deaab09d04a3a98de1a78",
+      "size": 1024
+    },
+    {
+      "file": "openrouter-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/openrouter-color.svg",
+      "sha256": "e0655c242b1d8320f617b16e934f2eaca7351212404e772046abdcaab728e14b",
+      "svg": "svg/openrouter.svg",
+      "svg_sha256": "17bede1b89166f824ee06753dc526a3f5e18b769706deaab09d04a3a98de1a78",
+      "size": 1024
+    },
+    {
+      "file": "copilot-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/copilot-color.svg",
+      "sha256": "28ddfee07350d91adec43f973fa8695979566bc0092a7fea165c6ad141d84201",
+      "svg": "svg/copilot.svg",
+      "svg_sha256": "50d59ef2ab0930de15d657dbd21628536b0fee1f2c88306cfb9970cc79b45b92",
+      "size": 1024
+    },
+    {
+      "file": "copilot-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/copilot-color.svg",
+      "sha256": "28ddfee07350d91adec43f973fa8695979566bc0092a7fea165c6ad141d84201",
+      "svg": "svg/copilot.svg",
+      "svg_sha256": "50d59ef2ab0930de15d657dbd21628536b0fee1f2c88306cfb9970cc79b45b92",
+      "size": 1024
+    },
+    {
+      "file": "ollama-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/ollama.svg",
+      "sha256": "01acd4ddb1edabc709c87769e93a55bd61b11a85a31722fd376e070dbf03a4bf",
+      "svg": "svg/ollama.svg",
+      "svg_sha256": "3a268218fb2e6e81fa31df70f70b51331625047794db81db21d35359428fae7a",
+      "size": 1024
+    },
+    {
+      "file": "ollama-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/ollama.svg",
+      "sha256": "4e12ba274f2990757f8bf20ab39449051ef916df5407799b03d45bb8630e9896",
+      "svg": "svg/ollama.svg",
+      "svg_sha256": "3a268218fb2e6e81fa31df70f70b51331625047794db81db21d35359428fae7a",
+      "size": 1024
+    },
+    {
+      "file": "opencode-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/opencode.svg",
+      "sha256": "cc119e1cd4b0b87cc7d5158d84c137a6a5ab5ee6477e064c53486a7465d8efdf",
+      "svg": "svg/opencode.svg",
+      "svg_sha256": "7cfa6e9d6726f7c9fa26c7d9aef0dfec52d20a137380454340f30f12ccbfd302",
+      "size": 1024
+    },
+    {
+      "file": "opencode-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/opencode.svg",
+      "sha256": "b1e85a20ed29b093f6de1d0d140f8a5f8054127dcd191f21789979114903e4a1",
+      "svg": "svg/opencode.svg",
+      "svg_sha256": "7cfa6e9d6726f7c9fa26c7d9aef0dfec52d20a137380454340f30f12ccbfd302",
+      "size": 1024
+    },
+    {
+      "file": "cursor-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/cursor.svg",
+      "sha256": "7dc7f45a7f062c1edc65e1440569efed00084c2eb69767a30efc9af5ff71169f",
+      "svg": "svg/cursor.svg",
+      "svg_sha256": "0cb51bddf264ae108926fd554c063ef40fc1aac3c5c921ddb39ad184e4e5d0ef",
+      "size": 1024
+    },
+    {
+      "file": "cursor-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/cursor.svg",
+      "sha256": "ef04bbfec2127207374c83b31297d9233fb84d35895fb52aa537211247bb241a",
+      "svg": "svg/cursor.svg",
+      "svg_sha256": "0cb51bddf264ae108926fd554c063ef40fc1aac3c5c921ddb39ad184e4e5d0ef",
+      "size": 1024
+    },
+    {
+      "file": "windsurf-light.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/windsurf.svg",
+      "sha256": "29ef34323bfc5b062dd679ebf568f2d23aa90d33e8033bc8078374e5212453f8",
+      "svg": "svg/windsurf.svg",
+      "svg_sha256": "e3c836aae05a3741e33d5c5a38d4167aacfbb69e480d098b8b94cad8c90e0d08",
+      "size": 1024
+    },
+    {
+      "file": "windsurf-dark.png",
+      "url": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/windsurf.svg",
+      "sha256": "77859bfbfcac9995a194ca31a31ee6bd85bbf8a53987a3978d81f6cebf69bfba",
+      "svg": "svg/windsurf.svg",
+      "svg_sha256": "e3c836aae05a3741e33d5c5a38d4167aacfbb69e480d098b8b94cad8c90e0d08",
+      "size": 1024
+    },
+    {
+      "file": "vscodium-light.png",
+      "url": "https://raw.githubusercontent.com/VSCodium/vscodium/master/icons/stable/codium_cnl.svg",
+      "sha256": "02e300a62d56dbe3755c30ed238b4266bc539d0a2c320355bab8cfaa7a704473",
+      "svg": "svg/vscodium.svg",
+      "svg_sha256": "9817036bd2f5add672e707da311a301033ad122d6c2c505c776cb48d35b94472",
+      "size": 1024
+    },
+    {
+      "file": "vscodium-dark.png",
+      "url": "https://raw.githubusercontent.com/VSCodium/vscodium/master/icons/stable/codium_cnl.svg",
+      "sha256": "02e300a62d56dbe3755c30ed238b4266bc539d0a2c320355bab8cfaa7a704473",
+      "svg": "svg/vscodium.svg",
+      "svg_sha256": "9817036bd2f5add672e707da311a301033ad122d6c2c505c776cb48d35b94472",
+      "size": 1024
+    },
+    {
+      "file": "git-light.png",
+      "url": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/git.svg",
+      "sha256": "9efbfac4ce3dcb43f1c2d53d5ae1d35efda4462020936772ae18475ca0bc9260",
+      "svg": "svg/git.svg",
+      "svg_sha256": "95724d436215d483de82288610c3c144854138f49945424697fcdf8be66e17d6",
+      "size": 1024
+    },
+    {
+      "file": "git-dark.png",
+      "url": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/git.svg",
+      "sha256": "9efbfac4ce3dcb43f1c2d53d5ae1d35efda4462020936772ae18475ca0bc9260",
+      "svg": "svg/git.svg",
+      "svg_sha256": "95724d436215d483de82288610c3c144854138f49945424697fcdf8be66e17d6",
+      "size": 1024
+    },
+    {
+      "file": "vscode-light.png",
+      "url": "https://raw.githubusercontent.com/microsoft/vscode/main/resources/linux/code.png",
+      "sha256": "a51653af6534e0637d91b55ebd5f63f989302071d67a0724e48adfc16624b0a7",
+      "original": "svg/vscode-original.png"
+    },
+    {
+      "file": "vscode-dark.png",
+      "url": "https://raw.githubusercontent.com/microsoft/vscode/main/resources/linux/code.png",
+      "sha256": "a51653af6534e0637d91b55ebd5f63f989302071d67a0724e48adfc16624b0a7",
+      "original": "svg/vscode-original.png"
+    }
+  ]
+}
