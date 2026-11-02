@@ -35,7 +35,7 @@ def configure(enabled):
         command=shlex.join([sys.executable,'-B','-I',str(script),'antigravity-desktop'])
         rule={}
         for event in ('SessionStart','PreInvocation','PostInvocation','PreToolUse','PostToolUse','Stop'):
-            handler={'type':'command','command':command+' '+event,'timeout':2}
+            handler={'type':'command','command':command+' '+event,'timeout':5}
             rule[event]=[{'matcher':'.*','hooks':[handler]}] if event in ('PreToolUse','PostToolUse') else [handler]
         previous=dict(data);data[GROUP]=rule;atomic(config,data)
         try:atomic(record,{'managed':rule})
