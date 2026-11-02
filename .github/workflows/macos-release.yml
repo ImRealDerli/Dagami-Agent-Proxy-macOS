@@ -5,7 +5,7 @@ on:
       tag:
         description: Existing macOS release tag
         required: true
-        default: v0.4.1-mac.27-beta
+        default: v0.4.1-mac.28-beta
 permissions:
   contents: write
 jobs:
@@ -25,6 +25,11 @@ jobs:
           pkgutil --check-signature "$RUNNER_TEMP/dagami-python.pkg"
           sudo installer -pkg "$RUNNER_TEMP/dagami-python.pkg" -target /
           /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 -m pip install certifi 'ds-store>=1.3,<2' 'mac-alias>=2,<3'
+      - name: Install Rust for both Mac architectures
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup default 1.99.1
+          rustup target add x86_64-apple-darwin aarch64-apple-darwin
       - name: Verify source and version
         run: |
           /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 tools/check_source_hygiene.py
@@ -37,6 +42,7 @@ jobs:
       - name: Build universal app and disk image
         run: |
           /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 tools/build_universal.py
+          DAGAMI_TEST_RUST_BINARY=../Build/DagamiNetwork /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 -m unittest tests.test_rust_transport tests.test_tls_channel tests.test_dns_resilience
           /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 tools/build_dmg.py
           /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 - <<'PY'
           import hashlib

@@ -13,7 +13,7 @@ struct ClientApp: Decodable, Identifiable { var id:String;var name:String;var pa
 struct NetworkService:Decodable,Identifiable { var id:String;var name:String }
 struct Snapshot:Decodable {
     var profiles:[Profile]=[];var apps:[ClientApp]=[];var services:[NetworkService]=[]
-    var monitoring:Bool?=true;var desktopMonitoring:Bool?=false;var systemDNS:String="Нет данных";var activated:Bool=false;var startup:Bool=false;var providers:[String:[String]]=[:]
+    var networkEngine:String?=nil;var monitoring:Bool?=true;var desktopMonitoring:Bool?=false;var systemDNS:String="Нет данных";var activated:Bool=false;var startup:Bool=false;var providers:[String:[String]]=[:]
 }
 struct UpdateInfo:Codable {
     var available:Bool=false;var current:String="";var currentBuild:Int=0;var tag:String="";var url:String="https://github.com/ImRealDerli/Dagami-Agent-Proxy-macOS/releases";var notes:String="";var severity:String="unspecified";var recommendation:String="optional";var lastResult:String=""
@@ -34,7 +34,7 @@ struct TargetCheck:Decodable,Identifiable {
 struct ConnectionReport:Decodable {var success:Bool;var targets:[TargetCheck];var errors:[String]}
 struct ManagedSession:Decodable,Identifiable {
     var id:String;var name:String;var profile:String;var running:Bool;var browser:Bool;var stopping:Bool;var pid:Int;var pids:[Int];var bridge:String;var error:String
-    var app:String?=nil;var terminal:Bool?=nil;var canStop:Bool?=nil;var notice:String?=nil;var telemetry:SessionTelemetry?=nil
+    var networkEngine:String?=nil;var app:String?=nil;var terminal:Bool?=nil;var canStop:Bool?=nil;var notice:String?=nil;var telemetry:SessionTelemetry?=nil
     var status:String {!error.isEmpty ? "Нет ответа":(stopping ? "Останавливается":(running ? (terminal == true ? "CLI в терминале":"Приложение запущено"):(browser ? "Открыт браузер входа":"Маршрут готов")))}
 }
 struct JournalEntry:Decodable,Identifiable {
@@ -488,7 +488,7 @@ struct RootView:View {
                             }.padding(.horizontal,9).padding(.vertical,7).background(section==item.0 ? Color.blue.opacity(0.10):.clear,in:RoundedRectangle(cornerRadius:11,style:.continuous)).contentShape(Rectangle())}.buttonStyle(.plain)
                         }}.padding(.horizontal,8)
                         Spacer()
-                        VStack(alignment:.leading,spacing:4){Text("Сделано для Mac").font(.system(size:11,weight:.medium));Text(designTest ? "Universal · mac.27 test":"Universal · mac.27 beta").font(.system(size:10)).foregroundStyle(.secondary)}.padding(17)
+                        VStack(alignment:.leading,spacing:4){Text("Сделано для Mac").font(.system(size:11,weight:.medium));Text(designTest ? "Universal · mac.28 test":"Universal · mac.28 beta").font(.system(size:10)).foregroundStyle(.secondary)}.padding(17)
                     }.frame(width:158).background(Color(nsColor:.controlBackgroundColor))
                     Divider().opacity(0.5)
                     VStack(spacing:0) {
@@ -562,7 +562,7 @@ struct RootView:View {
     }
     var settings:some View {
         VStack(spacing:20){Card{Label("Статистика сессий",systemImage:"chart.bar.xaxis").font(.headline);Toggle("Показывать активность и лимиты клиентов",isOn:Binding(get:{model.state.monitoring ?? true},set:{model.run("sessionMonitoring",["enabled":$0])})).disabled(model.busy);Text("Для новых запусков CLI через Dagami используются официальные события и status line. Сохраняются только состояние, модель и числовые счётчики; тексты запросов и ответов не сохраняются.").font(.caption).foregroundStyle(.secondary);Button((model.state.desktopMonitoring ?? false) ? "Отключить активность Antigravity App / IDE":"Подключить активность Antigravity App / IDE"){model.run("desktopMonitoring",["enabled":!(model.state.desktopMonitoring ?? false)])}.disabled(model.busy);Text("Антигравити использует официальное правило hooks. После подключения перезапустите приложение через Dagami. Лимиты App / IDE читаются при открытой вкладке сессий или по кнопке через внутренний локальный интерфейс.").font(.caption).foregroundStyle(.secondary)};Card{Label("Обновления Dagami",systemImage:"arrow.triangle.2.circlepath").font(.headline);Toggle("Проверять новые версии автоматически",isOn:$model.automaticUpdates).disabled(Bundle.main.object(forInfoDictionaryKey:"DagamiDesignTest") as? Bool == true);Text(model.updateStatus).font(.callout).foregroundStyle(.secondary).textSelection(.enabled);Text("Бета-линия macOS. Проверка при запуске и раз в 6 часов. Плашка показывает изменения и критичность; «Позже» откладывает напоминание на сутки.").font(.caption).foregroundStyle(.secondary);HStack{Button("Проверить обновления"){model.run("updateCheck",["profile":model.profile,"manual":true],refresh:false)}.disabled(model.busy);if model.update.available {Button("Обновить сейчас"){model.showUpdateOffer(manual:true)}.disabled(model.busy)};Link("Все выпуски",destination:URL(string:"https://github.com/ImRealDerli/Dagami-Agent-Proxy-macOS/releases")!)}};LicenseSettingsView();Card{Label("При входе в систему",systemImage:"power").font(.headline);Toggle("Запускать Dagami вместе с macOS",isOn:Binding(get:{model.state.startup},set:{model.run("startup",["enabled":$0])})).disabled(model.busy);Text("Настройка использует пользовательский LaunchAgent.").font(.caption).foregroundStyle(.secondary)}
-            Card{Text("Dagami Agent Proxy").font(.title2.bold());Text(designTest ? "Тест нового дизайна · Universal · mac.27":"0.4.1 mac.27 beta · Universal").foregroundStyle(.secondary);HStack{Link("Поддержка",destination:URL(string:"https://t.me/dagamvi")!);Link(destination:URL(string:"https://github.com/ImRealDerli/Dagami-Agent-Proxy-macOS/issues")!){HStack(spacing:6){BrandImage(name:"github").frame(width:15,height:15);Text("Сообщить об ошибке")}}};HStack{Link(destination:URL(string:"https://github.com/j46871417-ui/Dagami-Agent-Proxy")!){HStack(spacing:6){BrandImage(name:"github").frame(width:15,height:15);Text("Официальный репозиторий")}};Link(destination:URL(string:"https://github.com/ImRealDerli")!){HStack(spacing:6){BrandImage(name:"github").frame(width:15,height:15);Text("Портер на Mac — ImRealDerli")}}}.buttonStyle(.bordered)}
+            Card{Text("Dagami Agent Proxy").font(.title2.bold());Text("Сетевой транспорт: "+(model.state.networkEngine ?? "Нет данных")).font(.caption).foregroundStyle(.secondary);Text(designTest ? "Тест нового дизайна · Universal · mac.28":"0.4.1 mac.28 beta · Universal").foregroundStyle(.secondary);HStack{Link("Поддержка",destination:URL(string:"https://t.me/dagamvi")!);Link(destination:URL(string:"https://github.com/ImRealDerli/Dagami-Agent-Proxy-macOS/issues")!){HStack(spacing:6){BrandImage(name:"github").frame(width:15,height:15);Text("Сообщить об ошибке")}}};HStack{Link(destination:URL(string:"https://github.com/j46871417-ui/Dagami-Agent-Proxy")!){HStack(spacing:6){BrandImage(name:"github").frame(width:15,height:15);Text("Официальный репозиторий")}};Link(destination:URL(string:"https://github.com/ImRealDerli")!){HStack(spacing:6){BrandImage(name:"github").frame(width:15,height:15);Text("Портер на Mac — ImRealDerli")}}}.buttonStyle(.bordered)}
         }
     }
 }
@@ -866,7 +866,7 @@ struct SessionsView:View {
                     SessionInsights(session:session)
                     if let notice=session.notice,!notice.isEmpty {Text(notice).font(.caption).foregroundStyle(.secondary)}
                     if !session.error.isEmpty {Text(session.error).font(.caption).foregroundStyle(.orange).textSelection(.enabled)}
-                    DisclosureGroup("Подробности маршрута") {VStack(alignment:.leading,spacing:5){if !session.bridge.isEmpty {Text(session.bridge)};if session.pid>0 {Text("Контроллер: \(session.pid)")};if !session.pids.isEmpty {Text("Процессы: "+session.pids.map{String($0)}.joined(separator:", "))}}.font(.system(size:10,design:.monospaced)).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading)}.font(.system(size:11)).foregroundStyle(.secondary)
+                    DisclosureGroup("Подробности маршрута") {VStack(alignment:.leading,spacing:5){if let engine=session.networkEngine{Text("Сетевой транспорт: "+engine)}else{Text("Для нового транспорта перезапустите сессию через Dagami.")};if !session.bridge.isEmpty {Text(session.bridge)};if session.pid>0 {Text("Контроллер: \(session.pid)")};if !session.pids.isEmpty {Text("Процессы: "+session.pids.map{String($0)}.joined(separator:", "))}}.font(.system(size:10,design:.monospaced)).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading)}.font(.system(size:11)).foregroundStyle(.secondary)
                 }
             }}
             if model.auth.running {Card{Label("Сессия входа",systemImage:"person.crop.circle").font(.headline);Text((model.auth.service ?? "ИИ")+" · "+(model.auth.profile ?? "")).font(.caption);Text(model.auth.message).font(.caption).foregroundStyle(.secondary);Button("Завершить вход"){model.run("authStop",refresh:false)}.disabled(model.busy)}}

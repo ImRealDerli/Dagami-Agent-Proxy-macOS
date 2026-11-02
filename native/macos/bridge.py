@@ -43,7 +43,8 @@ def snapshot():
     except Exception:startup=False
     from devproxy_pkg.session_telemetry import enabled as monitoring_enabled
     from devproxy_pkg.desktop_monitoring import installed as desktop_monitoring
-    return {'monitoring':monitoring_enabled(),'desktopMonitoring':desktop_monitoring(),'profiles':profiles,'apps':apps,'services':services,'systemDNS':dns_status,'activated':active,'startup':startup,'providers':PROVIDERS}
+    from devproxy_pkg.core.rust_transport import binary_path
+    return {'networkEngine':'Rust' if binary_path() else 'Python','monitoring':monitoring_enabled(),'desktopMonitoring':desktop_monitoring(),'profiles':profiles,'apps':apps,'services':services,'systemDNS':dns_status,'activated':active,'startup':startup,'providers':PROVIDERS}
 
 def perform(data):
     action=data.get('action');args=data.get('args',{})

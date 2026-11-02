@@ -148,7 +148,7 @@ def read_name(data, offset):
     raise ValueError('Слишком длинное DNS имя.')
 
 
-def answer(data, query):
+def answers(data, query):
     if len(data)<12 or data[:2]!=query[:2]:raise ValueError('DNS transaction mismatch.')
     flags,qd,an,_,_=struct.unpack('!HHHHH',data[2:12])
     if not flags&0x8000 or flags&0x200 or flags&15 or qd!=1 or an>512:raise ValueError('DNS вернул ошибку/обрезанный ответ.')
@@ -169,9 +169,14 @@ def answer(data, query):
     for _ in range(16):
         old=len(owners);owners.update(aliases[x] for x in list(owners) if x in aliases)
         if len(owners)==old:break
+    result=[]
     for owner,addr,life in records:
-        if owner in owners and ipaddress.ip_address(addr).is_global:return addr,max(1,min(ttl,life,300))
-    raise ValueError('DNS не вернул публичный IPv4 для запрошенного имени.')
+        if owner in owners and ipaddress.ip_address(addr).is_global and addr not in [row[0] for row in result]:result.append((addr,max(1,min(ttl,life,300))))
+    if not result:raise ValueError('DNS не вернул публичный IPv4 для запрошенного имени.')
+    return result
+
+
+def answer(data,query):return answers(data,query)[0]
 
 
 def read_exact(sock, count):
@@ -217,27 +222,72 @@ def exchange(endpoint, wire, timeout=2.5, address=None):
 class Resolver:
     def __init__(self,endpoints=None,padding=False):
         self.endpoints=endpoints or DEFAULT_ENDPOINTS;self.padding=padding;self.cache={};self.failed={};self.lock=threading.Lock()
+        self.candidates={};self.rejected={};self.inflight={};self.errors={}
         for value in self.endpoints:Endpoint.parse(value)
 
-    def resolve(self,host):
+    def _cached(self,host):
+        now=time.monotonic()
+        rows=[(ip,expiry) for ip,expiry in self.candidates.get(host,[]) if expiry>now and self.rejected.get((host,ip),0)<=now]
+        if rows:
+            self.cache[host]=rows[0];return rows[0][0]
+        saved=self.cache.get(host)
+        if saved and saved[1]>now and self.rejected.get((host,saved[0]),0)<=now:return saved[0]
+        return None
+
+    def reject(self,host,ip):
+        host=host.lower().rstrip('.')
         with self.lock:
-            saved=self.cache.get(host)
-            if saved and saved[1]>time.monotonic():return saved[0]
-        wire=question(host,self.padding);deadline=time.monotonic()+12
-                                                                                      
-        for endpoint in self.endpoints:
-            ep=Endpoint.parse(endpoint);nodes=SEEDS.get(ep.host,[ep.host])
-            with self.lock:nodes=sorted(nodes,key=lambda n:self.failed.get((endpoint,n),0)>time.monotonic())
-            for node in nodes:
+            if len(self.rejected)>=512:self.rejected.pop(next(iter(self.rejected)))
+            self.rejected[(host,ip)]=time.monotonic()+30;self.cache.pop(host,None);self.errors.pop(host,None)
+
+    def resolve(self,host,timeout=8):
+        host=host.lower().rstrip('.');deadline=time.monotonic()+timeout
+        while True:
+            with self.lock:
+                cached=self._cached(host)
+                if cached:return cached
+                failed=self.errors.get(host)
+                if failed and failed[1]>time.monotonic():raise ConnectionError(failed[0])
+                pending=self.inflight.get(host)
+                if pending is None:
+                    if len(self.inflight)>=128:raise ConnectionError('Smart DNS: слишком много одновременных запросов.')
+                    pending=threading.Event();self.inflight[host]=pending;break
+            remaining=deadline-time.monotonic()
+            if remaining<=0 or not pending.wait(remaining):raise TimeoutError('Smart DNS: истёк срок ответа.')
+        try:return self._resolve(host,deadline)
+        except (OSError,ValueError,http.client.HTTPException):
+            with self.lock:
+                if len(self.errors)>=512:self.errors.pop(next(iter(self.errors)))
+                self.errors[host]=('Выбранные Smart DNS не предоставили рабочий адрес.',time.monotonic()+1)
+            raise
+        finally:
+            with self.lock:self.inflight.pop(host,None);pending.set()
+
+    def _resolve(self,host,deadline):
+        wire=question(host,self.padding)
+        def nodes(endpoint):
+            ep=Endpoint.parse(endpoint)
+            return list(dict.fromkeys(SEEDS.get(ep.host,[])+[ep.host]))
+        with self.lock:
+            endpoints=sorted(self.endpoints,key=lambda ep:all(self.failed.get((ep,node),0)>time.monotonic() for node in nodes(ep)))
+        for endpoint in endpoints:
+            candidates=nodes(endpoint)
+            with self.lock:candidates=sorted(candidates,key=lambda node:self.failed.get((endpoint,node),0)>time.monotonic())
+            for node in candidates:
                 remaining=deadline-time.monotonic()
                 if remaining<=0:raise TimeoutError('Smart DNS: истёк срок ответа.')
                 try:
-                    ip,ttl=answer(exchange(endpoint,wire,min(1.5,remaining),node),wire)
-                    with self.lock:self.cache[host]=(ip,time.monotonic()+ttl);self.failed.pop((endpoint,node),None)
-                    return ip
+                    rows=answers(exchange(endpoint,wire,min(1.5,remaining),node),wire);now=time.monotonic()
+                    with self.lock:
+                        rows=[(ip,now+ttl) for ip,ttl in rows if self.rejected.get((host,ip),0)<=now]
+                        if not rows:continue
+                        if len(self.candidates)>=512:
+                            old=next(iter(self.candidates));self.candidates.pop(old,None);self.cache.pop(old,None)
+                        self.candidates[host]=rows;self.cache[host]=rows[0];self.failed.pop((endpoint,node),None)
+                    return rows[0][0]
                 except (OSError,ValueError,http.client.HTTPException):
                     with self.lock:self.failed[(endpoint,node)]=time.monotonic()+30
-        raise ConnectionError('Выбранные Smart DNS не ответили; проверьте DNS-узлы или upstream.')
+        raise ConnectionError('Выбранные Smart DNS не ответили или вернули недоступные адреса; проверьте DNS-узлы или upstream.')
 
     def probe(self,host='cloudcode-pa.googleapis.com'):
         rows=[]

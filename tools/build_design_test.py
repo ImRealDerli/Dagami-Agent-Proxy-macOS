@@ -31,7 +31,7 @@ def main():
         shutil.copytree(ROOT/item,engine/item,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
     info_path=app/'Contents/Info.plist'
     info=plistlib.loads(info_path.read_bytes())
-    info.update(CFBundleName='Dagami Test',CFBundleDisplayName='Dagami · Тест',CFBundleIdentifier='ru.dagami.agentproxy.designtest',DagamiDesignTest=True,CFBundleShortVersionString='0.4.1',CFBundleVersion='427')
+    info.update(CFBundleName='Dagami Test',CFBundleDisplayName='Dagami · Тест',CFBundleIdentifier='ru.dagami.agentproxy.designtest',DagamiDesignTest=True,CFBundleShortVersionString='0.4.1',CFBundleVersion='428')
     info_path.write_bytes(plistlib.dumps(info))
     run('codesign','--force','--deep','--sign','-',app)
     run('codesign','--verify','--deep','--strict',app)

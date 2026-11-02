@@ -22,10 +22,13 @@ def main():
  if APP.exists():shutil.rmtree(APP)
  contents=APP/'Contents';resources=contents/'Resources';macos=contents/'MacOS';macos.mkdir(parents=True);resources.mkdir()
  run('lipo','-create',*binaries,'-output',macos/'Dagami')
+ run(sys.executable,ROOT/'tools/build_network.py','--output',BUILD/'DagamiNetwork')
+ shutil.copy2(BUILD/'DagamiNetwork',macos/'DagamiNetwork')
+ shutil.copy2(BUILD/'DagamiNetwork.licenses.txt',resources/'ThirdPartyRust.txt')
  engine=resources/'Engine';engine.mkdir()
  for item in ('devproxy_pkg','devproxy_gui.py','native'):
   source=ROOT/item
-  if source.is_dir():shutil.copytree(source,engine/item,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+  if source.is_dir():shutil.copytree(source,engine/item,ignore=shutil.ignore_patterns('__pycache__','*.pyc','target'))
   else:shutil.copy2(source,engine/item)
                                                                                       
  for driver in (engine/'devproxy_pkg/assets/webdriver').glob('mac-*/chromedriver'):driver.chmod(0o755)
@@ -67,7 +70,7 @@ def main():
  shutil.copy2(certificate,resources/'cacert.pem')
  shutil.copy2(ROOT/'LICENSE',resources/'LICENSE')
  shutil.copy2(ROOT/'devproxy_pkg/assets/dagami-agent-proxy.icns',resources/'Dagami.icns')
- info={'CFBundleName':'Dagami','CFBundleDisplayName':'Dagami','CFBundleIdentifier':'ru.dagami.agentproxy.native','CFBundleExecutable':'Dagami','CFBundleIconFile':'Dagami.icns','CFBundlePackageType':'APPL','CFBundleShortVersionString':'0.4.1','CFBundleVersion':'427','LSMinimumSystemVersion':'13.0','NSHighResolutionCapable':True,'NSPrincipalClass':'NSApplication','NSHumanReadableCopyright':'Dagami Agent Proxy · MIT'}
+ info={'CFBundleName':'Dagami','CFBundleDisplayName':'Dagami','CFBundleIdentifier':'ru.dagami.agentproxy.native','CFBundleExecutable':'Dagami','CFBundleIconFile':'Dagami.icns','CFBundlePackageType':'APPL','CFBundleShortVersionString':'0.4.1','CFBundleVersion':'428','LSMinimumSystemVersion':'13.0','NSHighResolutionCapable':True,'NSPrincipalClass':'NSApplication','NSHumanReadableCopyright':'Dagami Agent Proxy · MIT'}
  (contents/'Info.plist').write_bytes(plistlib.dumps(info))
  run('codesign','--force','--deep','--sign','-',APP,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
  run('codesign','--verify','--deep','--strict',APP)
@@ -79,7 +82,7 @@ def main():
  with zipfile.ZipFile(sourcezip,'w',zipfile.ZIP_DEFLATED) as z:
   for p in sorted(ROOT.rglob('*')):
    rel=p.relative_to(ROOT)
-   if any(part in ('.git','__pycache__','.venv','dist-portable') for part in rel.parts) or p.suffix in ('.pyc','.DS_Store'):continue
+   if any(part in ('.git','__pycache__','.venv','dist-portable','target') for part in rel.parts) or p.suffix in ('.pyc','.DS_Store'):continue
    if p.is_file():z.write(p,Path('Dagami-Source')/rel)
  manifest={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUTPUT.glob('*.zip')}
  (OUTPUT/'SHA256SUMS.txt').write_text(''.join(v+'  '+k+'\n' for k,v in manifest.items()))

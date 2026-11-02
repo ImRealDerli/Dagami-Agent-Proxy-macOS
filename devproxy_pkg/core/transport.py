@@ -11,6 +11,19 @@ from contextlib import contextmanager
 from typing import Generator, Optional
 
 
+def ensure_socket_capacity():
+    try:
+        import resource
+        soft,hard=resource.getrlimit(resource.RLIMIT_NOFILE)
+        if soft==resource.RLIM_INFINITY:return soft
+        target=1024 if hard==resource.RLIM_INFINITY else min(1024,hard)
+        if soft<target:
+            try:resource.setrlimit(resource.RLIMIT_NOFILE,(target,hard));return target
+            except (OSError,ValueError):pass
+        return soft
+    except (ImportError,OSError,ValueError):return None
+
+
 class AdaptiveTLSGate:
     
 
@@ -125,20 +138,24 @@ class FastDuplexRelay:
     BUFFER_SIZE = 65536         
 
     @classmethod
-    def pipe(cls, sock1: socket.socket, sock2: socket.socket, fragment_size: int = 0) -> None:
+    def pipe(cls, sock1: socket.socket, sock2: socket.socket, fragment_size: int = 0) -> dict:
         tune_socket(sock1)
         tune_socket(sock2)
 
         sock1.setblocking(True)
         sock2.setblocking(True)
 
+        stats={'uploaded':0,'downloaded':0,'early_tls_alert':False,'remote_empty_eof':False}
         def _forward(src: socket.socket, dst: socket.socket):
             first=True
             try:
                 while True:
                     data = src.recv(cls.BUFFER_SIZE)
                     if not data:
+                        if src is sock2 and stats['downloaded']==0:stats['remote_empty_eof']=True
                         break
+                    key='uploaded' if src is sock1 else 'downloaded';stats[key]+=len(data)
+                    if first and src is sock2 and data[:1]==b'\x15':stats['early_tls_alert']=True
                     if first and src is sock1 and fragment_size and data[:1]==b'\x16':
                         for offset in range(0,len(data),fragment_size):dst.sendall(data[offset:offset+fragment_size])
                     else:dst.sendall(data)
@@ -164,3 +181,5 @@ class FastDuplexRelay:
                 s.close()
             except Exception:
                 pass
+
+        return stats

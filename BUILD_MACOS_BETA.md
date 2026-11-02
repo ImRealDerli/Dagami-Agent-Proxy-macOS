@@ -45,3 +45,9 @@ PYTHONPATH=../BuildTools python3 tools/build_dmg.py
 ## Сборка на GitHub
 
 В Actions доступен ручной workflow «macOS Universal release». Он собирает существующий macOS-тег на отдельном Mac, проверяет подпись APP и образ DMG, вычисляет SHA-256 и загружает четыре файла в подготовленный черновик релиза. Для запуска нужен черновик с этим тегом; опубликованные релизы workflow не заменяет. Исходники берутся из тега, а не из незакоммиченных файлов.
+
+## Rust-транспорт
+
+Начиная с mac.28 сборка APP требует Rust 1.99.1 и обе цели: `rustup target add x86_64-apple-darwin aarch64-apple-darwin`. `tools/build_universal.py` вызывает `tools/build_network.py`, собирает Tokio/rustls с `Cargo.lock`, объединяет архитектуры и подписывает `DagamiNetwork`. В APP добавляется `ThirdPartyRust.txt` с лицензиями зависимостей. Cargo target и служебные материалы хранятся в `../Build`, в исходники не включаются.
+
+Отдельная сборка: `DEVELOPER_DIR=/Library/Developer/CommandLineTools python3 tools/build_network.py`. Для фикстур: `DAGAMI_TEST_RUST_BINARY=../Build/DagamiNetwork python3 -m unittest tests.test_rust_transport`. Фикстуры поднимают только локальные прокси и временный CA. Исходный Python-запуск без собранного помощника сохраняет совместимый транспорт; в основной macOS APP помощник входит в пакет.

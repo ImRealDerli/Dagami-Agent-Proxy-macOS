@@ -6,6 +6,7 @@ from .adapters import list_adapters
 from .portable_runtime import request, runtime_dir
 
 TITLES={
+ 'proxyTunnel':'Сетевой мост',
  'sessionQuota':'Чтение лимитов','sessionMonitoring':'Статистика сессий','desktopMonitoring':'Активность Antigravity',
  'profileSave':'Сохранение профиля','profileDelete':'Удаление профиля','profileDetails':'Загрузка настроек профиля',
  'launch':'Запуск приложения','stop':'Остановка сессии','check':'Проверка подключения','checkConnection':'Проверка подключения',
@@ -67,7 +68,7 @@ def sessions():
                 'running':bool(value.get('running')),'browser':bool(value.get('browser_running')),
                 'stopping':bool(value.get('stopping')) and not pending,'pid':value.get('pid') if type(value.get('pid')) is int else 0,
                 'pids':[p for p in value.get('application_pids',[]) if type(p) is int],
-                'telemetry':value.get('telemetry',{}),'bridge':bridge,'error':'Контроллер не ответил вовремя. Обновите статус через несколько секунд.' if pending else ''}
+                'networkEngine':value.get('networkEngine'),'telemetry':value.get('telemetry',{}),'bridge':bridge,'error':'Контроллер не ответил вовремя. Обновите статус через несколько секунд.' if pending else ''}
         except Exception as exc:
             return {'id':adapter.app_id,'name':adapter.display_name,'profile':'','running':False,'browser':False,
                 'stopping':False,'pid':0,'pids':[],'bridge':'','error':journal.clean(str(exc),limit=400)}
@@ -79,5 +80,5 @@ def sessions():
         result.append({'id':row['id'],'app':row.get('app'),'name':row.get('application','CLI'),'profile':row.get('profile',''),
             'running':bool(row.get('running')),'browser':False,'stopping':bool(row.get('stopping')),'pid':row.get('pid',0),
             'pids':row.get('application_pids',[]),'bridge':row.get('bridge',''),'error':row.get('error',''),
-            'telemetry':row.get('telemetry',{}),'terminal':True,'canStop':row.get('canStop',True),'notice':row.get('notice','')})
+            'networkEngine':row.get('networkEngine'),'telemetry':row.get('telemetry',{}),'terminal':True,'canStop':row.get('canStop',True),'notice':row.get('notice','')})
     return result

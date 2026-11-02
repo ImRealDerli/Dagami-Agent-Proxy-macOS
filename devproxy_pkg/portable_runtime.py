@@ -333,7 +333,7 @@ def serve_session(app, profile_name):
                             auth_url=url
                             log.info('Login browser launched app=%s',app)
                         elif command not in ('status','authStatus'): raise ValueError('Неизвестная команда.')
-                    result = {'app': app, 'application':adapter.display_name, 'executable':exe, 'application_pids':[p.pid for p in applications if alive(p)], 'profile': profile_name, 'pid': os.getpid(), 'bridge': local, 'running': any(alive(p) for p in applications), 'browser_running': any(alive(p) for p in processes if p not in applications), 'account_verified': False,'auth_route':1,'telemetry':telemetry.snapshot()}
+                    result = {'app': app, 'application':adapter.display_name, 'executable':exe, 'application_pids':[p.pid for p in applications if alive(p)], 'profile': profile_name, 'pid': os.getpid(), 'bridge': local, 'running': any(alive(p) for p in applications), 'browser_running': any(alive(p) for p in processes if p not in applications), 'account_verified': False,'auth_route':1,'telemetry':telemetry.snapshot(),'networkEngine':'Rust' if tunnel.transport.available else 'Python'}
                     if command=='authStatus':result['url']=auth_url
                     body = json.dumps(result).encode(); status = 200
                 except Exception as exc:

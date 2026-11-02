@@ -123,3 +123,5 @@ desktop.ini
 /temp-test/
 
 !/devproxy_pkg/assets/webdriver/selenium-vendor.zip
+
+**/target/

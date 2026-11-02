@@ -49,3 +49,18 @@ class TestAdaptiveTLSGate(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SocketCapacityTests(unittest.TestCase):
+    @unittest.skipUnless(__import__('os').name=='posix','POSIX resource limits')
+    def test_network_process_can_use_connection_budget_without_changing_hard_limit(self):
+        from unittest.mock import patch
+        from devproxy_pkg.core.transport import ensure_socket_capacity
+        with patch('resource.getrlimit',return_value=(256,4096)),patch('resource.setrlimit') as change:
+            self.assertEqual(1024,ensure_socket_capacity());self.assertEqual((1024,4096),change.call_args.args[1])
+    @unittest.skipUnless(__import__('os').name=='posix','POSIX resource limits')
+    def test_denied_limit_change_preserves_runtime(self):
+        from unittest.mock import patch
+        from devproxy_pkg.core.transport import ensure_socket_capacity
+        with patch('resource.getrlimit',return_value=(256,4096)),patch('resource.setrlimit',side_effect=PermissionError('fixture denied')):
+            self.assertEqual(256,ensure_socket_capacity())

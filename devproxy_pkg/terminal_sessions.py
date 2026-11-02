@@ -37,13 +37,15 @@ class TerminalSession:
     def __init__(self,app,profile,process,bridge,telemetry=None):
         from .portable_runtime import app_adapter
         self.application=app_adapter(app).display_name;self.telemetry=telemetry
+        from .core.rust_transport import binary_path
+        self.network_engine='Rust' if binary_path() else 'Python'
         self.id='cli_'+uuid.uuid4().hex;self.app=app;self.profile=profile;self.process=process;self.bridge=bridge
         self.token=secrets.token_hex(32);self.server=None;self.thread=None;self.stopping=False;self.error='';self.path=None
     def status(self):
         running=self.process.poll() is None
         return {'id':self.id,'app':self.app,'application':self.application,'profile':self.profile,
             'pid':os.getpid(),'application_pids':[self.process.pid] if running else [],'bridge':self.bridge,
-            'running':running,'stopping':self.stopping,'browser_running':False,'terminal':True,'canStop':True,'error':self.error,'telemetry':self.telemetry.snapshot() if self.telemetry else {}}
+            'networkEngine':self.network_engine,'running':running,'stopping':self.stopping,'browser_running':False,'terminal':True,'canStop':True,'error':self.error,'telemetry':self.telemetry.snapshot() if self.telemetry else {}}
     def stop(self):
         try:stop_owned_process(self.process)
         except Exception as error:
