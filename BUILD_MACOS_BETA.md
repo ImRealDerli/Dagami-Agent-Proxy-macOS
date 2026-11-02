@@ -41,3 +41,7 @@ PYTHONPATH=../BuildTools python3 tools/build_dmg.py
 Маленькие иконки для реальных размеров интерфейса готовит `python3 tools/prepare_icon_rasters.py` (Pillow из requirements-brand-icons.txt). Скрипт загрузки логотипов вызывает его автоматически. Готовые размеры и SHA-256 сохранены в BrandIcons/raster-manifest.json. При запуске приложение использует AppKit и готовые варианты, дополнительных Python-зависимостей для иконок не требуется.
 
 Если Xcode требует незавершённую настройку, сборку можно выполнить с установленными Command Line Tools: `DEVELOPER_DIR=/Library/Developer/CommandLineTools python3 tools/build_universal.py`.
+
+## Сборка на GitHub
+
+В Actions доступен ручной workflow «macOS Universal release». Он собирает существующий macOS-тег на отдельном Mac, проверяет подпись APP и образ DMG, вычисляет SHA-256 и загружает четыре файла в подготовленный черновик релиза. Для запуска нужен черновик с этим тегом; опубликованные релизы workflow не заменяет. Исходники берутся из тега, а не из незакоммиченных файлов.

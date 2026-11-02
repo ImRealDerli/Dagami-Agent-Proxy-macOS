@@ -1,0 +1,54 @@
+name: macOS Universal release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing macOS release tag
+        required: true
+        default: v0.4.1-mac.27-beta
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: macos-15-intel
+    timeout-minutes: 30
+    env:
+      DAGAMI_TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+      - name: Install Python universal2 and packaging dependencies
+        run: |
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/dagami-python.pkg" https://www.python.org/ftp/python/3.12.8/python-3.12.8-macos11.pkg
+          pkgutil --check-signature "$RUNNER_TEMP/dagami-python.pkg"
+          sudo installer -pkg "$RUNNER_TEMP/dagami-python.pkg" -target /
+          /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 -m pip install certifi 'ds-store>=1.3,<2' 'mac-alias>=2,<3'
+      - name: Verify source and version
+        run: |
+          /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 tools/check_source_hygiene.py
+          /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 -m unittest discover -s tools -p test_source_hygiene.py
+          /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 - <<'PY'
+          import os
+          from devproxy_pkg import __version__
+          assert os.environ['DAGAMI_TAG'] == 'v' + __version__.replace('b0+', '-').replace('+', '-') + '-beta'
+          PY
+      - name: Build universal app and disk image
+        run: |
+          /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 tools/build_universal.py
+          /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 tools/build_dmg.py
+          /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          out = Path('../Release')
+          names = ['Dagami-macOS-Universal.zip', 'Dagami-macOS-Universal.dmg', 'Dagami-Full-Source.zip']
+          (out/'SHA256SUMS.txt').write_text(''.join(hashlib.sha256((out/name).read_bytes()).hexdigest()+'  '+name+'\n' for name in names))
+          PY
+      - name: Publish verified beta assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$DAGAMI_TAG" --json isDraft --jq '.isDraft' | /usr/bin/grep -qx true
+          gh release upload "$DAGAMI_TAG" ../Release/Dagami-macOS-Universal.zip ../Release/Dagami-macOS-Universal.dmg ../Release/Dagami-Full-Source.zip ../Release/SHA256SUMS.txt --clobber
+          gh release edit "$DAGAMI_TAG" --draft=false --prerelease --notes-file RELEASE_NOTES.md
