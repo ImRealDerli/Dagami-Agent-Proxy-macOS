@@ -1,5 +1,7 @@
 # Dagami Agent Proxy для macOS — beta
 
+**Тестовая ветка `test/limits-ui`: новый дизайн счётчиков.** Основная ветка и основная APP не меняются. Запустите `Dagami Limits.app` в папке «Тест». В «Главная → Сессии → Вид лимитов» доступен явный демонстрационный просмотр без обращения к аккаунтам.
+
 Неофициальный форк [Dagami Agent Proxy](https://github.com/j46871417-ui/Dagami-Agent-Proxy). Здесь развивается версия для Mac: приложение со SwiftUI, профили подключения, запуск IDE и CLI через локальный мост, настройка DNS и подготовка совместимых версий Antigravity.
 
 Оригинальный Dagami делает команда официального проекта. macOS-порт поддерживает [ImRealDerli](https://github.com/ImRealDerli). Ошибки этой сборки лучше оставлять [здесь](https://github.com/ImRealDerli/Dagami-Agent-Proxy-macOS/issues), чтобы не смешивать их с Windows-версией.

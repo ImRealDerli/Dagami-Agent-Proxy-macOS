@@ -148,7 +148,7 @@ final class RPC: @unchecked Sendable {
             sessions=[ManagedSession(id:"antigravity",name:"Antigravity IDE",profile:"ИИ — Smart DNS",running:true,browser:false,stopping:false,pid:1234,pids:[1235],bridge:"http://127.0.0.1:54084",error:"")]
             events=[JournalEntry(id:"fixture-error",time:"2026-11-02T01:00:00+05:00",action:"prepare",title:"Применение патча",success:false,summary:"Проверка подписи приложения не прошла. Откройте подробности.",detail:"Fixture: codesign exited with status 1\nstderr: invalid signature"),JournalEntry(id:"fixture-ok",time:"2026-11-02T00:59:00+05:00",action:"launch",title:"Запуск приложения",success:true,summary:"Команда запуска отправлена. Состояние приложения — в разделе «Сессии».",detail:"Fixture: application launched")]
             sessions[0].telemetry=try? JSONDecoder().decode(SessionTelemetry.self,from:JSONSerialization.data(withJSONObject:["state":"working","model":"Gemini","activityAt":Date().timeIntervalSince1970,"updatedAt":Date().timeIntervalSince1970,"source":"Официальные события клиента","note":"Демонстрационные данные; аккаунты не запрашиваются"]))
-            quotaReports[sessions[0].id]=try? JSONDecoder().decode(SessionTelemetry.self,from:JSONSerialization.data(withJSONObject:["updatedAt":Date().timeIntervalSince1970,"source":"Локальный сервер Antigravity · внутренний интерфейс","quotas":[["id":"gemini-weekly","label":"Gemini · weekly","usedPercent":28,"resetAt":Date().addingTimeInterval(86400).timeIntervalSince1970]],"note":"Лимиты аккаунта, общие для сессий. Демонстрационные значения."]))
+            quotaReports[sessions[0].id]=try? JSONDecoder().decode(SessionTelemetry.self,from:JSONSerialization.data(withJSONObject:["updatedAt":Date().timeIntervalSince1970,"source":"Локальный сервер Antigravity · внутренний интерфейс","quotas":[["id":"gemini-five-hour","label":"Gemini · 5h","usedPercent":28,"resetAt":Date().addingTimeInterval(5460).timeIntervalSince1970],["id":"gemini-weekly","label":"Gemini · weekly","usedPercent":82,"resetAt":Date().addingTimeInterval(187200).timeIntervalSince1970]],"note":"Лимиты аккаунта, общие для сессий. Демонстрационные значения."]))
             state.services=[NetworkService(id:"Ethernet",name:"Ethernet"),NetworkService(id:"Wi-Fi",name:"Wi-Fi")];profile="ai";ready=true
             if let preview=ProcessInfo.processInfo.environment["DAGAMI_UI_CHECK_PREVIEW"] {
                 connectionProfile="ИИ — Smart DNS";checkStarted=Date();checkingConnection=preview=="running";showConnectionPanel=true
@@ -266,7 +266,7 @@ final class Delegate:NSObject,NSApplicationDelegate,NSWindowDelegate {
             NSApp.windows.first?.delegate=self
             if let path=ProcessInfo.processInfo.environment["DAGAMI_UI_SCREENSHOT"] {
                 DispatchQueue.main.asyncAfter(deadline:.now()+2) {
-                    if let view=NSApp.windows.first(where:{$0.frame.width>700})?.contentView,
+                    if let window=NSApp.windows.first(where:{$0.frame.width>700}),let view=(ProcessInfo.processInfo.environment["DAGAMI_UI_GALLERY"]=="1" ? window.attachedSheet?.contentView:window.contentView),
                        let rep=view.bitmapImageRepForCachingDisplay(in:view.bounds) {
                         view.cacheDisplay(in:view.bounds,to:rep)
                         try? rep.representation(using:.png,properties:[:])?.write(to:URL(fileURLWithPath:path))
@@ -305,11 +305,11 @@ final class Delegate:NSObject,NSApplicationDelegate,NSWindowDelegate {
     @NSApplicationDelegateAdaptor(Delegate.self) var delegate
     @StateObject var model=Model()
     var body:some Scene {
-        WindowGroup(designTest ? "Dagami · Тест":"Dagami") {
+        WindowGroup(designTest ? "Dagami · Лимиты":"Dagami") {
             RootView().environmentObject(model).frame(minWidth:820,minHeight:600)
-                .tint(.blue).toggleStyle(.switch).onAppear{if !model.ready {model.refresh()};if let page=ProcessInfo.processInfo.environment["DAGAMI_UI_PAGE"] {model.page=page}}
+                .tint(.blue).toggleStyle(.switch).preferredColorScheme(ProcessInfo.processInfo.environment["DAGAMI_UI_THEME"]=="light" ? .light:(ProcessInfo.processInfo.environment["DAGAMI_UI_THEME"]=="dark" ? .dark:nil)).onAppear{if !model.ready {model.refresh()};if let page=ProcessInfo.processInfo.environment["DAGAMI_UI_PAGE"] {model.page=page}}
         }.windowStyle(.hiddenTitleBar).defaultSize(width:860,height:650)
-        MenuBarExtra(designTest ? "Dagami · Тест":"Dagami",systemImage:"circle.hexagongrid.fill") {
+        MenuBarExtra(designTest ? "Dagami · Лимиты":"Dagami",systemImage:"circle.hexagongrid.fill") {
             TrayView().environmentObject(model)
         }.menuBarExtraStyle(.window)
     }
@@ -480,7 +480,7 @@ struct RootView:View {
             else {
                 HStack(spacing:0) {
                     VStack(alignment:.leading,spacing:18) {
-                        HStack(spacing:9){Image(systemName:"circle.hexagongrid.fill").font(.system(size:26)).foregroundStyle(.blue);VStack(alignment:.leading,spacing:1){Text("Dagami").font(.system(size:18,weight:.bold,design:.rounded));Text(designTest ? "Тест дизайна":"Agent Proxy").font(.system(size:10)).foregroundStyle(.secondary)}}.padding(.top,30).padding(.horizontal,16)
+                        HStack(spacing:9){Image(systemName:"circle.hexagongrid.fill").font(.system(size:26)).foregroundStyle(.blue);VStack(alignment:.leading,spacing:1){Text("Dagami").font(.system(size:18,weight:.bold,design:.rounded));Text(designTest ? "Лимиты · тест":"Agent Proxy").font(.system(size:10)).foregroundStyle(.secondary)}}.padding(.top,30).padding(.horizontal,16)
                         VStack(spacing:5){ForEach(Array(sections.enumerated()),id:\.element.0){index,item in
                             Button{chooseSection(item.0)}label:{HStack(spacing:9){
                                 Image(systemName:item.1).font(.system(size:12,weight:.semibold)).foregroundStyle(.white).frame(width:25,height:25).background(navColor(index),in:RoundedRectangle(cornerRadius:7,style:.continuous))
@@ -850,6 +850,7 @@ struct ConnectionCheckView:View {
 }
 struct SessionsView:View {
     @EnvironmentObject var model:Model
+    @State private var showQuotaDesign=false
     func stop(_ session:ManagedSession) {
         let alert=NSAlert();alert.messageText="Остановить «\(session.name)»?";alert.informativeText=session.terminal == true ? "Сохраните работу. Будет завершена только выбранная CLI-сессия и её дочерние процессы.":"Сохраните работу. Приложение, его управляемые фоновые процессы и браузер входа будут закрыты."
         alert.addButton(withTitle:"Остановить");alert.addButton(withTitle:"Отмена")
@@ -857,7 +858,7 @@ struct SessionsView:View {
     }
     var body:some View {
         VStack(spacing:12){
-            HStack{Text("Управляемые сессии: \(model.sessions.count)").font(.system(size:12)).foregroundStyle(.secondary);Spacer();Button{model.run("sessions",refresh:false)}label:{Label("Обновить",systemImage:"arrow.clockwise")}.disabled(model.busy)}
+            HStack{Text("Управляемые сессии: \(model.sessions.count)").font(.system(size:12)).foregroundStyle(.secondary);Spacer();if designTest{Button{showQuotaDesign=true}label:{Label("Вид лимитов",systemImage:"sparkles")}};Button{model.run("sessions",refresh:false)}label:{Label("Обновить",systemImage:"arrow.clockwise")}.disabled(model.busy)}
             if model.sessions.isEmpty {Card{Label("Нет открытых сессий",systemImage:"rectangle.stack").font(.headline);Text("Запустите приложение через Dagami — здесь появятся его профиль, маршрут и состояние.").font(.caption).foregroundStyle(.secondary);Button("К приложениям"){model.page="Приложения"}.buttonStyle(.borderedProminent)}}
             LazyVStack(spacing:10){ForEach(model.sessions){session in
                 Card {
@@ -870,7 +871,7 @@ struct SessionsView:View {
                 }
             }}
             if model.auth.running {Card{Label("Сессия входа",systemImage:"person.crop.circle").font(.headline);Text((model.auth.service ?? "ИИ")+" · "+(model.auth.profile ?? "")).font(.caption);Text(model.auth.message).font(.caption).foregroundStyle(.secondary);Button("Завершить вход"){model.run("authStop",refresh:false)}.disabled(model.busy)}}
-        }.task {
+        }.onAppear{if designTest && ProcessInfo.processInfo.environment["DAGAMI_UI_GALLERY"]=="1"{showQuotaDesign=true}}.sheet(isPresented:$showQuotaDesign){QuotaDesignGallery()}.task {
             if !model.busy {model.run("sessions",refresh:false)}
             while !Task.isCancelled {do{try await Task.sleep(nanoseconds:5_000_000_000)}catch{return};if !model.busy {model.run("sessions",refresh:false)}}
         }
@@ -948,19 +949,152 @@ struct ConnectionPanel:View {
     }
 }
 
+struct QuotaRing:View {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    var remaining:Double?
+    var colors:[Color]
+    var disabled:Bool
+    @State private var progress:Double=0
+    var body:some View {
+        ZStack {
+            Circle().stroke(Color.primary.opacity(0.065),lineWidth:7)
+            if remaining != nil {
+                if progress>0 {Circle().trim(from:0,to:progress).stroke(AngularGradient(colors:colors+[colors[0]],center:.center,startAngle:.degrees(0),endAngle:.degrees(360)),style:StrokeStyle(lineWidth:7,lineCap:.round)).rotationEffect(.degrees(-90))}
+            } else {Circle().stroke(Color.secondary.opacity(0.16),style:StrokeStyle(lineWidth:1,dash:[2,5])).padding(6)}
+            Circle().fill(colors[0].opacity(0.09)).padding(13)
+            Image(systemName:disabled ? "pause.fill":(remaining == nil ? "minus":(remaining==0 ? "bolt.slash.fill":"bolt.fill"))).font(.system(size:20,weight:.medium)).foregroundStyle(colors[0])
+        }.frame(width:73,height:73).padding(4).accessibilityHidden(true)
+            .onAppear{update()}.onChange(of:remaining){_ in update()}
+    }
+    func update(){withAnimation(reduceMotion ? nil:.timingCurve(0.2,0.8,0.2,1,duration:0.75)){progress=(remaining ?? 0)/100}}
+}
+struct QuotaValue:View {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    var value:String
+    var percent:Bool
+    @ViewBuilder var digits:some View {
+        if #available(macOS 14.0,*) {Text(value).contentTransition(.numericText())}
+        else {Text(value)}
+    }
+    var body:some View {
+        HStack(alignment:.firstTextBaseline,spacing:2){digits.font(.system(size:38,weight:.semibold,design:.rounded)).tracking(-1.8).monospacedDigit();if percent{Text("%").font(.system(size:18,weight:.medium,design:.rounded)).foregroundStyle(.secondary)}}
+            .animation(reduceMotion ? nil:.easeOut(duration:0.35),value:value).lineLimit(1).minimumScaleFactor(0.65)
+    }
+}
+struct QuotaMetricCard:View {
+    @Environment(\.colorScheme) var scheme
+    var quota:QuotaWindow
+    var service:String
+    var now:Date
+    var remaining:Double? {guard quota.disabled != true,let used=quota.usedPercent,used.isFinite,(0...100).contains(used) else{return nil};return 100-used}
+    var amount:Double? {guard quota.disabled != true,let value=quota.remainingAmount,value.isFinite,value>=0 else{return nil};return value}
+    var exhausted:Bool {remaining==0 || (remaining==nil && amount==0)}
+    var ringRemaining:Double? {remaining ?? (amount==0 ? 0:nil)}
+    var expired:Bool {quota.resetAt.map{ $0<=now.timeIntervalSince1970 } ?? false}
+    var colors:[Color] {
+        if quota.disabled == true || (remaining == nil && amount == nil){return [.secondary,.secondary.opacity(0.55)]}
+        if exhausted || (remaining.map{$0<=10} ?? false) {if scheme == .light{return [Color(red:0.77,green:0.16,blue:0.24),Color(red:0.66,green:0.12,blue:0.34)]};return [Color(red:1,green:0.38,blue:0.42),Color(red:0.89,green:0.24,blue:0.53)]}
+        if let value=remaining,value<=25 {if scheme == .light{return [Color(red:0.70,green:0.35,blue:0.03),Color(red:0.82,green:0.22,blue:0.08)]};return [Color(red:1,green:0.72,blue:0.27),Color(red:1,green:0.43,blue:0.29)]}
+        if service.hasPrefix("codex") {if scheme == .light{return [Color(red:0.08,green:0.48,blue:0.36),Color(red:0.08,green:0.43,blue:0.58)]};return [Color(red:0.24,green:0.78,blue:0.61),Color(red:0.14,green:0.66,blue:0.78)]}
+        if quota.label.lowercased().contains("claude") || service=="claude" {if scheme == .light{return [Color(red:0.45,green:0.32,blue:0.76),Color(red:0.28,green:0.40,blue:0.79)]};return [Color(red:0.64,green:0.55,blue:0.98),Color(red:0.40,green:0.54,blue:0.99)]}
+        if scheme == .light{return [Color(red:0.10,green:0.45,blue:0.72),Color(red:0.08,green:0.58,blue:0.43)]}
+        return [Color(red:0.26,green:0.75,blue:0.96),Color(red:0.28,green:0.84,blue:0.69)]
+    }
+    var brand:String {
+        let label=quota.label.lowercased()
+        if label.contains("claude") || service=="claude"{return "claude"}
+        if service.hasPrefix("codex") || label.contains("gpt"){return "openai"}
+        if label.contains("gemini"){return "gemini"}
+        if service.hasPrefix("antigravity") || service=="agy"{return "antigravity"}
+        return ""
+    }
+    var title:String {let name=quota.label.components(separatedBy:" · ").first ?? quota.label;return name.isEmpty ? "Лимит":name}
+    var period:String {
+        let raw=quota.label.components(separatedBy:" · ").dropFirst().joined(separator:" · ").lowercased()
+        if raw=="weekly" || raw=="7 days"{return "На неделю"}
+        if raw=="daily" || raw=="1 day"{return "На день"}
+        if raw=="five_hour" || raw=="5h"{return "На 5 часов"}
+        return raw.isEmpty ? "Лимит аккаунта":raw
+    }
+    var statusColor:Color {expired ? (scheme == .dark ? .orange:Color(red:0.67,green:0.34,blue:0.02)):colors[0]}
+    var status:String {
+        if quota.disabled == true{return "Недоступно"}
+        if expired{return "Обновить"}
+        guard let value=remaining else{return amount.map{$0<=0 ? "Исчерпан":"Доступно"} ?? "Нет данных"}
+        if value<=0{return "Исчерпан"}
+        return value<=25 ? "Заканчивается":"Доступно"
+    }
+    var valueText:String {
+        if let value=remaining{return value>0 && value<1 ? "<1":String(Int(value.rounded()))}
+        if let value=amount{return value.formatted(.number.notation(.compactName).precision(.fractionLength(0...1)).locale(Locale(identifier:"ru_RU")))}
+        return "—"
+    }
+    var resetText:String {
+        guard let reset=quota.resetAt else{return "Сброс не указан"}
+        let seconds=reset-now.timeIntervalSince1970
+        if seconds<=0{return "Пора обновить данные"}
+        let minutes=max(1,Int(ceil(seconds/60)))
+        if minutes<60{return "Через \(minutes) мин"}
+        if minutes<1440{return "Через \(minutes/60) ч \(minutes%60) мин"}
+        return "Через \(minutes/1440) дн \((minutes%1440)/60) ч"
+    }
+    var body:some View {
+        VStack(alignment:.leading,spacing:14){
+            HStack(spacing:8){
+                ZStack{RoundedRectangle(cornerRadius:8,style:.continuous).fill(Color.primary.opacity(0.045));if brand.isEmpty{Image(systemName:"chart.pie.fill").foregroundStyle(colors[0])}else{BrandImage(name:brand).frame(width:18,height:18)}}.frame(width:27,height:27)
+                VStack(alignment:.leading,spacing:2){Text(title).font(.system(size:12,weight:.semibold)).lineLimit(1);Text(period).font(.system(size:9)).foregroundStyle(.secondary).lineLimit(1)}
+                Spacer(minLength:3)
+                HStack(spacing:4){Circle().fill(statusColor).frame(width:4,height:4);Text(status).font(.system(size:9,weight:.medium)).lineLimit(1)}.foregroundStyle(statusColor).padding(.horizontal,7).padding(.vertical,5).background((statusColor).opacity(0.09),in:Capsule())
+            }
+            HStack(alignment:.center){
+                VStack(alignment:.leading,spacing:1){Text(quota.disabled == true ? "Лимит недоступен":"Осталось в запасе").font(.system(size:10)).foregroundStyle(.secondary);QuotaValue(value:valueText,percent:remaining != nil)}
+                Spacer(minLength:10)
+                QuotaRing(remaining:ringRemaining,colors:colors,disabled:quota.disabled == true)
+            }.frame(height:76)
+            HStack(spacing:5){Image(systemName:expired ? "arrow.clockwise":"clock").font(.system(size:9,weight:.medium));Text(resetText).font(.system(size:10,weight:.medium));Spacer(minLength:0);if let reset=quota.resetAt,!expired{Text(Date(timeIntervalSince1970:reset).formatted(date:.omitted,time:.shortened)).font(.system(size:9)).monospacedDigit().opacity(0.65)}}.foregroundStyle(expired ? statusColor:Color.secondary)
+                .help(quota.resetAt.map{"Сброс: "+Date(timeIntervalSince1970:$0).formatted(date:.abbreviated,time:.shortened)} ?? "Клиент не указал время сброса")
+        }.padding(15)
+        .background(RoundedRectangle(cornerRadius:18,style:.continuous).fill(LinearGradient(colors:[Color.primary.opacity(scheme == .dark ? 0.045:0.018),colors[0].opacity(scheme == .dark ? 0.055:0.035)],startPoint:.topLeading,endPoint:.bottomTrailing)))
+        .overlay(RoundedRectangle(cornerRadius:18,style:.continuous).strokeBorder(LinearGradient(colors:[Color.primary.opacity(scheme == .dark ? 0.12:0.07),colors[0].opacity(0.12),Color.primary.opacity(0.035)],startPoint:.topLeading,endPoint:.bottomTrailing),lineWidth:1))
+        .accessibilityElement(children:.combine)
+        .help(quota.label)
+    }
+}
+struct QuotaDesignGallery:View {
+    @Environment(\.dismiss) var dismiss
+    let now=Date()
+    var examples:[QuotaWindow] {
+        if ProcessInfo.processInfo.environment["DAGAMI_UI_LIMITS_EDGE"]=="1" {return [
+            QuotaWindow(id:"unknown",label:"Gemini · weekly",usedPercent:nil,remainingAmount:nil,resetAt:nil,disabled:false),
+            QuotaWindow(id:"disabled",label:"Claude · weekly",usedPercent:nil,remainingAmount:nil,resetAt:nil,disabled:true),
+            QuotaWindow(id:"fraction",label:"GPT · 5h",usedPercent:99.6,remainingAmount:nil,resetAt:now.addingTimeInterval(1800).timeIntervalSince1970,disabled:false),
+            QuotaWindow(id:"stale",label:"Gemini Pro · daily",usedPercent:nil,remainingAmount:0,resetAt:now.addingTimeInterval(-3600).timeIntervalSince1970,disabled:false)
+        ]}
+        return [
+        QuotaWindow(id:"gemini",label:"Gemini · 5h",usedPercent:28,remainingAmount:nil,resetAt:now.addingTimeInterval(5460).timeIntervalSince1970,disabled:false),
+        QuotaWindow(id:"claude",label:"Claude · weekly",usedPercent:54,remainingAmount:nil,resetAt:now.addingTimeInterval(187200).timeIntervalSince1970,disabled:false),
+        QuotaWindow(id:"gpt",label:"GPT · 5h",usedPercent:88,remainingAmount:nil,resetAt:now.addingTimeInterval(2400).timeIntervalSince1970,disabled:false),
+        QuotaWindow(id:"empty",label:"Gemini Pro · daily",usedPercent:100,remainingAmount:nil,resetAt:now.addingTimeInterval(12600).timeIntervalSince1970,disabled:false)
+    ]}
+    var body:some View {
+        VStack(alignment:.leading,spacing:18){
+            HStack(alignment:.top){VStack(alignment:.leading,spacing:4){Text("Лимиты").font(.system(size:25,weight:.bold,design:.rounded));Text("Демонстрация оформления · значения для примера").font(.system(size:11)).foregroundStyle(.secondary)};Spacer();Button{dismiss()}label:{Image(systemName:"xmark.circle.fill").font(.system(size:20)).foregroundStyle(.secondary)}.buttonStyle(.plain)}
+            LazyVGrid(columns:[GridItem(.flexible(),spacing:12),GridItem(.flexible())],spacing:12){ForEach(examples){quota in QuotaMetricCard(quota:quota,service:"",now:now)}}
+            HStack(spacing:6){Image(systemName:"info.circle");Text("Полное кольцо — полный запас. Данные аккаунта не изменяются.")}.font(.system(size:10)).foregroundStyle(.secondary)
+        }.padding(25).frame(width:660).background(Color(nsColor:.windowBackgroundColor))
+    }
+}
 struct QuotaRows:View {
     var report:SessionTelemetry
+    var service:String=""
     var body:some View {
-        VStack(alignment:.leading,spacing:10) {
-            if let quotas=report.quotas,!quotas.isEmpty {ForEach(quotas){quota in
-                VStack(alignment:.leading,spacing:5){
-                    HStack{Text(quota.label).font(.system(size:11,weight:.medium));Spacer();if quota.disabled == true {Text("Недоступно").foregroundStyle(.secondary)}else if let used=quota.usedPercent {Text("Осталось \(Int((100-used).rounded()))%").monospacedDigit().foregroundStyle(used>=90 ? Color.orange:Color.primary)}else if let amount=quota.remainingAmount{Text("Осталось: \(Int(amount))").monospacedDigit()}}.font(.system(size:11))
-                    if quota.disabled != true,let used=quota.usedPercent{ProgressView(value:max(0,min(100,100-used)),total:100).tint(used>=90 ? .red:(used>=75 ? .orange:.green)).accessibilityLabel("Осталось \(Int((100-used).rounded())) процентов")}
-                    if let reset=quota.resetAt {Text(Date(timeIntervalSince1970:reset)>Date() ? "Сброс: "+Date(timeIntervalSince1970:reset).formatted(date:.abbreviated,time:.shortened):"Время сброса прошло. Обновите данные у клиента.").font(.system(size:10)).foregroundStyle(.secondary)}
+        VStack(alignment:.leading,spacing:10){
+            if let quotas=report.quotas,!quotas.isEmpty {
+                TimelineView(.periodic(from:.now,by:60)){context in
+                    LazyVGrid(columns:quotas.count==1 ? [GridItem(.flexible())]:[GridItem(.adaptive(minimum:235),spacing:10)],spacing:10){ForEach(quotas){quota in QuotaMetricCard(quota:quota,service:service,now:context.date)}}
                 }
-            }}
-            if let updated=report.updatedAt{Text("Получено "+Date(timeIntervalSince1970:updated).formatted(date:.omitted,time:.standard)).font(.system(size:9)).foregroundStyle(.secondary)}
-            if let source=report.source,!source.isEmpty{Text(source).font(.system(size:9)).foregroundStyle(.secondary)}
+            }
+            HStack(spacing:5){Image(systemName:"arrow.triangle.2.circlepath").font(.system(size:8));Text("Данные клиента").font(.system(size:9));Spacer();if let updated=report.updatedAt{Text("Обновлено "+Date(timeIntervalSince1970:updated).formatted(date:.omitted,time:.shortened)).font(.system(size:9)).monospacedDigit()}}.foregroundStyle(.secondary).help(report.source ?? "Лимиты предоставлены клиентом")
         }
     }
 }
@@ -977,7 +1111,7 @@ struct SessionInsights:View {
                 if let context=stats.contextUsed {Text("Контекст разговора: \(Int(context))% — отдельно от квоты аккаунта").font(.system(size:10)).foregroundStyle(.secondary)}
                 if let note=stats.note,!note.isEmpty{Text(note).font(.system(size:10)).foregroundStyle(.secondary)}
             } else {Text("Клиент не предоставил данные о текущем действии.").font(.system(size:10)).foregroundStyle(.secondary)}
-            if let report=report,let quotas=report.quotas,!quotas.isEmpty {QuotaRows(report:report)}
+            if let report=report,let quotas=report.quotas,!quotas.isEmpty {QuotaRows(report:report,service:app)}
             else {Text("Лимиты пока не предоставлены клиентом.").font(.system(size:10)).foregroundStyle(.secondary)}
             if let error=model.quotaErrors[session.id]{Text(error).font(.system(size:10)).foregroundStyle(.orange).textSelection(.enabled)}
             if let report=model.quotaReports[session.id],let note=report.note{Text(note).font(.system(size:10)).foregroundStyle(.secondary)}

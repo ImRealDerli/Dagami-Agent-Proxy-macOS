@@ -10,11 +10,13 @@ def run(*args):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--runtime-app',type=Path,default=DEST.parent/'Dagami.app')
+    parser.add_argument('--output-dir',type=Path,default=DEST)
     args=parser.parse_args()
     if not args.runtime_app.is_dir():
         raise SystemExit('Укажите готовую universal-сборку Dagami через --runtime-app')
-    app=DEST/'Dagami Test.app'
-    build=DEST/'.Build'
+    destination=args.output_dir.resolve();destination.mkdir(parents=True,exist_ok=True)
+    app=destination/'Dagami Limits.app'
+    build=destination/'.LimitsBuild'
     build.mkdir(exist_ok=True)
     sdk=subprocess.check_output(['xcrun','--show-sdk-path'],text=True).strip()
     sources=[ROOT/'native/macos/Dagami.swift',ROOT/'native/macos/OAuthClipboard.swift']
@@ -28,10 +30,10 @@ def main():
     engine=resources/'Engine'
     for item in ('native','devproxy_pkg'):
         shutil.rmtree(engine/item)
-        shutil.copytree(ROOT/item,engine/item,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+        shutil.copytree(ROOT/item,engine/item,ignore=shutil.ignore_patterns('__pycache__','*.pyc','target'))
     info_path=app/'Contents/Info.plist'
     info=plistlib.loads(info_path.read_bytes())
-    info.update(CFBundleName='Dagami Test',CFBundleDisplayName='Dagami · Тест',CFBundleIdentifier='ru.dagami.agentproxy.designtest',DagamiDesignTest=True,CFBundleShortVersionString='0.4.1',CFBundleVersion='428')
+    info.update(CFBundleName='Dagami Limits',CFBundleDisplayName='Dagami · Лимиты',CFBundleIdentifier='ru.dagami.agentproxy.limitstest',DagamiDesignTest=True,CFBundleShortVersionString='0.4.1',CFBundleVersion='428')
     info_path.write_bytes(plistlib.dumps(info))
     run('codesign','--force','--deep','--sign','-',app)
     run('codesign','--verify','--deep','--strict',app)
